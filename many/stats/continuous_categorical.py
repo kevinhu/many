@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
-import scipy.special as special
-from scipy.stats import pearsonr, rankdata, tiecorrect, norm, mannwhitneyu
+from scipy.stats import rankdata, tiecorrect, norm, mannwhitneyu
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
 import sys

@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import scipy.special as special
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
 import sys

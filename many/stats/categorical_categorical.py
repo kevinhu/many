@@ -1,48 +1,16 @@
+import sys
+
 import numpy as np
 import pandas as pd
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
-import sys
 
 from .fisher import mlog10Test1t
 
-
-def precheck_align(A, B):
-    """
-    Perform basic checks and alignment on A, B.
-
-    Parameters
-    ----------
-    A: Pandas DataFrame
-        First set of observations, with rows as samples and columns as labels
-    B: Pandas DataFrame
-        Second set of observations, with rows as samples and columns as labels
-
-    Returns
-    -------
-    A, B: reformatted and aligned versions of inputs
-    """
-
-    # cast to DataFrame in case either is a Series
-    A = pd.DataFrame(A)
-    B = pd.DataFrame(B)
-
-    # drop samples with all missing values
-    A = A.dropna(how="all", axis=0)
-    B = B.dropna(how="all", axis=0)
-
-    # align samples
-    A, B = A.align(B, axis=0, join="inner")
-
-    # check sample sizes
-    n = A.shape[0]  # number of samples for each variable
-    if n < 2:
-        raise ValueError("x and y must have length at least 2.")
-
-    return A, B
+from .utils import precheck_align
 
 
-def mat_fishers_naive(A, B, pbar=False):
+def mat_fishers_naive(a_mat, b_mat, pbar=False):
     """
     Compute odds ratios and Fisher's exact test 
     between every column-column pair of A (binary) and B (binary),
@@ -68,49 +36,49 @@ def mat_fishers_naive(A, B, pbar=False):
     fishers: -log10 p-values of Fisher exact test
     """
 
-    A, B = precheck_align(A, B)
+    a_mat, b_mat = precheck_align(a_mat, b_mat)
 
-    A_names = A.columns
-    B_names = B.columns
+    a_names = a_mat.columns
+    b_names = b_mat.columns
 
-    p = len(A_names)
-    q = len(B_names)
+    a_num_cols = len(a_names)
+    b_num_cols = len(b_names)
 
-    oddsrs = np.zeros((p, q))
-    pvals = np.zeros((p, q))
+    oddsrs = np.zeros((a_num_cols, b_num_cols))
+    pvals = np.zeros((a_num_cols, b_num_cols))
 
-    AB = np.zeros((p, q), dtype=np.int64)
-    Ab = np.zeros((p, q), dtype=np.int64)
-    aB = np.zeros((p, q), dtype=np.int64)
-    ab = np.zeros((p, q), dtype=np.int64)
+    AB = np.zeros((a_num_cols, b_num_cols), dtype=np.int64)
+    Ab = np.zeros((a_num_cols, b_num_cols), dtype=np.int64)
+    aB = np.zeros((a_num_cols, b_num_cols), dtype=np.int64)
+    ab = np.zeros((a_num_cols, b_num_cols), dtype=np.int64)
 
     if pbar:
         sys.stderr.flush()
-        progress = tqdm(total=p * q)
+        progress = tqdm(total=a_num_cols * b_num_cols)
 
-    for A_col_idx, A_col in enumerate(A_names):
-        for B_col_idx, B_col in enumerate(B_names):
+    for a_col_idx, a_col_name in enumerate(a_names):
+        for b_col_idx, b_col_name in enumerate(b_names):
 
-            a = A[A_col].dropna().astype(bool)
-            b = B[B_col].dropna().astype(bool)
+            a_col = a_mat[a_col_name].dropna().astype(bool)
+            b_col = b_mat[b_col_name].dropna().astype(bool)
 
-            a, b = a.align(b, join="inner")
+            a_col, b_col = a_col.align(b_col, join="inner")
 
-            XY = (a & b).sum()
-            Xy = (a & (~b)).sum()
-            xY = ((~a) & b).sum()
-            xy = ((~a) & (~b)).sum()
+            XY = (a_col & b_col).sum()
+            Xy = (a_col & (~b_col)).sum()
+            xY = ((~a_col) & b_col).sum()
+            xy = ((~a_col) & (~b_col)).sum()
 
-            AB[A_col_idx][B_col_idx] = XY
-            Ab[A_col_idx][B_col_idx] = Xy
-            aB[A_col_idx][B_col_idx] = xY
-            ab[A_col_idx][B_col_idx] = xy
+            AB[a_col_idx][b_col_idx] = XY
+            Ab[a_col_idx][b_col_idx] = Xy
+            aB[a_col_idx][b_col_idx] = xY
+            ab[a_col_idx][b_col_idx] = xy
 
             oddsr = (XY / Xy) / (xY / xy)
             pval = mlog10Test1t(XY, Xy, xY, xy)
 
-            oddsrs[A_col_idx][B_col_idx] = oddsr
-            pvals[A_col_idx][B_col_idx] = pval
+            oddsrs[a_col_idx][b_col_idx] = oddsr
+            pvals[a_col_idx][b_col_idx] = pval
 
             if pbar:
                 progress.update(1)
@@ -118,18 +86,18 @@ def mat_fishers_naive(A, B, pbar=False):
     if pbar:
         progress.close()
 
-    pvals = pd.DataFrame(pvals, index=A_names, columns=B_names)
+    pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
 
-    oddsrs = pd.DataFrame(oddsrs, index=A_names, columns=B_names)
+    oddsrs = pd.DataFrame(oddsrs, index=a_names, columns=b_names)
 
-    if p == 1 or q == 1:
+    if a_num_cols == 1 or b_num_cols == 1:
 
-        if p == 1:
+        if a_num_cols == 1:
 
             oddsrs = pd.Series(oddsrs.iloc[0])
             pvals = pd.Series(pvals.iloc[0])
 
-        elif q == 1:
+        elif b_num_cols == 1:
 
             oddsrs = pd.Series(oddsrs.iloc[:, 0])
             pvals = pd.Series(pvals.iloc[:, 0])
@@ -151,9 +119,7 @@ def mat_fishers_naive(A, B, pbar=False):
 
         return merged
 
-    else:
-
-        return oddsrs, pvals
+    return oddsrs, pvals
 
 
 def fisher_arr(x):
@@ -174,7 +140,7 @@ def fisher_arr(x):
     return mlog10Test1t(x[0], x[1], x[2], x[3])
 
 
-def mat_fishers(A, B):
+def mat_fishers(a_mat, b_mat):
     """
     Compute odds ratios and Fisher's exact test 
     between every column-column pair of A (binary) and B (binary),
@@ -199,29 +165,29 @@ def mat_fishers(A, B):
     fishers: -log10 p-values of Fisher exact test
     """
 
-    A, B = precheck_align(A, B)
+    a_mat, b_mat = precheck_align(a_mat, b_mat)
 
-    A_names = A.columns
-    B_names = B.columns
+    a_names = a_mat.columns
+    b_names = b_mat.columns
 
-    p = len(A_names)  # number of variables in A
-    q = len(B_names)  # number of variables in B
+    a_num_cols = len(a_names)  # number of variables in A
+    b_num_cols = len(b_names)  # number of variables in B
 
-    a_nan = A.isna().sum().sum() == 0
-    b_nan = B.isna().sum().sum() == 0
+    a_nan = a_mat.isna().sum().sum() == 0
+    b_nan = b_mat.isna().sum().sum() == 0
 
     if not a_nan and not b_nan:
         raise ValueError("A and B cannot have missing values")
 
-    A = A.astype(np.int64)
-    B = B.astype(np.int64)
+    a_mat = a_mat.astype(np.int64)
+    b_mat = b_mat.astype(np.int64)
 
-    A, B = np.array(A), np.array(B)
+    a_mat, b_mat = np.array(a_mat), np.array(b_mat)
 
-    A_pos = A
-    A_neg = 1 - A
-    B_pos = B
-    B_neg = 1 - B
+    A_pos = a_mat
+    A_neg = 1 - a_mat
+    B_pos = b_mat
+    B_neg = 1 - b_mat
 
     AB = np.dot(A_pos.T, B_pos)
     Ab = np.dot(A_pos.T, B_neg)
@@ -231,19 +197,19 @@ def mat_fishers(A, B):
     comb = np.stack([AB, Ab, aB, ab])
 
     pvals = np.apply_along_axis(fisher_arr, 0, comb)
-    pvals = pd.DataFrame(pvals, index=A_names, columns=B_names)
+    pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
 
     oddsrs = (AB / Ab) / (aB / ab)
-    oddsrs = pd.DataFrame(oddsrs, index=A_names, columns=B_names)
+    oddsrs = pd.DataFrame(oddsrs, index=a_names, columns=b_names)
 
-    if p == 1 or q == 1:
+    if a_num_cols == 1 or b_num_cols == 1:
 
-        if p == 1:
+        if a_num_cols == 1:
 
             oddsrs = pd.Series(oddsrs.iloc[0])
             pvals = pd.Series(pvals.iloc[0])
 
-        elif q == 1:
+        elif b_num_cols == 1:
             oddsrs = pd.Series(oddsrs.iloc[:, 0])
             pvals = pd.Series(pvals.iloc[:, 0])
 
@@ -264,12 +230,10 @@ def mat_fishers(A, B):
 
         return merged
 
-    else:
-
-        return oddsrs, pvals
+    return oddsrs, pvals
 
 
-def mat_fishers_nan(A, B):
+def mat_fishers_nan(a_mat, b_mat):
     """
     Compute odds ratios and Fisher's exact test 
     between every column-column pair of A (binary) and B (binary),
@@ -293,50 +257,50 @@ def mat_fishers_nan(A, B):
     fishers: -log10 p-values of Fisher exact test
     """
 
-    A, B = precheck_align(A, B)
+    a_mat, b_mat = precheck_align(a_mat, b_mat)
 
-    A_names = A.columns
-    B_names = B.columns
+    a_names = a_mat.columns
+    b_names = b_mat.columns
 
-    A, B = np.array(A), np.array(B)
+    a_mat, b_mat = np.array(a_mat), np.array(b_mat)
 
-    p = A.shape[1]  # number of variables in A
-    q = B.shape[1]  # number of variables in B
+    a_num_cols = a_mat.shape[1]  # number of variables in A
+    b_num_cols = b_mat.shape[1]  # number of variables in B
 
-    A_pos = A
-    A_neg = 1 - A
-    B_pos = B
-    B_neg = 1 - B
+    a_pos = a_mat
+    a_neg = 1 - a_mat
+    b_pos = b_mat
+    b_neg = 1 - b_mat
 
-    A_nan = np.isnan(A)
-    B_nan = np.isnan(B)
+    a_nan = np.isnan(a_mat)
+    b_nan = np.isnan(b_mat)
 
-    A_pos = np.ma.array(A_pos, mask=A_nan, dtype=np.int64)
-    A_neg = np.ma.array(A_neg, mask=A_nan, dtype=np.int64)
-    B_pos = np.ma.array(B_pos, mask=B_nan, dtype=np.int64)
-    B_neg = np.ma.array(B_neg, mask=B_nan, dtype=np.int64)
+    a_pos = np.ma.array(a_pos, mask=a_nan, dtype=np.int64)
+    a_neg = np.ma.array(a_neg, mask=a_nan, dtype=np.int64)
+    b_pos = np.ma.array(b_pos, mask=b_nan, dtype=np.int64)
+    b_neg = np.ma.array(b_neg, mask=b_nan, dtype=np.int64)
 
-    AB = np.ma.dot(A_pos.T, B_pos)
-    Ab = np.ma.dot(A_pos.T, B_neg)
-    aB = np.ma.dot(A_neg.T, B_pos)
-    ab = np.ma.dot(A_neg.T, B_neg)
+    AB = np.ma.dot(a_pos.T, b_pos)
+    Ab = np.ma.dot(a_pos.T, b_neg)
+    aB = np.ma.dot(a_neg.T, b_pos)
+    ab = np.ma.dot(a_neg.T, b_neg)
 
     comb = np.stack([AB, Ab, aB, ab])
 
     pvals = np.apply_along_axis(fisher_arr, 0, comb)
-    pvals = pd.DataFrame(pvals, index=A_names, columns=B_names)
+    pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
 
     oddsrs = (AB / Ab) / (aB / ab)
-    oddsrs = pd.DataFrame(oddsrs, index=A_names, columns=B_names)
+    oddsrs = pd.DataFrame(oddsrs, index=a_names, columns=b_names)
 
-    if p == 1 or q == 1:
+    if a_num_cols == 1 or b_num_cols == 1:
 
-        if p == 1:
+        if a_num_cols == 1:
 
             oddsrs = pd.Series(oddsrs.iloc[0])
             pvals = pd.Series(pvals.iloc[0])
 
-        elif q == 1:
+        elif b_num_cols == 1:
 
             oddsrs = pd.Series(oddsrs.iloc[:, 0])
             pvals = pd.Series(pvals.iloc[:, 0])
@@ -358,6 +322,4 @@ def mat_fishers_nan(A, B):
 
         return merged
 
-    else:
-
-        return oddsrs, pvals
+    return oddsrs, pvals

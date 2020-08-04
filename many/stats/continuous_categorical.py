@@ -1,49 +1,16 @@
+import sys
+
 import numpy as np
 import pandas as pd
 from scipy.stats import rankdata, tiecorrect, norm, mannwhitneyu
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
-import sys
 
-
-def precheck_align(A, B):
-    """
-    Perform basic checks and alignment on A, B.
-
-    Parameters
-    ----------
-    A: Pandas DataFrame
-        Continuous set of observations, with rows as samples and columns as labels.
-    B: Pandas DataFrame
-        Binary set of observations, with rows as samples and columns as labels.
-        Required to be castable to boolean datatype.
-
-    Returns
-    -------
-    A, B: reformatted and aligned versions of inputs
-    """
-
-    # cast to DataFrame in case either is a Series
-    A = pd.DataFrame(A, dtype=np.float64)
-    B = pd.DataFrame(B, dtype=np.float16)
-
-    # drop samples with all missing values
-    A = A.dropna(how="all", axis=0)
-    B = B.dropna(how="all", axis=0)
-
-    # align samples
-    A, B = A.align(B, axis=0, join="inner")
-
-    # check sample sizes
-    n = A.shape[0]  # number of samples for each variable
-    if n < 2:
-        raise ValueError("x and y must have length at least 2.")
-
-    return A, B
+from .utils import precheck_align
 
 
 def mat_mwus_naive(
-    A, B, use_continuity=True, pbar=False, effect="rank_biserial",
+    a_mat, b_mat, use_continuity=True, pbar=False, effect="rank_biserial",
 ):
     """
     Compute rank-biserial correlations and Mann-Whitney statistics 
@@ -70,65 +37,65 @@ def mat_mwus_naive(
     pvals: -log10 p-values of correlations
     """
 
-    A, B = precheck_align(A, B)
+    a_mat, b_mat = precheck_align(a_mat, b_mat)
 
-    A_names = A.columns
-    B_names = B.columns
+    a_names = a_mat.columns
+    b_names = b_mat.columns
 
-    p = A.shape[1]  # number of variables in A
-    q = B.shape[1]  # number of variables in B
+    a_num_cols = a_mat.shape[1]  # number of variables in A
+    b_num_cols = b_mat.shape[1]  # number of variables in B
 
-    corrs = np.zeros((p, q))  # null value of r = 0
-    pvals = np.zeros((p, q)) + 1  # null value of p=1
+    corrs = np.zeros((a_num_cols, b_num_cols))  # null value of r = 0
+    pvals = np.zeros((a_num_cols, b_num_cols)) + 1  # null value of p=1
 
-    pos_ns = np.zeros((p, q))
-    neg_ns = np.zeros((p, q))
+    pos_ns = np.zeros((a_num_cols, b_num_cols))
+    neg_ns = np.zeros((a_num_cols, b_num_cols))
 
     if pbar:
         sys.stderr.flush()
-        progress = tqdm(total=p * q)
+        progress = tqdm(total=a_num_cols * b_num_cols)
 
-    for A_col_idx, A_col in enumerate(A_names):
-        for B_col_idx, B_col in enumerate(B_names):
+    for a_col_idx, a_col_name in enumerate(a_names):
+        for b_col_idx, b_col_name in enumerate(b_names):
 
-            a = A[A_col].dropna()
-            b = B[B_col].dropna()
+            a_col = a_mat[a_col_name].dropna()
+            b_col = b_mat[b_col_name].dropna()
 
-            a, b = a.align(b, join="inner")
+            a_col, b_col = a_col.align(b_col, join="inner")
 
-            b_pos = b == 1
-            b_neg = b == 0
+            b_pos = b_col == 1
+            b_neg = b_col == 0
 
             pos_n = b_pos.sum()
             neg_n = b_neg.sum()
 
-            pos_ns[A_col_idx][B_col_idx] = pos_n
-            neg_ns[A_col_idx][B_col_idx] = neg_n
+            pos_ns[a_col_idx][b_col_idx] = pos_n
+            neg_ns[a_col_idx][b_col_idx] = neg_n
 
             if pos_n >= 1 and neg_n >= 1:
 
-                a1 = a[b_pos]
-                a2 = a[b_neg]
+                a_pos = a_mat[b_pos]
+                a_neg = a_mat[b_neg]
 
                 # handle identical values cases
-                if np.std(np.concatenate([a1, a2])) == 0:
+                if np.std(np.concatenate([a_pos, a_neg])) == 0:
 
-                    pvals[A_col_idx][B_col_idx] = 1
+                    pvals[a_col_idx][b_col_idx] = 1
 
                 else:
 
                     U2, pval = mannwhitneyu(
-                        a1, a2, use_continuity=use_continuity, alternative="two-sided"
+                        a_pos, a_neg, use_continuity=use_continuity, alternative="two-sided"
                     )
 
                     if effect == "rank_biserial":
-                        corrs[A_col_idx][B_col_idx] = 2 * U2 / (len(a1) * len(a2)) - 1
+                        corrs[a_col_idx][b_col_idx] = 2 * U2 / (len(a_pos) * len(a_neg)) - 1
                     elif effect == "median":
-                        corrs[A_col_idx][B_col_idx] = a1.median() - a2.median()
+                        corrs[a_col_idx][b_col_idx] = a_pos.median() - a_neg.median()
                     elif effect == "mean":
-                        corrs[A_col_idx][B_col_idx] = a1.mean() - a2.mean()
+                        corrs[a_col_idx][b_col_idx] = a_pos.mean() - a_neg.mean()
 
-                    pvals[A_col_idx][B_col_idx] = pval
+                    pvals[a_col_idx][b_col_idx] = pval
 
             if pbar:
                 progress.update(1)
@@ -139,21 +106,21 @@ def mat_mwus_naive(
     # account for small p-values rounding to 0
     pvals[pvals == 0] = np.finfo(np.float64).tiny
 
-    corrs = pd.DataFrame(corrs, index=A_names, columns=B_names)
-    pvals = pd.DataFrame(pvals, index=A_names, columns=B_names)
-    pos_ns = pd.DataFrame(pos_ns, index=A_names, columns=B_names)
-    neg_ns = pd.DataFrame(neg_ns, index=A_names, columns=B_names)
+    corrs = pd.DataFrame(corrs, index=a_names, columns=b_names)
+    pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
+    pos_ns = pd.DataFrame(pos_ns, index=a_names, columns=b_names)
+    neg_ns = pd.DataFrame(neg_ns, index=a_names, columns=b_names)
 
-    if p == 1 or q == 1:
+    if a_num_cols == 1 or b_num_cols == 1:
 
-        if p == 1:
+        if a_num_cols == 1:
 
             corrs = pd.Series(corrs.iloc[0])
             pvals = pd.Series(pvals.iloc[0])
             pos_ns = pd.Series(pos_ns.iloc[0])
             neg_ns = pd.Series(neg_ns.iloc[0])
 
-        elif q == 1:
+        elif b_num_cols == 1:
 
             corrs = pd.Series(corrs.iloc[:, 0])
             pvals = pd.Series(pvals.iloc[:, 0])
@@ -177,13 +144,11 @@ def mat_mwus_naive(
 
         return merged
 
-    else:
-
-        pvals = -np.log10(pvals)
-        return corrs, pvals
+    pvals = -np.log10(pvals)
+    return corrs, pvals
 
 
-def mat_mwus(A, B, use_continuity=True):
+def mat_mwus(a_mat, b_mat, use_continuity=True):
     """
     Compute rank-biserial correlations and Mann-Whitney statistics 
     between every column-column pair of A (continuous) and B (binary).
@@ -205,51 +170,51 @@ def mat_mwus(A, B, use_continuity=True):
     pvals: -log10 p-values of correlations
     """
 
-    A, B = precheck_align(A, B)
+    a_mat, b_mat = precheck_align(a_mat, b_mat)
 
-    A_names = A.columns
-    B_names = B.columns
+    a_names = a_mat.columns
+    b_names = b_mat.columns
 
-    B = B.astype(bool)
+    b_mat = b_mat.astype(bool)
 
-    A_r = A.apply(rankdata)
-    A_T = A_r.apply(tiecorrect)
+    a_ranks = a_mat.apply(rankdata)
+    a_ties = a_ranks.apply(tiecorrect)
 
-    a_nan = A.isna().sum().sum() == 0
-    b_nan = B.isna().sum().sum() == 0
+    a_nan = a_mat.isna().sum().sum() == 0
+    b_nan = b_mat.isna().sum().sum() == 0
 
     if not a_nan and not b_nan:
         raise ValueError("A and B cannot have missing values")
 
-    A, B = np.array(A), np.array(B)
+    a_mat, b_mat = np.array(a_mat), np.array(b_mat)
 
-    p = A.shape[1]  # number of variables in A
-    q = B.shape[1]  # number of variables in B
+    a_num_cols = a_mat.shape[1]  # number of variables in A
+    b_num_cols = b_mat.shape[1]  # number of variables in B
 
-    A = A.astype(np.float64)
-    B_pos = B.astype(np.float64)
-    B_neg = (~B).astype(np.float64)
+    a_mat = a_mat.astype(np.float64)
+    b_pos = b_mat.astype(np.float64)
+    b_neg = (~b_mat).astype(np.float64)
 
-    pos_ns = B_pos.sum(axis=0)
-    neg_ns = B_neg.sum(axis=0)
+    pos_ns = b_pos.sum(axis=0)
+    neg_ns = b_neg.sum(axis=0)
 
-    pos_ns = np.vstack([pos_ns] * p)
-    neg_ns = np.vstack([neg_ns] * p)
+    pos_ns = np.vstack([pos_ns] * a_num_cols)
+    neg_ns = np.vstack([neg_ns] * a_num_cols)
 
-    pos_ranks = np.dot(A_r.T, B_pos)
-    neg_ranks = np.dot(A_r.T, B_neg)
+    pos_ranks = np.dot(a_ranks.T, b_pos)
+    neg_ranks = np.dot(a_ranks.T, b_neg)
 
     u1 = pos_ns * neg_ns + (pos_ns * (pos_ns + 1)) / 2.0 - pos_ranks
     u2 = pos_ns * neg_ns - u1
 
     corrs = 2 * u2 / (pos_ns * neg_ns) - 1
 
-    A_T = np.vstack([np.array(A_T)] * q).T
+    a_ties = np.vstack([np.array(a_ties)] * b_num_cols).T
 
     #     if T == 0:
     #         raise ValueError('All numbers are identical in mannwhitneyu')
 
-    sd = np.sqrt(A_T * pos_ns * neg_ns * (pos_ns + neg_ns + 1) / 12.0)
+    sd = np.sqrt(a_ties * pos_ns * neg_ns * (pos_ns + neg_ns + 1) / 12.0)
 
     meanrank = pos_ns * neg_ns / 2.0 + 0.5 * use_continuity
     bigu = np.maximum(u1, u2)
@@ -260,21 +225,21 @@ def mat_mwus(A, B, use_continuity=True):
     # account for small p-values rounding to 0
     pvals[pvals == 0] = np.finfo(np.float64).tiny
 
-    pvals = pd.DataFrame(pvals, columns=B_names, index=A_names)
-    corrs = pd.DataFrame(corrs, columns=B_names, index=A_names)
-    pos_ns = pd.DataFrame(pos_ns, columns=B_names, index=A_names)
-    neg_ns = pd.DataFrame(neg_ns, columns=B_names, index=A_names)
+    pvals = pd.DataFrame(pvals, columns=b_names, index=a_names)
+    corrs = pd.DataFrame(corrs, columns=b_names, index=a_names)
+    pos_ns = pd.DataFrame(pos_ns, columns=b_names, index=a_names)
+    neg_ns = pd.DataFrame(neg_ns, columns=b_names, index=a_names)
 
-    if p == 1 or q == 1:
+    if a_num_cols == 1 or b_num_cols == 1:
 
-        if p == 1:
+        if a_num_cols == 1:
 
             corrs = pd.Series(corrs.iloc[0])
             pvals = pd.Series(pvals.iloc[0])
             pos_ns = pd.Series(pos_ns.iloc[0])
             neg_ns = pd.Series(neg_ns.iloc[0])
 
-        elif q == 1:
+        elif b_num_cols == 1:
 
             corrs = pd.Series(corrs.iloc[:, 0])
             pvals = pd.Series(pvals.iloc[:, 0])
@@ -298,7 +263,5 @@ def mat_mwus(A, B, use_continuity=True):
 
         return merged
 
-    else:
-
-        pvals = -np.log10(pvals)
-        return corrs, pvals
+    pvals = -np.log10(pvals)
+    return corrs, pvals

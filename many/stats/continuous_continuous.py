@@ -1,54 +1,16 @@
+import sys
+
 import numpy as np
 import pandas as pd
 import scipy.special as special
 from scipy.stats import pearsonr, spearmanr
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
-import sys
+
+from .utils import precheck_align
 
 
-def precheck_align(A, B, method):
-    """
-    Perform basic checks and alignment on A, B.
-
-    Parameters
-    ----------
-    A: Pandas DataFrame
-        First set of observations, with rows as samples and columns as labels
-    B: Pandas DataFrame
-        Second set of observations, with rows as samples and columns as labels
-    method: string
-        Correlation method to use
-
-    Returns
-    -------
-    A, B: reformatted and aligned versions of inputs
-    """
-
-    # check method
-    if method != "pearson" and method != "spearman":
-        raise ValueError("Method must be 'pearson' or 'spearman'")
-
-    # cast to DataFrame in case either is a Series
-    A = pd.DataFrame(A, dtype=np.float64)
-    B = pd.DataFrame(B, dtype=np.float64)
-
-    # drop samples with all missing values
-    A = A.dropna(how="all", axis=0)
-    B = B.dropna(how="all", axis=0)
-
-    # align samples
-    A, B = A.align(B, axis=0, join="inner")
-
-    # check sample sizes
-    n = A.shape[0]  # number of samples for each variable
-    if n < 2:
-        raise ValueError("x and y must have length at least 2.")
-
-    return A, B
-
-
-def mat_corrs_naive(A, B, method="pearson", pbar=False):
+def mat_corrs_naive(a_mat, b_mat, method="pearson", pbar=False):
     """
     Compute correlations between every column-column pair of A and B
     using a double for loop.
@@ -73,50 +35,50 @@ def mat_corrs_naive(A, B, method="pearson", pbar=False):
     pvals: -log10 p-values of correlations
     """
 
-    A, B = precheck_align(A, B, method)
+    a_mat, b_mat = precheck_align(a_mat, b_mat)
 
     # store names before array conversion
-    A_names = A.columns
-    B_names = B.columns
+    a_names = a_mat.columns
+    b_names = b_mat.columns
 
-    p = len(A_names)  # number of variables in A
-    q = len(B_names)  # number of variables in B
+    a_num_cols = len(a_names)  # number of variables in A
+    b_num_cols = len(b_names)  # number of variables in B
 
     # initialize arrays for correlations and p-values
-    corrs = np.zeros((p, q))
-    pvals = np.zeros((p, q))
-    ns = np.zeros((p, q))
+    corrs = np.zeros((a_num_cols, b_num_cols))
+    pvals = np.zeros((a_num_cols, b_num_cols))
+    sample_counts = np.zeros((a_num_cols, b_num_cols))
 
     if pbar:
         sys.stderr.flush()
-        progress = tqdm(total=p * q)
+        progress = tqdm(total=a_num_cols * b_num_cols)
 
-    for A_col_idx, A_col in enumerate(A_names):
-        for B_col_idx, B_col in enumerate(B_names):
+    for a_col_idx, a_col_name in enumerate(a_names):
+        for b_col_idx, b_col_name in enumerate(b_names):
 
             # select columns to correlate
-            a = A[A_col].dropna()
-            b = B[B_col].dropna()
+            a_col = a_mat[a_col_name].dropna()
+            b_col = b_mat[b_col_name].dropna()
 
-            a, b = a.align(b, join="inner", axis=0)
+            a_col, b_col = a_col.align(b_col, join="inner", axis=0)
 
-            n = len(a)
+            num_samples = len(a_col)
 
-            if n > 2:
+            if num_samples > 2:
 
                 if method == "pearson":
-                    corr, pval = pearsonr(a, b)
+                    corr, pval = pearsonr(a_col, b_col)
                 elif method == "spearman":
-                    corr, pval = spearmanr(a, b)
+                    corr, pval = spearmanr(a_col, b_col)
 
-            elif n <= 2:
+            elif num_samples <= 2:
 
                 corr, pval = np.nan, np.nan
 
             # add in correlation
-            corrs[A_col_idx][B_col_idx] = corr
-            pvals[A_col_idx][B_col_idx] = pval
-            ns[A_col_idx][B_col_idx] = n
+            corrs[a_col_idx][b_col_idx] = corr
+            pvals[a_col_idx][b_col_idx] = pval
+            sample_counts[a_col_idx][b_col_idx] = num_samples
 
             if pbar:
                 progress.update(1)
@@ -128,29 +90,29 @@ def mat_corrs_naive(A, B, method="pearson", pbar=False):
     pvals[pvals == 0] = np.finfo(np.float64).tiny
 
     # convert correlation arrays to named DataFrames
-    corrs = pd.DataFrame(corrs, index=A_names, columns=B_names)
+    corrs = pd.DataFrame(corrs, index=a_names, columns=b_names)
 
-    ns = pd.DataFrame(ns, index=A_names, columns=B_names)
+    sample_counts = pd.DataFrame(sample_counts, index=a_names, columns=b_names)
 
-    pvals = pd.DataFrame(pvals, index=A_names, columns=B_names)
+    pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
 
     # if one of the matrices is a single variable,
     # return correlation results in series form
-    if p == 1 or q == 1:
+    if a_num_cols == 1 or b_num_cols == 1:
 
-        if p == 1:
+        if a_num_cols == 1:
             corrs = pd.Series(corrs.iloc[0])
             pvals = pd.Series(pvals.iloc[0])
-            ns = pd.Series(ns.iloc[0])
+            sample_counts = pd.Series(sample_counts.iloc[0])
 
-        elif q == 1:
+        elif b_num_cols == 1:
             corrs = pd.Series(corrs.iloc[:, 0])
             pvals = pd.Series(pvals.iloc[:, 0])
-            ns = pd.Series(ns.iloc[0])
+            sample_counts = pd.Series(sample_counts.iloc[0])
 
         merged = pd.DataFrame()
         merged["corr"] = corrs
-        merged["n"] = ns
+        merged["n"] = sample_counts
         merged["pval"] = pvals
 
         # drop correlations with less than 3 samples
@@ -165,13 +127,11 @@ def mat_corrs_naive(A, B, method="pearson", pbar=False):
 
         return merged
 
-    else:
-
-        pvals = -np.log10(pvals)
-        return corrs, pvals
+    pvals = -np.log10(pvals)
+    return corrs, pvals
 
 
-def mat_corrs(A, B, method="pearson"):
+def mat_corrs(a_mat, b_mat, method="pearson"):
     """
     Compute correlations between every column-column pair of A and B
 
@@ -193,16 +153,16 @@ def mat_corrs(A, B, method="pearson"):
     pvals: -log10 p-values of correlations
     """
 
-    A, B = precheck_align(A, B, method)
+    a_mat, b_mat = precheck_align(a_mat, b_mat)
 
-    A_names = A.columns
-    B_names = B.columns
-    p = len(A_names)  # number of variables in A
-    q = len(B_names)  # number of variables in B
-    n = len(A.index)  # number of samples
+    a_names = a_mat.columns
+    b_names = b_mat.columns
+    a_num_cols = len(a_names)  # number of variables in A
+    b_num_cols = len(b_names)  # number of variables in B
+    num_samples = len(a_mat.index)  # number of samples
 
-    a_nan = A.isna().sum().sum() == 0
-    b_nan = B.isna().sum().sum() == 0
+    a_nan = a_mat.isna().sum().sum() == 0
+    b_nan = b_mat.isna().sum().sum() == 0
 
     if not a_nan and not b_nan:
         raise ValueError("A and B cannot have missing values")
@@ -210,29 +170,29 @@ def mat_corrs(A, B, method="pearson"):
     # Compute column ranks, as Spearman correlation is equivalent
     # to Pearson correlation between ranks
     if method == "spearman":
-        A = A.rank(method="min")
-        B = B.rank(method="min")
+        a_mat = a_mat.rank(method="min")
+        b_mat = b_mat.rank(method="min")
 
-    A, B = np.array(A), np.array(B)
+    a_mat, b_mat = np.array(a_mat), np.array(b_mat)
 
     # Subtract column means
-    residuals_A = A - A.mean(axis=0)
-    residuals_B = B - B.mean(axis=0)
+    residuals_a = a_mat - a_mat.mean(axis=0)
+    residuals_b = b_mat - b_mat.mean(axis=0)
 
     # Sum squares across columns
-    sums_A = (residuals_A ** 2).sum(axis=0)
-    sums_B = (residuals_B ** 2).sum(axis=0)
+    sums_a = (residuals_a ** 2).sum(axis=0)
+    sums_b = (residuals_b ** 2).sum(axis=0)
 
     # Compute correlations
-    residual_products = np.dot(residuals_A.T, residuals_B)
-    sum_products = np.sqrt(np.dot(sums_A[:, None], sums_B[None]))
+    residual_products = np.dot(residuals_a.T, residuals_b)
+    sum_products = np.sqrt(np.dot(sums_a[:, None], sums_b[None]))
     corrs = residual_products / sum_products
 
     # Compute significance values
-    ab = n / 2 - 1
+    ab = num_samples / 2 - 1
 
-    def beta(r):
-        return 2 * special.btdtr(ab, ab, 0.5 * (1 - abs(np.float64(r))))
+    def beta(corr):
+        return 2 * special.btdtr(ab, ab, 0.5 * (1 - abs(np.float64(corr))))
 
     beta = np.vectorize(beta)
 
@@ -242,22 +202,22 @@ def mat_corrs(A, B, method="pearson"):
     pvals[pvals == 0] = np.finfo(np.float64).tiny
 
     # Store correlations in DataFrames
-    corrs = pd.DataFrame(corrs, index=A_names, columns=B_names)
-    pvals = pd.DataFrame(pvals, index=A_names, columns=B_names)
+    corrs = pd.DataFrame(corrs, index=a_names, columns=b_names)
+    pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
 
-    if p == 1 or q == 1:
+    if a_num_cols == 1 or b_num_cols == 1:
 
-        if p == 1:
+        if a_num_cols == 1:
             corrs = pd.Series(corrs.iloc[0])
             pvals = pd.Series(pvals.iloc[0])
 
-        elif q == 1:
+        elif b_num_cols == 1:
             corrs = pd.Series(corrs.iloc[:, 0])
             pvals = pd.Series(pvals.iloc[:, 0])
 
         merged = pd.DataFrame()
         merged["corr"] = corrs
-        merged["n"] = n
+        merged["n"] = num_samples
         merged["pval"] = pvals
         merged["qval"] = multipletests(merged["pval"], alpha=0.01, method="fdr_bh")[1]
 
@@ -268,17 +228,15 @@ def mat_corrs(A, B, method="pearson"):
 
         return merged
 
-    else:
-
-        pvals = -np.log10(pvals)
-        return corrs, pvals
+    pvals = -np.log10(pvals)
+    return corrs, pvals
 
 
 def pearson_significance(row):
-    r = row["corr"]
+    corr = row["corr"]
     ab = row["n"] / 2 - 1
 
-    beta = 2 * special.btdtr(ab, ab, 0.5 * (1 - abs(r)))
+    beta = 2 * special.btdtr(ab, ab, 0.5 * (1 - abs(corr)))
 
     # account for small p-values rounding to 0
     beta = max(np.finfo(np.float64).tiny, beta)
@@ -286,7 +244,7 @@ def pearson_significance(row):
     return beta
 
 
-def mat_corrs_nan(A, B, method="pearson"):
+def mat_corrs_nan(a_mat, b_mat, method="pearson"):
     """
     Compute correlations between A and every column of B. A must be
     a Series for this method to work.
@@ -307,68 +265,68 @@ def mat_corrs_nan(A, B, method="pearson"):
         correlation coefficient, p-value, and q-value
     """
 
-    A, B = precheck_align(A, B, method)
+    a_mat, b_mat = precheck_align(a_mat, b_mat)
 
-    if len(A.columns) != 1:
+    if len(a_mat.columns) != 1:
         raise ValueError("A must contain only a single variable.")
 
-    B_names = B.columns
-    B_nan = B.isna()
+    b_names = b_mat.columns
+    b_nan = b_mat.isna()
 
-    m = len(B_names)
+    b_num_cols = len(b_names)
 
-    n = len(A.index)  # number of samples
+    num_samples = len(a_mat.index)  # number of samples
 
     # compute column ranks, as Spearman correlation is equivalent
     # to Pearson correlation between ranks
     if method == "spearman":
 
-        B_nan = B.isna()
-        B = B.rank(na_option="top", method="min")
-        B[B <= B_nan.sum()] = np.nan
-        B = B - B_nan.sum()
+        b_nan = b_mat.isna()
+        b_mat = b_mat.rank(na_option="top", method="min")
+        b_mat[b_mat <= b_nan.sum()] = np.nan
+        b_mat = b_mat - b_nan.sum()
 
         # construct mirrored A matrix
-        m = B.shape[1]
-        A_nan = np.repeat(np.array(A), m, axis=1)
-        A_nan[B_nan] = np.nan
-        A_nan = pd.DataFrame(A_nan)
+        b_num_cols = b_mat.shape[1]
+        a_nan = np.repeat(np.array(a_mat), b_num_cols, axis=1)
+        a_nan[b_nan] = np.nan
+        a_nan = pd.DataFrame(a_nan)
 
         # rank mirrored A matrix
-        A_nan = A_nan.rank(na_option="top", method="min")
-        A_nan[A_nan <= B_nan.sum()] = np.nan
-        A_nan = A_nan - B_nan.sum()
-        A_nan = np.ma.array(np.array(A_nan), mask=B_nan)
+        a_nan = a_nan.rank(na_option="top", method="min")
+        a_nan[a_nan <= b_nan.sum()] = np.nan
+        a_nan = a_nan - b_nan.sum()
+        a_nan = np.ma.array(np.array(a_nan), mask=b_nan)
 
     elif method == "pearson":
-        A_nan = np.ma.array(np.repeat(np.array(A), m, axis=1), mask=B_nan)
+        a_nan = np.ma.array(np.repeat(np.array(a_mat), b_num_cols, axis=1), mask=b_nan)
 
     # convert to arrays
-    A, B = np.array(A), np.array(B)
-    nan_sums = np.isnan(B).sum(axis=0)
+    a_mat, b_mat = np.array(a_mat), np.array(b_mat)
+    nan_sums = np.isnan(b_mat).sum(axis=0)
 
     # make masked arrays
-    A = np.ma.array(A, mask=np.isnan(A))
-    B = np.ma.array(B, mask=np.isnan(B))
+    a_mat = np.ma.array(a_mat, mask=np.isnan(a_mat))
+    b_mat = np.ma.array(b_mat, mask=np.isnan(b_mat))
 
     # subtract column means
-    residuals_B = B - np.ma.mean(B, axis=0)
-    residuals_A_nan = A_nan - np.ma.mean(A_nan, axis=0)
+    residuals_b = b_mat - np.ma.mean(b_mat, axis=0)
+    residuals_a_nan = a_nan - np.ma.mean(a_nan, axis=0)
 
     # sum squares across columns
-    sums_B = np.ma.sum(residuals_B ** 2, axis=0)
-    sums_A_nan = np.ma.sum(residuals_A_nan ** 2, axis=0)
+    sums_b = np.ma.sum(residuals_b ** 2, axis=0)
+    sums_a_nan = np.ma.sum(residuals_a_nan ** 2, axis=0)
 
     # compute correlations
-    residual_products = np.ma.sum(residuals_A_nan * residuals_B, axis=0)
-    sum_products = np.sqrt(sums_A_nan * sums_B)
+    residual_products = np.ma.sum(residuals_a_nan * residuals_b, axis=0)
+    sum_products = np.sqrt(sums_a_nan * sums_b)
 
     corrs = np.array(residual_products / sum_products).reshape(-1)
 
-    corr_df = pd.DataFrame(index=B_names)
+    corr_df = pd.DataFrame(index=b_names)
 
     corr_df["corr"] = corrs
-    corr_df["n"] = n - nan_sums
+    corr_df["n"] = num_samples - nan_sums
     corr_df["pval"] = corr_df.apply(pearson_significance, axis=1)
     corr_df["qval"] = multipletests(corr_df["pval"], alpha=0.01, method="fdr_bh")[1]
 
@@ -381,8 +339,8 @@ def mat_corrs_nan(A, B, method="pearson"):
 
 
 def mat_corrs_subtyped(
-    A,
-    B,
+    a_mat,
+    b_mat,
     subtypes,
     min_count=5,
     pbar=False,
@@ -433,14 +391,14 @@ def mat_corrs_subtyped(
     """
 
     # remove missing values in A
-    A = A.dropna(how="any")
+    a_mat = a_mat.dropna(how="any")
 
     # common rows between all
-    common = set(A.index) & set(B.index) & set(subtypes.index)
+    common = set(a_mat.index) & set(b_mat.index) & set(subtypes.index)
     common = sorted(list(common))
 
-    A = A.loc[common]
-    B = B.loc[common]
+    a_mat = a_mat.loc[common]
+    b_mat = b_mat.loc[common]
     subtypes = subtypes.loc[common]
 
     # select subtypes with sufficient sample size
@@ -462,19 +420,19 @@ def mat_corrs_subtyped(
 
         subtype_rows = list(subtypes[subtypes == subtype].index)
 
-        A_subset = A.loc[subtype_rows]
-        B_subset = B.loc[subtype_rows]
+        a_subset = a_mat.loc[subtype_rows]
+        b_subset = b_mat.loc[subtype_rows]
 
         if mat_method == "mat_corrs_naive":
-            res = mat_corrs_naive(A_subset, B_subset, **kwargs)
+            res = mat_corrs_naive(a_subset, b_subset, **kwargs)
 
         elif mat_method == "mat_corrs_nan":
 
-            res = mat_corrs_nan(A_subset, B_subset, **kwargs)
+            res = mat_corrs_nan(a_subset, b_subset, **kwargs)
 
         elif mat_method == "mat_corrs":
 
-            res = mat_corrs(A_subset, B_subset, **kwargs)
+            res = mat_corrs(a_subset, b_subset, **kwargs)
 
         # rename columns for merging
         res.columns = [subtype + "_" + x for x in res.columns]

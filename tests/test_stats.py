@@ -1,382 +1,161 @@
+import many
 import numpy as np
 
 import sys
+
 sys.path.append("../")
 
-import many
 
-# preset dimensions of A and B
+class bcolors:
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    ENDC = "\033[0m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
 
-n_samples = 100
-A_mult_n = 10
-B_mult_n = 25
 
-# mat_corrs with full-size matrices
+TOLERANCE = 1e-8
 
-print("Testing mat_corrs (method = pearson):")
 
-A_test, B_test = many.stats.generate_test(
-    n_samples, A_mult_n, B_mult_n, A_type="continuous", B_type="continuous", nan=False
-)
+class OutputMismatchError(Exception):
+    pass
 
-v_corrs, v_pvals = many.stats.mat_corrs(A_test, B_test, method="pearson")
-n_corrs, n_pvals = many.stats.mat_corrs_naive(A_test, B_test, method="pearson")
 
-print("Max corr deviation: {0:.1E}".format((np.abs(v_corrs - n_corrs)).max().max()))
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_pvals - n_pvals)).max().max()
+class TypeMismatchError(Exception):
+    pass
+
+
+class ShapeMismatchError(Exception):
+    pass
+
+
+def compare(
+    base_method,
+    method,
+    num_samples,
+    a_num_cols,
+    b_num_cols,
+    a_type,
+    b_type,
+    a_nan,
+    b_nan,
+    method_kwargs,
+    output_names,
+):
+
+    print(
+        f"Comparing {bcolors.BOLD}{bcolors.HEADER}{method.__name__}{bcolors.ENDC} ",
+        end="",
     )
-)
-print()
 
-print("Testing mat_corrs (method = spearman):")
+    print(f" with {bcolors.BOLD}{bcolors.HEADER}{base_method.__name__}{bcolors.ENDC}")
 
-v_corrs, v_pvals = many.stats.mat_corrs(A_test, B_test, method="spearman")
-n_corrs, n_pvals = many.stats.mat_corrs_naive(A_test, B_test, method="spearman")
-
-print("Max corr deviation: {0:.1E}".format((np.abs(v_corrs - n_corrs)).max().max()))
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_pvals - n_pvals)).max().max()
+    args_string = ", ".join(
+        f"{bcolors.BOLD}{key}{bcolors.ENDC} = {value}"
+        for key, value in [
+            ["num_samples", num_samples],
+            ["a_num_cols", a_num_cols],
+            ["b_num_cols", b_num_cols],
+            ["a_type", a_type],
+            ["b_type", b_type],
+            ["a_nan", a_nan],
+            ["b_nan", b_nan],
+        ]
     )
-)
-print()
+    print(f"\twith {args_string}")
 
-# mat_corrs with 1-dimensional A matrix
-
-print("Testing mat_corrs (method = pearson, 1-dimensional A):")
-
-A_test, B_test = many.stats.generate_test(
-    n_samples, A_mult_n, B_mult_n, A_type="continuous", B_type="continuous", nan=False
-)
-
-A_test = A_test.iloc[:, 0]
-
-v_res = many.stats.mat_corrs(A_test, B_test, method="pearson")
-n_res = many.stats.mat_corrs_naive(A_test, B_test, method="pearson")
-
-print(
-    "Max corr deviation: {0:.1E}".format(
-        (np.abs(v_res["corr"] - n_res["corr"])).max().max()
+    kwargs_string = ", ".join(
+        f"{bcolors.BOLD}{bcolors.OKBLUE}{key}{bcolors.ENDC} = {value}"
+        for key, value in method_kwargs.items()
     )
-)
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_res["pval"] - n_res["pval"])).max().max()
+    print(f"\tand {kwargs_string}")
+
+    a_test, b_test = many.stats.generate_test(
+        num_samples, a_num_cols, b_num_cols, a_type, b_type, a_nan, b_nan
     )
-)
-print()
 
-print("Testing mat_corrs (method = spearman, 1-dimensional A):")
+    base_result = base_method(a_test, b_test, **method_kwargs)
+    result = method(a_test, b_test, **method_kwargs)
 
-v_res = many.stats.mat_corrs(A_test, B_test, method="spearman")
-n_res = many.stats.mat_corrs_naive(A_test, B_test, method="spearman")
+    if len(output_names) == 1:
 
-print(
-    "Max corr deviation: {0:.1E}".format(
-        (np.abs(v_res["corr"] - n_res["corr"])).max().max()
-    )
-)
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_res["pval"] - n_res["pval"])).max().max()
-    )
-)
-print()
+        base_result = [base_result]
+        result = [result]
 
-# mat_corrs with 1-dimensional B matrix
+    if len(base_result) != len(result):
+        raise OutputMismatchError("\tOutputs have different lengths")
 
-print("Testing mat_corrs (method = pearson, 1-dimensional B):")
+    for i in range(len(output_names)):
 
-A_test, B_test = many.stats.generate_test(
-    n_samples, A_mult_n, B_mult_n, A_type="continuous", B_type="continuous", nan=False
-)
+        base_output = base_result[i]
+        output = result[i]
 
-B_test = B_test.iloc[:, 0]
+        output_name = output_names[i]
 
-v_res = many.stats.mat_corrs(A_test, B_test, method="pearson")
-n_res = many.stats.mat_corrs_naive(A_test, B_test, method="pearson")
+        print(f"\tChecking {bcolors.BOLD}{output_name}{bcolors.ENDC} outputs: ",end="")
 
-print(
-    "Max corr deviation: {0:.1E}".format(
-        (np.abs(v_res["corr"] - n_res["corr"])).max().max()
-    )
-)
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_res["pval"] - n_res["pval"])).max().max()
-    )
-)
-print()
+        if type(base_output) != type(output):
+            raise TypeMismatchError("Outputs have different types")
 
-print("Testing mat_corrs (method = spearman, 1-dimensional B):")
+        if base_output.shape != output.shape:
+            raise ShapeMismatchError("Outputs have different shapes")
 
-v_res = many.stats.mat_corrs(A_test, B_test, method="spearman")
-n_res = many.stats.mat_corrs_naive(A_test, B_test, method="spearman")
+        max_deviation = np.abs(base_output - output).max().max()
 
-print(
-    "Max corr deviation: {0:.1E}".format(
-        (np.abs(v_res["corr"] - n_res["corr"])).max().max()
-    )
-)
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_res["pval"] - n_res["pval"])).max().max()
-    )
-)
-print()
+        max_deviation_str = "{0:.3E}".format(max_deviation)
 
-# mat_corrs_nan
+        if max_deviation < TOLERANCE:
 
-print("Testing mat_corrs_nan (method = pearson):")
+            print(
+                f"max deviation is {bcolors.OKGREEN}{max_deviation_str}{bcolors.ENDC}"
+            )
 
-A_test, B_test = many.stats.generate_test(
-    n_samples, A_mult_n, B_mult_n, A_type="continuous", B_type="continuous", nan=True
+        else:
+
+            print(f"max deviation is {bcolors.FAIL}{max_deviation_str}{bcolors.ENDC}")
+
+
+compare(
+    many.stats.mat_corrs_naive,
+    many.stats.mat_corrs,
+    100,
+    10,
+    25,
+    "continuous",
+    "continuous",
+    False,
+    False,
+    {"method": "pearson"},
+    ["corrs", "pvals"],
 )
 
-A_test = A_test.iloc[:, 0]
-
-v_res = many.stats.mat_corrs_nan(A_test, B_test, method="pearson")
-n_res = many.stats.mat_corrs_naive(A_test, B_test, method="pearson")
-
-print(
-    "Max corr deviation: {0:.1E}".format(
-        (np.abs(v_res["corr"] - n_res["corr"])).max().max()
-    )
-)
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_res["pval"] - n_res["pval"])).max().max()
-    )
-)
-print()
-
-
-print("Testing mat_corrs_nan (method = spearman):")
-
-v_res = many.stats.mat_corrs_nan(A_test, B_test, method="spearman")
-n_res = many.stats.mat_corrs_naive(A_test, B_test, method="spearman")
-
-print(
-    "Max corr deviation: {0:.1E}".format(
-        (np.abs(v_res["corr"] - n_res["corr"])).max().max()
-    )
-)
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_res["pval"] - n_res["pval"])).max().max()
-    )
-)
-print()
-
-# mat_mwus with full-size matrices
-
-print("Testing mat_mwus:")
-
-A_test, B_test = many.stats.generate_test(
-    n_samples, A_mult_n, B_mult_n, A_type="continuous", B_type="categorical", nan=False
+compare(
+    many.stats.mat_corrs_naive,
+    many.stats.mat_corrs,
+    100,
+    1,
+    25,
+    "continuous",
+    "continuous",
+    False,
+    False,
+    {"method": "pearson"},
+    ["merged"],
 )
 
-v_corrs, v_pvals = many.stats.mat_mwus(A_test, B_test)
-n_corrs, n_pvals = many.stats.mat_mwus_naive(A_test, B_test)
-
-print("Max corr deviation: {0:.1E}".format((np.abs(v_corrs - n_corrs)).max().max()))
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_pvals - n_pvals)).max().max()
-    )
+compare(
+    many.stats.mat_corrs_naive,
+    many.stats.mat_corrs,
+    100,
+    1,
+    1,
+    "continuous",
+    "continuous",
+    False,
+    False,
+    {"method": "pearson"},
+    ["merged"],
 )
-print()
-
-# mat_mwus with 1-dimensional A matrix
-
-print("Testing mat_mwus (1-dimensional A):")
-
-A_test, B_test = many.stats.generate_test(
-    n_samples, A_mult_n, B_mult_n, A_type="continuous", B_type="categorical", nan=False
-)
-
-A_test = A_test[0]
-
-v_res = many.stats.mat_mwus(A_test, B_test)
-n_res = many.stats.mat_mwus_naive(A_test, B_test)
-
-print(
-    "Max corr deviation: {0:.1E}".format(
-        (np.abs(v_res["corr"] - n_res["corr"])).max().max()
-    )
-)
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_res["pval"] - n_res["pval"])).max().max()
-    )
-)
-print()
-
-# mat_mwus with 1-dimensional B matrix
-
-print("Testing mat_mwus (1-dimensional B):")
-
-A_test, B_test = many.stats.generate_test(
-    n_samples, A_mult_n, B_mult_n, A_type="continuous", B_type="categorical", nan=False
-)
-
-B_test = B_test[0]
-
-v_res = many.stats.mat_mwus(A_test, B_test)
-n_res = many.stats.mat_mwus_naive(A_test, B_test)
-
-print(
-    "Max corr deviation: {0:.1E}".format(
-        (np.abs(v_res["corr"] - n_res["corr"])).max().max()
-    )
-)
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_res["pval"] - n_res["pval"])).max().max()
-    )
-)
-print()
-
-# mat_fishers with full-size matrices
-
-print("Testing mat_fishers:")
-
-A_test, B_test = many.stats.generate_test(
-    n_samples, A_mult_n, B_mult_n, A_type="categorical", B_type="categorical", nan=False
-)
-
-v_corrs, v_pvals = many.stats.mat_fishers(A_test, B_test)
-n_corrs, n_pvals = many.stats.mat_fishers_naive(A_test, B_test)
-
-print(
-    "Max odds ratio deviation: {0:.1E}".format((np.abs(v_corrs - n_corrs)).max().max())
-)
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_pvals - n_pvals)).max().max()
-    )
-)
-print()
-
-# mat_fishers with 1-dimensional A matrix
-
-print("Testing mat_fishers (1-dimensional A):")
-
-A_test, B_test = many.stats.generate_test(
-    n_samples, A_mult_n, B_mult_n, A_type="categorical", B_type="categorical", nan=False
-)
-
-A_test = A_test[0]
-
-v_res = many.stats.mat_fishers(A_test, B_test)
-n_res = many.stats.mat_fishers_naive(A_test, B_test)
-
-print(
-    "Max corr deviation: {0:.1E}".format(
-        (np.abs(v_res["oddsr"] - n_res["oddsr"])).max().max()
-    )
-)
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_res["pval"] - n_res["pval"])).max().max()
-    )
-)
-print()
-
-# mat_fishers with 1-dimensional B matrix
-
-print("Testing mat_fishers (1-dimensional B):")
-
-A_test, B_test = many.stats.generate_test(
-    n_samples, A_mult_n, B_mult_n, A_type="categorical", B_type="categorical", nan=False
-)
-
-B_test = B_test[0]
-
-v_res = many.stats.mat_fishers(A_test, B_test)
-n_res = many.stats.mat_fishers_naive(A_test, B_test)
-
-print(
-    "Max corr deviation: {0:.1E}".format(
-        (np.abs(v_res["oddsr"] - n_res["oddsr"])).max().max()
-    )
-)
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_res["pval"] - n_res["pval"])).max().max()
-    )
-)
-print()
-
-# mat_fishers with full-size matrices
-
-print("Testing mat_fishers:")
-
-A_test, B_test = many.stats.generate_test(
-    n_samples, A_mult_n, B_mult_n, A_type="categorical", B_type="categorical", nan=True
-)
-
-v_corrs, v_pvals = many.stats.mat_fishers_nan(A_test, B_test)
-n_corrs, n_pvals = many.stats.mat_fishers_naive(A_test, B_test)
-
-print(
-    "Max odds ratio deviation: {0:.1E}".format((np.abs(v_corrs - n_corrs)).max().max())
-)
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_pvals - n_pvals)).max().max()
-    )
-)
-print()
-
-# mat_fishers with 1-dimensional A matrix
-
-print("Testing mat_fishers (1-dimensional A):")
-
-A_test, B_test = many.stats.generate_test(
-    n_samples, A_mult_n, B_mult_n, A_type="categorical", B_type="categorical", nan=True
-)
-
-A_test = A_test[0]
-
-v_res = many.stats.mat_fishers_nan(A_test, B_test)
-n_res = many.stats.mat_fishers_naive(A_test, B_test)
-
-print(
-    "Max corr deviation: {0:.1E}".format(
-        (np.abs(v_res["oddsr"] - n_res["oddsr"])).max().max()
-    )
-)
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_res["pval"] - n_res["pval"])).max().max()
-    )
-)
-print()
-
-# mat_fishers with 1-dimensional B matrix
-
-print("Testing mat_fishers (1-dimensional B):")
-
-A_test, B_test = many.stats.generate_test(
-    n_samples, A_mult_n, B_mult_n, A_type="categorical", B_type="categorical", nan=True
-)
-
-B_test = B_test[0]
-
-v_res = many.stats.mat_fishers_nan(A_test, B_test)
-n_res = many.stats.mat_fishers_naive(A_test, B_test)
-
-print(
-    "Max corr deviation: {0:.1E}".format(
-        (np.abs(v_res["oddsr"] - n_res["oddsr"])).max().max()
-    )
-)
-print(
-    "Max -log10(pval) deviation: {0:.1E}".format(
-        (np.abs(v_res["pval"] - n_res["pval"])).max().max()
-    )
-)
-print()

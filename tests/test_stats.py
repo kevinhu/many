@@ -95,13 +95,15 @@ def compare(
 
         output_name = output_names[i]
 
-        print(f"\tChecking {bcolors.BOLD}{output_name}{bcolors.ENDC} outputs: ",end="")
+        print(f"\tChecking {bcolors.BOLD}{output_name}{bcolors.ENDC} outputs: ", end="")
 
         if type(base_output) != type(output):
             raise TypeMismatchError("Outputs have different types")
 
         if base_output.shape != output.shape:
-            raise ShapeMismatchError("Outputs have different shapes",base_output.shape,output.shape)
+            raise ShapeMismatchError(
+                "Outputs have different shapes", base_output.shape, output.shape
+            )
 
         max_deviation = np.abs(base_output - output).max().max()
 
@@ -116,6 +118,7 @@ def compare(
         else:
 
             print(f"max deviation is {bcolors.FAIL}{max_deviation_str}{bcolors.ENDC}")
+
 
 # mat_corrs, full-size comparison
 compare(
@@ -132,107 +135,111 @@ compare(
     ["corrs", "pvals"],
 )
 
-# mat_corrs, 1-d a_mat
-compare(
-    many.stats.mat_corrs_naive,
-    many.stats.mat_corrs,
-    100,
-    1,
-    25,
-    "continuous",
-    "continuous",
-    False,
-    False,
-    {"method": "pearson"},
-    ["merged"],
-)
+mat_corr_methods = ["pearson", "spearman"]
 
-# mat_corrs, 1-d b_mat
-compare(
-    many.stats.mat_corrs_naive,
-    many.stats.mat_corrs,
-    100,
-    10,
-    1,
-    "continuous",
-    "continuous",
-    False,
-    False,
-    {"method": "pearson"},
-    ["merged"],
-)
+for corr_method in mat_corr_methods:
 
-# mat_corrs_nan, 1-d both
-compare(
-    many.stats.mat_corrs_naive,
-    many.stats.mat_corrs,
-    100,
-    1,
-    1,
-    "continuous",
-    "continuous",
-    False,
-    False,
-    {"method": "pearson"},
-    ["merged"],
-)
+    # mat_corrs, 1-d a_mat
+    compare(
+        many.stats.mat_corrs_naive,
+        many.stats.mat_corrs,
+        100,
+        1,
+        25,
+        "continuous",
+        "continuous",
+        False,
+        False,
+        {"method": corr_method},
+        ["merged"],
+    )
 
-# mat_corrs_nan, no nans
-compare(
-    many.stats.mat_corrs_naive,
-    many.stats.mat_corrs_nan,
-    100,
-    1,
-    100,
-    "continuous",
-    "continuous",
-    False,
-    False,
-    {"method": "pearson"},
-    ["merged"],
-)
+    # mat_corrs, 1-d b_mat
+    compare(
+        many.stats.mat_corrs_naive,
+        many.stats.mat_corrs,
+        100,
+        10,
+        1,
+        "continuous",
+        "continuous",
+        False,
+        False,
+        {"method": corr_method},
+        ["merged"],
+    )
 
-# mat_corrs_nan, nans in a
-compare(
-    many.stats.mat_corrs_naive,
-    many.stats.mat_corrs_nan,
-    100,
-    1,
-    100,
-    "continuous",
-    "continuous",
-    True,
-    False,
-    {"method": "pearson"},
-    ["merged"],
-)
+    # mat_corrs_nan, 1-d both
+    compare(
+        many.stats.mat_corrs_naive,
+        many.stats.mat_corrs,
+        100,
+        1,
+        1,
+        "continuous",
+        "continuous",
+        False,
+        False,
+        {"method": corr_method},
+        ["merged"],
+    )
 
-# mat_corrs_nan, nans in b
-compare(
-    many.stats.mat_corrs_naive,
-    many.stats.mat_corrs_nan,
-    100,
-    1,
-    100,
-    "continuous",
-    "continuous",
-    False,
-    True,
-    {"method": "pearson"},
-    ["merged"],
-)
+    # mat_corrs_nan, no nans
+    compare(
+        many.stats.mat_corrs_naive,
+        many.stats.mat_corrs_nan,
+        100,
+        1,
+        100,
+        "continuous",
+        "continuous",
+        False,
+        False,
+        {"method": corr_method},
+        ["merged"],
+    )
 
-# mat_corrs_nan, nans in both
-compare(
-    many.stats.mat_corrs_naive,
-    many.stats.mat_corrs_nan,
-    100,
-    1,
-    100,
-    "continuous",
-    "continuous",
-    True,
-    True,
-    {"method": "pearson"},
-    ["merged"],
-)
+    # mat_corrs_nan, nans in a
+    compare(
+        many.stats.mat_corrs_naive,
+        many.stats.mat_corrs_nan,
+        100,
+        1,
+        100,
+        "continuous",
+        "continuous",
+        True,
+        False,
+        {"method": corr_method},
+        ["merged"],
+    )
+
+    # mat_corrs_nan, nans in b
+    compare(
+        many.stats.mat_corrs_naive,
+        many.stats.mat_corrs_nan,
+        100,
+        1,
+        100,
+        "continuous",
+        "continuous",
+        False,
+        True,
+        {"method": corr_method},
+        ["merged"],
+    )
+
+    # mat_corrs_nan, nans in both
+    compare(
+        many.stats.mat_corrs_naive,
+        many.stats.mat_corrs_nan,
+        100,
+        1,
+        100,
+        "continuous",
+        "continuous",
+        True,
+        True,
+        {"method": corr_method},
+        ["merged"],
+    )

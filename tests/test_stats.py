@@ -101,7 +101,7 @@ def compare(
             raise TypeMismatchError("Outputs have different types")
 
         if base_output.shape != output.shape:
-            raise ShapeMismatchError("Outputs have different shapes")
+            raise ShapeMismatchError("Outputs have different shapes",base_output.shape,output.shape)
 
         max_deviation = np.abs(base_output - output).max().max()
 
@@ -117,7 +117,7 @@ def compare(
 
             print(f"max deviation is {bcolors.FAIL}{max_deviation_str}{bcolors.ENDC}")
 
-
+# full-size comparison
 compare(
     many.stats.mat_corrs_naive,
     many.stats.mat_corrs,
@@ -132,12 +132,43 @@ compare(
     ["corrs", "pvals"],
 )
 
+# comparison with vector a_mat
 compare(
     many.stats.mat_corrs_naive,
     many.stats.mat_corrs,
     100,
     1,
     25,
+    "continuous",
+    "continuous",
+    False,
+    False,
+    {"method": "pearson"},
+    ["merged"],
+)
+
+# comparison with both vectors
+compare(
+    many.stats.mat_corrs_naive,
+    many.stats.mat_corrs,
+    100,
+    10,
+    1,
+    "continuous",
+    "continuous",
+    False,
+    False,
+    {"method": "pearson"},
+    ["merged"],
+)
+
+# comparison with both vectors
+compare(
+    many.stats.mat_corrs_naive,
+    many.stats.mat_corrs,
+    100,
+    1,
+    1,
     "continuous",
     "continuous",
     False,

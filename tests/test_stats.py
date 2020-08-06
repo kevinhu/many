@@ -1,3 +1,5 @@
+from itertools import product
+
 import many
 import numpy as np
 
@@ -135,9 +137,13 @@ compare(
     ["corrs", "pvals"],
 )
 
+a_types = ["continuous", "zero"]
+b_types = ["continuous", "zero"]
 mat_corr_methods = ["pearson", "spearman"]
 
-for corr_method in mat_corr_methods:
+param_combos = product(a_types, b_types, mat_corr_methods)
+
+for a_type, b_type, corr_method in param_combos:
 
     # mat_corrs, 1-d a_mat
     compare(
@@ -146,8 +152,8 @@ for corr_method in mat_corr_methods:
         100,
         1,
         25,
-        "continuous",
-        "continuous",
+        a_type,
+        b_type,
         False,
         False,
         {"method": corr_method},
@@ -161,8 +167,8 @@ for corr_method in mat_corr_methods:
         100,
         10,
         1,
-        "continuous",
-        "continuous",
+        a_type,
+        b_type,
         False,
         False,
         {"method": corr_method},
@@ -176,8 +182,8 @@ for corr_method in mat_corr_methods:
         100,
         1,
         1,
-        "continuous",
-        "continuous",
+        a_type,
+        b_type,
         False,
         False,
         {"method": corr_method},
@@ -191,8 +197,8 @@ for corr_method in mat_corr_methods:
         100,
         1,
         100,
-        "continuous",
-        "continuous",
+        a_type,
+        b_type,
         False,
         False,
         {"method": corr_method},
@@ -206,8 +212,8 @@ for corr_method in mat_corr_methods:
         100,
         1,
         100,
-        "continuous",
-        "continuous",
+        a_type,
+        b_type,
         True,
         False,
         {"method": corr_method},
@@ -221,8 +227,8 @@ for corr_method in mat_corr_methods:
         100,
         1,
         100,
-        "continuous",
-        "continuous",
+        a_type,
+        b_type,
         False,
         True,
         {"method": corr_method},
@@ -236,8 +242,8 @@ for corr_method in mat_corr_methods:
         100,
         1,
         100,
-        "continuous",
-        "continuous",
+        a_type,
+        b_type,
         True,
         True,
         {"method": corr_method},

@@ -117,7 +117,7 @@ def compare(
 
             print(f"max deviation is {bcolors.FAIL}{max_deviation_str}{bcolors.ENDC}")
 
-# full-size comparison
+# mat_corrs, full-size comparison
 compare(
     many.stats.mat_corrs_naive,
     many.stats.mat_corrs,
@@ -132,7 +132,7 @@ compare(
     ["corrs", "pvals"],
 )
 
-# comparison with vector a_mat
+# mat_corrs, 1-d a_mat
 compare(
     many.stats.mat_corrs_naive,
     many.stats.mat_corrs,
@@ -147,7 +147,7 @@ compare(
     ["merged"],
 )
 
-# comparison with both vectors
+# mat_corrs, 1-d b_mat
 compare(
     many.stats.mat_corrs_naive,
     many.stats.mat_corrs,
@@ -162,7 +162,7 @@ compare(
     ["merged"],
 )
 
-# comparison with both vectors
+# mat_corrs_nan, 1-d both
 compare(
     many.stats.mat_corrs_naive,
     many.stats.mat_corrs,
@@ -177,16 +177,62 @@ compare(
     ["merged"],
 )
 
+# mat_corrs_nan, no nans
 compare(
     many.stats.mat_corrs_naive,
-    many.stats.mat_corrs,
+    many.stats.mat_corrs_nan,
     100,
     1,
+    100,
+    "continuous",
+    "continuous",
+    False,
+    False,
+    {"method": "pearson"},
+    ["merged"],
+)
+
+# mat_corrs_nan, nans in a
+compare(
+    many.stats.mat_corrs_naive,
+    many.stats.mat_corrs_nan,
+    100,
     1,
+    100,
+    "continuous",
+    "continuous",
+    True,
+    False,
+    {"method": "pearson"},
+    ["merged"],
+)
+
+# mat_corrs_nan, nans in b
+compare(
+    many.stats.mat_corrs_naive,
+    many.stats.mat_corrs_nan,
+    100,
+    1,
+    100,
     "continuous",
     "continuous",
     False,
-    False,
+    True,
+    {"method": "pearson"},
+    ["merged"],
+)
+
+# mat_corrs_nan, nans in both
+compare(
+    many.stats.mat_corrs_naive,
+    many.stats.mat_corrs_nan,
+    100,
+    1,
+    100,
+    "continuous",
+    "continuous",
+    True,
+    True,
     {"method": "pearson"},
     ["merged"],
 )

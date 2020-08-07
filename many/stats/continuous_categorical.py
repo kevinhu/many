@@ -9,7 +9,7 @@ from tqdm import tqdm_notebook as tqdm
 from .utils import precheck_align
 
 
-def mat_mwus_naive(
+def mat_mwu_naive(
     a_mat, b_mat, use_continuity=True, pbar=False, effect="rank_biserial",
 ):
     """
@@ -36,6 +36,10 @@ def mat_mwus_naive(
     corrs: rank-biserial correlations
     pvals: -log10 p-values of correlations
     """
+
+    if effect not in ["mean", "median", "rank_biserial"]:
+
+        raise ValueError("effect must be 'mean', 'median', or 'rank_biserial'")
 
     a_mat, b_mat = precheck_align(a_mat, b_mat)
 
@@ -74,8 +78,8 @@ def mat_mwus_naive(
 
             if pos_n >= 1 and neg_n >= 1:
 
-                a_pos = a_mat[b_pos]
-                a_neg = a_mat[b_neg]
+                a_pos = a_col[b_pos]
+                a_neg = a_col[b_neg]
 
                 # handle identical values cases
                 if np.std(np.concatenate([a_pos, a_neg])) == 0:
@@ -85,11 +89,16 @@ def mat_mwus_naive(
                 else:
 
                     U2, pval = mannwhitneyu(
-                        a_pos, a_neg, use_continuity=use_continuity, alternative="two-sided"
+                        a_pos,
+                        a_neg,
+                        use_continuity=use_continuity,
+                        alternative="two-sided",
                     )
 
                     if effect == "rank_biserial":
-                        corrs[a_col_idx][b_col_idx] = 2 * U2 / (len(a_pos) * len(a_neg)) - 1
+                        corrs[a_col_idx][b_col_idx] = (
+                            2 * U2 / (len(a_pos) * len(a_neg)) - 1
+                        )
                     elif effect == "median":
                         corrs[a_col_idx][b_col_idx] = a_pos.median() - a_neg.median()
                     elif effect == "mean":
@@ -110,6 +119,9 @@ def mat_mwus_naive(
     pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
     pos_ns = pd.DataFrame(pos_ns, index=a_names, columns=b_names)
     neg_ns = pd.DataFrame(neg_ns, index=a_names, columns=b_names)
+
+    corrs = corrs.fillna(0)
+    pvals = pvals.fillna(1)
 
     if a_num_cols == 1 or b_num_cols == 1:
 
@@ -135,6 +147,9 @@ def mat_mwus_naive(
 
         merged = merged[(merged["pos_n"] >= 1) & (merged["neg_n"] >= 1)]
 
+        if len(merged) == 0:
+            return merged
+
         merged["qval"] = multipletests(merged["pval"], alpha=0.01, method="fdr_bh")[1]
 
         merged["pval"] = -np.log10(merged["pval"])
@@ -145,10 +160,11 @@ def mat_mwus_naive(
         return merged
 
     pvals = -np.log10(pvals)
+
     return corrs, pvals
 
 
-def mat_mwus(a_mat, b_mat, use_continuity=True):
+def mat_mwu(a_mat, b_mat, use_continuity=True, effect="rank_biserial"):
     """
     Compute rank-biserial correlations and Mann-Whitney statistics 
     between every column-column pair of A (continuous) and B (binary).
@@ -169,6 +185,10 @@ def mat_mwus(a_mat, b_mat, use_continuity=True):
     corrs: rank-biserial correlations
     pvals: -log10 p-values of correlations
     """
+
+    if effect not in ["rank_biserial"]:
+
+        raise ValueError("effect must be 'rank_biserial'")
 
     a_mat, b_mat = precheck_align(a_mat, b_mat)
 
@@ -207,7 +227,15 @@ def mat_mwus(a_mat, b_mat, use_continuity=True):
     u1 = pos_ns * neg_ns + (pos_ns * (pos_ns + 1)) / 2.0 - pos_ranks
     u2 = pos_ns * neg_ns - u1
 
+    # temporarily mask zeros
+    n_prod = pos_ns * neg_ns
+    zero_prod = n_prod == 0
+    n_prod[zero_prod] = 1
+
     corrs = 2 * u2 / (pos_ns * neg_ns) - 1
+
+    # set zeros to nan
+    corrs[zero_prod] = 0
 
     a_ties = np.vstack([np.array(a_ties)] * b_num_cols).T
 
@@ -218,8 +246,16 @@ def mat_mwus(a_mat, b_mat, use_continuity=True):
 
     meanrank = pos_ns * neg_ns / 2.0 + 0.5 * use_continuity
     bigu = np.maximum(u1, u2)
+
+    # temporarily mask zeros
+    sd_0 = sd == 0
+    sd[sd_0] = 1
+
     z = (bigu - meanrank) / sd
 
+    z[sd_0] = 0
+
+    # compute p values
     pvals = 2 * np.vectorize(norm.sf)(np.abs(z))
 
     # account for small p-values rounding to 0
@@ -229,6 +265,9 @@ def mat_mwus(a_mat, b_mat, use_continuity=True):
     corrs = pd.DataFrame(corrs, columns=b_names, index=a_names)
     pos_ns = pd.DataFrame(pos_ns, columns=b_names, index=a_names)
     neg_ns = pd.DataFrame(neg_ns, columns=b_names, index=a_names)
+
+    corrs = corrs.fillna(0)
+    pvals = pvals.fillna(1)
 
     if a_num_cols == 1 or b_num_cols == 1:
 
@@ -254,6 +293,9 @@ def mat_mwus(a_mat, b_mat, use_continuity=True):
 
         merged = merged[(merged["pos_n"] >= 1) & (merged["neg_n"] >= 1)]
 
+        if len(merged) == 0:
+            return merged
+
         merged["qval"] = multipletests(merged["pval"], alpha=0.01, method="fdr_bh")[1]
 
         merged["pval"] = -np.log10(merged["pval"])
@@ -264,4 +306,5 @@ def mat_mwus(a_mat, b_mat, use_continuity=True):
         return merged
 
     pvals = -np.log10(pvals)
+
     return corrs, pvals

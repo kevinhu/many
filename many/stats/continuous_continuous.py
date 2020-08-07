@@ -1,16 +1,22 @@
 import sys
+import warnings
 
 import numpy as np
 import pandas as pd
 import scipy.special as special
-from scipy.stats import pearsonr, spearmanr
+from scipy.stats import (
+    pearsonr,
+    spearmanr,
+    SpearmanRConstantInputWarning,
+    PearsonRConstantInputWarning,
+)
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
 
 from .utils import precheck_align
 
 
-def mat_corrs_naive(a_mat, b_mat, method="pearson", pbar=False):
+def mat_corr_naive(a_mat, b_mat, method="pearson", pbar=False):
     """
     Compute correlations between every column-column pair of A and B
     using a double for loop.
@@ -52,6 +58,9 @@ def mat_corrs_naive(a_mat, b_mat, method="pearson", pbar=False):
     if pbar:
         sys.stderr.flush()
         progress = tqdm(total=a_num_cols * b_num_cols)
+
+    warnings.simplefilter("ignore", SpearmanRConstantInputWarning)
+    warnings.simplefilter("ignore", PearsonRConstantInputWarning)
 
     for a_col_idx, a_col_name in enumerate(a_names):
         for b_col_idx, b_col_name in enumerate(b_names):
@@ -96,6 +105,9 @@ def mat_corrs_naive(a_mat, b_mat, method="pearson", pbar=False):
 
     pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
 
+    corrs = corrs.fillna(0)
+    pvals = pvals.fillna(1)
+
     # if one of the matrices is a single variable,
     # return correlation results in series form
     if a_num_cols == 1 or b_num_cols == 1:
@@ -108,7 +120,7 @@ def mat_corrs_naive(a_mat, b_mat, method="pearson", pbar=False):
         elif b_num_cols == 1:
             corrs = pd.Series(corrs.iloc[:, 0])
             pvals = pd.Series(pvals.iloc[:, 0])
-            sample_counts = pd.Series(sample_counts.iloc[0])
+            sample_counts = pd.Series(sample_counts.iloc[:, 0])
 
         merged = pd.DataFrame()
         merged["corr"] = corrs
@@ -131,7 +143,7 @@ def mat_corrs_naive(a_mat, b_mat, method="pearson", pbar=False):
     return corrs, pvals
 
 
-def mat_corrs(a_mat, b_mat, method="pearson"):
+def mat_corr(a_mat, b_mat, method="pearson"):
     """
     Compute correlations between every column-column pair of A and B
 
@@ -186,7 +198,13 @@ def mat_corrs(a_mat, b_mat, method="pearson"):
     # Compute correlations
     residual_products = np.dot(residuals_a.T, residuals_b)
     sum_products = np.sqrt(np.dot(sums_a[:, None], sums_b[None]))
+
+    sum_zeros = sum_products == 0
+    sum_products[sum_zeros] = 1
+
     corrs = residual_products / sum_products
+
+    corrs[sum_zeros] = 0
 
     # Compute significance values
     ab = num_samples / 2 - 1
@@ -234,6 +252,10 @@ def mat_corrs(a_mat, b_mat, method="pearson"):
 
 def pearson_significance(row):
     corr = row["corr"]
+
+    if corr == 0:
+        return 1
+
     ab = row["n"] / 2 - 1
 
     beta = 2 * special.btdtr(ab, ab, 0.5 * (1 - abs(corr)))
@@ -244,7 +266,7 @@ def pearson_significance(row):
     return beta
 
 
-def mat_corrs_nan(a_mat, b_mat, method="pearson"):
+def mat_corr_nan(a_mat, b_mat, method="pearson"):
     """
     Compute correlations between A and every column of B. A must be
     a Series for this method to work.
@@ -338,7 +360,7 @@ def mat_corrs_nan(a_mat, b_mat, method="pearson"):
     return corr_df
 
 
-def mat_corrs_subtyped(
+def mat_corr_subtyped(
     a_mat,
     b_mat,
     subtypes,

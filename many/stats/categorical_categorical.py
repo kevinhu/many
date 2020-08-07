@@ -10,7 +10,7 @@ from .fisher import mlog10Test1t
 from .utils import precheck_align
 
 
-def mat_fishers_naive(a_mat, b_mat, pbar=False):
+def mat_fisher_naive(a_mat, b_mat, pbar=False):
     """
     Compute odds ratios and Fisher's exact test 
     between every column-column pair of A (binary) and B (binary),
@@ -74,7 +74,14 @@ def mat_fishers_naive(a_mat, b_mat, pbar=False):
             aB[a_col_idx][b_col_idx] = xY
             ab[a_col_idx][b_col_idx] = xy
 
-            oddsr = (XY / Xy) / (xY / xy)
+            numer = XY * xy
+            denom = xY * Xy
+
+            if denom == 0:
+                oddsr = -1
+            else:
+                oddsr = numer/denom
+
             pval = mlog10Test1t(XY, Xy, xY, xy)
 
             oddsrs[a_col_idx][b_col_idx] = oddsr
@@ -89,6 +96,9 @@ def mat_fishers_naive(a_mat, b_mat, pbar=False):
     pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
 
     oddsrs = pd.DataFrame(oddsrs, index=a_names, columns=b_names)
+
+    pvals = pvals.fillna(0)
+    oddsrs = oddsrs.fillna(1)
 
     if a_num_cols == 1 or b_num_cols == 1:
 
@@ -140,7 +150,7 @@ def fisher_arr(x):
     return mlog10Test1t(x[0], x[1], x[2], x[3])
 
 
-def mat_fishers(a_mat, b_mat):
+def mat_fisher(a_mat, b_mat):
     """
     Compute odds ratios and Fisher's exact test 
     between every column-column pair of A (binary) and B (binary),
@@ -199,8 +209,18 @@ def mat_fishers(a_mat, b_mat):
     pvals = np.apply_along_axis(fisher_arr, 0, comb)
     pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
 
-    oddsrs = (AB / Ab) / (aB / ab)
+    numer = AB * ab
+    denom = aB * Ab
+
+    zero_denom = denom == 0
+    denom[zero_denom] = 1
+
+    oddsrs = numer/denom
+    oddsrs[zero_denom] = -1
     oddsrs = pd.DataFrame(oddsrs, index=a_names, columns=b_names)
+
+    pvals = pvals.fillna(0)
+    oddsrs = oddsrs.fillna(1)
 
     if a_num_cols == 1 or b_num_cols == 1:
 
@@ -233,7 +253,7 @@ def mat_fishers(a_mat, b_mat):
     return oddsrs, pvals
 
 
-def mat_fishers_nan(a_mat, b_mat):
+def mat_fisher_nan(a_mat, b_mat):
     """
     Compute odds ratios and Fisher's exact test 
     between every column-column pair of A (binary) and B (binary),
@@ -290,8 +310,18 @@ def mat_fishers_nan(a_mat, b_mat):
     pvals = np.apply_along_axis(fisher_arr, 0, comb)
     pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
 
-    oddsrs = (AB / Ab) / (aB / ab)
+    numer = AB * ab
+    denom = aB * Ab
+
+    zero_denom = denom == 0
+    denom[zero_denom] = 1
+
+    oddsrs = numer/denom
+    oddsrs[zero_denom] = -1
     oddsrs = pd.DataFrame(oddsrs, index=a_names, columns=b_names)
+
+    pvals = pvals.fillna(0)
+    oddsrs = oddsrs.fillna(1)
 
     if a_num_cols == 1 or b_num_cols == 1:
 

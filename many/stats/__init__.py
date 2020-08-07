@@ -13,5 +13,3 @@ from .continuous_continuous import (
     mat_corr_nan,
     mat_corr_subtyped,
 )
-
-from .utils import generate_test

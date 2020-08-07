@@ -3,6 +3,8 @@ import many
 from config import TOLERANCE
 
 import numpy as np
+import pandas as pd
+
 
 class bcolors:
     HEADER = "\033[95m"
@@ -14,6 +16,7 @@ class bcolors:
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
 
+
 class OutputMismatchError(Exception):
     pass
 
@@ -24,6 +27,79 @@ class TypeMismatchError(Exception):
 
 class ShapeMismatchError(Exception):
     pass
+
+
+def generate_test(
+    n_samples,
+    a_num_cols,
+    b_num_cols,
+    a_type="continuous",
+    b_type="continuous",
+    a_nan=False,
+    b_nan=False,
+):
+    """
+    Generates randomly initialized matrix pairs for testing and benchmarking.
+
+    Parameters
+    ----------
+    n_samples: int
+        Number of samples per matrix (equivalent to number of rows)
+    a_num_cols: int
+        Number of variables for A (equivalent to number of columns in A)
+    b_num_cols: int
+        Number of variables for B (equivalent to number of columns in B) 
+    a_type: string, "continuous", "categorical", or "zero"
+        Type of variables in A
+    b_type: string, "continuous", "categorical", or "zero"
+        Type of variables in B
+    nan: boolean
+        whether or not to simulate missing (NaN) values in A and B
+
+    Returns
+    -------
+    a_test, b_test: test DataFrames
+    """
+
+    if a_type == "categorical":
+        a_test = np.random.randint(0, 2, (n_samples, a_num_cols))
+    elif a_type == "continuous":
+        a_test = np.random.random((n_samples, a_num_cols))
+    elif a_type == "zero":
+        a_test = np.zeros((n_samples, a_num_cols))
+    else:
+        raise ValueError("'a_type' must be 'categorical', 'continuous', or 'zero'")
+
+    if b_type == "categorical":
+        b_test = np.random.randint(0, 2, (n_samples, b_num_cols))
+    elif b_type == "continuous":
+        b_test = np.random.random((n_samples, b_num_cols))
+    elif b_type == "zero":
+        b_test = np.zeros((n_samples, b_num_cols))
+    else:
+        raise ValueError("'b_type' must be 'categorical', 'continuous', or 'zero'")
+
+    if a_nan:
+
+        a_test = a_test.astype(np.float64)
+
+        A_nan = np.random.randint(0, 2, (n_samples, a_num_cols))
+
+        a_test[A_nan == 1] = np.nan
+
+    if b_nan:
+
+        b_test = b_test.astype(np.float64)
+
+        B_nan = np.random.randint(0, 2, (n_samples, b_num_cols))
+
+        b_test[B_nan == 1] = np.nan
+
+    a_test = pd.DataFrame(a_test)
+    b_test = pd.DataFrame(b_test)
+
+    return a_test, b_test
+
 
 def compare(
     base_method,
@@ -66,7 +142,7 @@ def compare(
     )
     print(f"\tand {kwargs_string}")
 
-    a_test, b_test = many.stats.generate_test(
+    a_test, b_test = generate_test(
         num_samples, a_num_cols, b_num_cols, a_type, b_type, a_nan, b_nan
     )
 
@@ -81,7 +157,7 @@ def compare(
     if len(base_result) != len(result):
         raise OutputMismatchError("\tOutputs have different lengths")
 
-    for i in range(len(output_names)):
+    for i, output_name in enumerate(output_names):
 
         base_output = base_result[i]
         output = result[i]

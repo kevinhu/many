@@ -262,7 +262,7 @@ mat_mwu_param_combos = product(a_types, b_types, effects)
 for a_type, b_type, effect in mat_mwu_param_combos:
 
     # mat_mwu, full-size comparison
-    x,y = compare(
+    x, y = compare(
         many.stats.mat_mwu_naive,
         many.stats.mat_mwu,
         100,
@@ -274,4 +274,49 @@ for a_type, b_type, effect in mat_mwu_param_combos:
         False,
         {"effect": effect},
         ["corrs", "pvals"],
+    )
+
+    # mat_mwu, 1-d a_mat
+    x, y = compare(
+        many.stats.mat_mwu_naive,
+        many.stats.mat_mwu,
+        100,
+        1,
+        25,
+        a_type,
+        b_type,
+        False,
+        False,
+        {"effect": effect},
+        ["merged"],
+    )
+
+    # mat_mwu, 1-d b_mat
+    x, y = compare(
+        many.stats.mat_mwu_naive,
+        many.stats.mat_mwu,
+        100,
+        10,
+        1,
+        a_type,
+        b_type,
+        False,
+        False,
+        {"effect": effect},
+        ["merged"],
+    )
+
+    # mat_mwu, 1-d both
+    x, y = compare(
+        many.stats.mat_mwu_naive,
+        many.stats.mat_mwu,
+        100,
+        1,
+        1,
+        a_type,
+        b_type,
+        False,
+        False,
+        {"effect": effect},
+        ["merged"],
     )

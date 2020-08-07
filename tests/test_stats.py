@@ -121,34 +121,36 @@ def compare(
 
             print(f"max deviation is {bcolors.FAIL}{max_deviation_str}{bcolors.ENDC}")
 
+    return base_result, result
 
-# mat_corrs, full-size comparison
-compare(
-    many.stats.mat_corrs_naive,
-    many.stats.mat_corrs,
-    100,
-    10,
-    25,
-    "continuous",
-    "continuous",
-    False,
-    False,
-    {"method": "pearson"},
-    ["corrs", "pvals"],
-)
 
 a_types = ["continuous", "zero"]
 b_types = ["continuous", "zero"]
-mat_corr_methods = ["pearson", "spearman"]
+methods = ["pearson", "spearman"]
 
-param_combos = product(a_types, b_types, mat_corr_methods)
+mat_corr_param_combos = product(a_types, b_types, methods)
 
-for a_type, b_type, corr_method in param_combos:
+for a_type, b_type, corr_method in mat_corr_param_combos:
 
-    # mat_corrs, 1-d a_mat
+    # mat_corr, full-size comparison
     compare(
-        many.stats.mat_corrs_naive,
-        many.stats.mat_corrs,
+        many.stats.mat_corr_naive,
+        many.stats.mat_corr,
+        100,
+        10,
+        25,
+        a_type,
+        b_type,
+        False,
+        False,
+        {"method": corr_method},
+        ["corrs", "pvals"],
+    )
+
+    # mat_corr, 1-d a_mat
+    compare(
+        many.stats.mat_corr_naive,
+        many.stats.mat_corr,
         100,
         1,
         25,
@@ -160,10 +162,10 @@ for a_type, b_type, corr_method in param_combos:
         ["merged"],
     )
 
-    # mat_corrs, 1-d b_mat
+    # mat_corr, 1-d b_mat
     compare(
-        many.stats.mat_corrs_naive,
-        many.stats.mat_corrs,
+        many.stats.mat_corr_naive,
+        many.stats.mat_corr,
         100,
         10,
         1,
@@ -175,10 +177,10 @@ for a_type, b_type, corr_method in param_combos:
         ["merged"],
     )
 
-    # mat_corrs_nan, 1-d both
+    # mat_corr_nan, 1-d both
     compare(
-        many.stats.mat_corrs_naive,
-        many.stats.mat_corrs,
+        many.stats.mat_corr_naive,
+        many.stats.mat_corr,
         100,
         1,
         1,
@@ -190,10 +192,10 @@ for a_type, b_type, corr_method in param_combos:
         ["merged"],
     )
 
-    # mat_corrs_nan, no nans
+    # mat_corr_nan, no nans
     compare(
-        many.stats.mat_corrs_naive,
-        many.stats.mat_corrs_nan,
+        many.stats.mat_corr_naive,
+        many.stats.mat_corr_nan,
         100,
         1,
         100,
@@ -205,10 +207,10 @@ for a_type, b_type, corr_method in param_combos:
         ["merged"],
     )
 
-    # mat_corrs_nan, nans in a
+    # mat_corr_nan, nans in a
     compare(
-        many.stats.mat_corrs_naive,
-        many.stats.mat_corrs_nan,
+        many.stats.mat_corr_naive,
+        many.stats.mat_corr_nan,
         100,
         1,
         100,
@@ -220,10 +222,10 @@ for a_type, b_type, corr_method in param_combos:
         ["merged"],
     )
 
-    # mat_corrs_nan, nans in b
+    # mat_corr_nan, nans in b
     compare(
-        many.stats.mat_corrs_naive,
-        many.stats.mat_corrs_nan,
+        many.stats.mat_corr_naive,
+        many.stats.mat_corr_nan,
         100,
         1,
         100,
@@ -235,10 +237,10 @@ for a_type, b_type, corr_method in param_combos:
         ["merged"],
     )
 
-    # mat_corrs_nan, nans in both
+    # mat_corr_nan, nans in both
     compare(
-        many.stats.mat_corrs_naive,
-        many.stats.mat_corrs_nan,
+        many.stats.mat_corr_naive,
+        many.stats.mat_corr_nan,
         100,
         1,
         100,
@@ -248,4 +250,28 @@ for a_type, b_type, corr_method in param_combos:
         True,
         {"method": corr_method},
         ["merged"],
+    )
+
+
+a_types = ["continuous", "zero"]
+b_types = ["categorical", "zero"]
+effects = ["rank_biserial"]
+
+mat_mwu_param_combos = product(a_types, b_types, effects)
+
+for a_type, b_type, effect in mat_mwu_param_combos:
+
+    # mat_mwu, full-size comparison
+    x,y = compare(
+        many.stats.mat_mwu_naive,
+        many.stats.mat_mwu,
+        100,
+        10,
+        25,
+        a_type,
+        b_type,
+        False,
+        False,
+        {"effect": effect},
+        ["corrs", "pvals"],
     )

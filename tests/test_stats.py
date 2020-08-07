@@ -130,193 +130,267 @@ methods = ["pearson", "spearman"]
 
 mat_corr_param_combos = product(a_types, b_types, methods)
 
-for a_type, b_type, corr_method in mat_corr_param_combos:
+# for a_type, b_type, corr_method in mat_corr_param_combos:
 
-    # mat_corr, full-size comparison
-    compare(
-        many.stats.mat_corr_naive,
-        many.stats.mat_corr,
-        100,
-        10,
-        25,
-        a_type,
-        b_type,
-        False,
-        False,
-        {"method": corr_method},
-        ["corrs", "pvals"],
-    )
+#     # mat_corr, full-size comparison
+#     compare(
+#         many.stats.mat_corr_naive,
+#         many.stats.mat_corr,
+#         100,
+#         10,
+#         25,
+#         a_type,
+#         b_type,
+#         False,
+#         False,
+#         {"method": corr_method},
+#         ["corrs", "pvals"],
+#     )
 
-    # mat_corr, 1-d a_mat
-    compare(
-        many.stats.mat_corr_naive,
-        many.stats.mat_corr,
-        100,
-        1,
-        25,
-        a_type,
-        b_type,
-        False,
-        False,
-        {"method": corr_method},
-        ["merged"],
-    )
+#     # mat_corr, 1-d a_mat
+#     compare(
+#         many.stats.mat_corr_naive,
+#         many.stats.mat_corr,
+#         100,
+#         1,
+#         25,
+#         a_type,
+#         b_type,
+#         False,
+#         False,
+#         {"method": corr_method},
+#         ["merged"],
+#     )
 
-    # mat_corr, 1-d b_mat
-    compare(
-        many.stats.mat_corr_naive,
-        many.stats.mat_corr,
-        100,
-        10,
-        1,
-        a_type,
-        b_type,
-        False,
-        False,
-        {"method": corr_method},
-        ["merged"],
-    )
+#     # mat_corr, 1-d b_mat
+#     compare(
+#         many.stats.mat_corr_naive,
+#         many.stats.mat_corr,
+#         100,
+#         10,
+#         1,
+#         a_type,
+#         b_type,
+#         False,
+#         False,
+#         {"method": corr_method},
+#         ["merged"],
+#     )
 
-    # mat_corr_nan, 1-d both
-    compare(
-        many.stats.mat_corr_naive,
-        many.stats.mat_corr,
-        100,
-        1,
-        1,
-        a_type,
-        b_type,
-        False,
-        False,
-        {"method": corr_method},
-        ["merged"],
-    )
+#     # mat_corr_nan, 1-d both
+#     compare(
+#         many.stats.mat_corr_naive,
+#         many.stats.mat_corr,
+#         100,
+#         1,
+#         1,
+#         a_type,
+#         b_type,
+#         False,
+#         False,
+#         {"method": corr_method},
+#         ["merged"],
+#     )
 
-    # mat_corr_nan, no nans
-    compare(
-        many.stats.mat_corr_naive,
-        many.stats.mat_corr_nan,
-        100,
-        1,
-        100,
-        a_type,
-        b_type,
-        False,
-        False,
-        {"method": corr_method},
-        ["merged"],
-    )
+#     # mat_corr_nan, no nans
+#     compare(
+#         many.stats.mat_corr_naive,
+#         many.stats.mat_corr_nan,
+#         100,
+#         1,
+#         100,
+#         a_type,
+#         b_type,
+#         False,
+#         False,
+#         {"method": corr_method},
+#         ["merged"],
+#     )
 
-    # mat_corr_nan, nans in a
-    compare(
-        many.stats.mat_corr_naive,
-        many.stats.mat_corr_nan,
-        100,
-        1,
-        100,
-        a_type,
-        b_type,
-        True,
-        False,
-        {"method": corr_method},
-        ["merged"],
-    )
+#     # mat_corr_nan, nans in a
+#     compare(
+#         many.stats.mat_corr_naive,
+#         many.stats.mat_corr_nan,
+#         100,
+#         1,
+#         100,
+#         a_type,
+#         b_type,
+#         True,
+#         False,
+#         {"method": corr_method},
+#         ["merged"],
+#     )
 
-    # mat_corr_nan, nans in b
-    compare(
-        many.stats.mat_corr_naive,
-        many.stats.mat_corr_nan,
-        100,
-        1,
-        100,
-        a_type,
-        b_type,
-        False,
-        True,
-        {"method": corr_method},
-        ["merged"],
-    )
+#     # mat_corr_nan, nans in b
+#     compare(
+#         many.stats.mat_corr_naive,
+#         many.stats.mat_corr_nan,
+#         100,
+#         1,
+#         100,
+#         a_type,
+#         b_type,
+#         False,
+#         True,
+#         {"method": corr_method},
+#         ["merged"],
+#     )
 
-    # mat_corr_nan, nans in both
-    compare(
-        many.stats.mat_corr_naive,
-        many.stats.mat_corr_nan,
-        100,
-        1,
-        100,
-        a_type,
-        b_type,
-        True,
-        True,
-        {"method": corr_method},
-        ["merged"],
-    )
+#     # mat_corr_nan, nans in both
+#     compare(
+#         many.stats.mat_corr_naive,
+#         many.stats.mat_corr_nan,
+#         100,
+#         1,
+#         100,
+#         a_type,
+#         b_type,
+#         True,
+#         True,
+#         {"method": corr_method},
+#         ["merged"],
+#     )
 
 
-a_types = ["continuous", "zero"]
+# a_types = ["continuous", "zero"]
+# b_types = ["categorical", "zero"]
+# effects = ["rank_biserial"]
+
+# mat_mwu_param_combos = product(a_types, b_types, effects)
+
+# for a_type, b_type, effect in mat_mwu_param_combos:
+
+#     # mat_mwu, full-size comparison
+#     compare(
+#         many.stats.mat_mwu_naive,
+#         many.stats.mat_mwu,
+#         100,
+#         10,
+#         25,
+#         a_type,
+#         b_type,
+#         False,
+#         False,
+#         {"effect": effect},
+#         ["corrs", "pvals"],
+#     )
+
+#     # mat_mwu, 1-d a_mat
+#     compare(
+#         many.stats.mat_mwu_naive,
+#         many.stats.mat_mwu,
+#         100,
+#         1,
+#         25,
+#         a_type,
+#         b_type,
+#         False,
+#         False,
+#         {"effect": effect},
+#         ["merged"],
+#     )
+
+#     # mat_mwu, 1-d b_mat
+#     compare(
+#         many.stats.mat_mwu_naive,
+#         many.stats.mat_mwu,
+#         100,
+#         10,
+#         1,
+#         a_type,
+#         b_type,
+#         False,
+#         False,
+#         {"effect": effect},
+#         ["merged"],
+#     )
+
+#     # mat_mwu, 1-d both
+#     compare(
+#         many.stats.mat_mwu_naive,
+#         many.stats.mat_mwu,
+#         100,
+#         1,
+#         1,
+#         a_type,
+#         b_type,
+#         False,
+#         False,
+#         {"effect": effect},
+#         ["merged"],
+#     )
+
+a_col_counts = [1, 10]
+b_col_counts = [1, 25]
+a_types = ["categorical", "zero"]
 b_types = ["categorical", "zero"]
-effects = ["rank_biserial"]
 
-mat_mwu_param_combos = product(a_types, b_types, effects)
+mat_fisher_param_combos = product(a_col_counts, b_col_counts, a_types, b_types)
 
-for a_type, b_type, effect in mat_mwu_param_combos:
+for a_col_count, b_col_count, a_type, b_type in mat_fisher_param_combos:
 
-    # mat_mwu, full-size comparison
-    x, y = compare(
-        many.stats.mat_mwu_naive,
-        many.stats.mat_mwu,
-        100,
-        10,
-        25,
-        a_type,
-        b_type,
-        False,
-        False,
-        {"effect": effect},
-        ["corrs", "pvals"],
-    )
+    if a_col_count == 1 or b_col_count == 1:
 
-    # mat_mwu, 1-d a_mat
-    x, y = compare(
-        many.stats.mat_mwu_naive,
-        many.stats.mat_mwu,
-        100,
-        1,
-        25,
-        a_type,
-        b_type,
-        False,
-        False,
-        {"effect": effect},
-        ["merged"],
-    )
+        # mat_fisher, single-dim comparison
+        compare(
+            many.stats.mat_fisher_naive,
+            many.stats.mat_fisher,
+            100,
+            a_col_count,
+            b_col_count,
+            a_type,
+            b_type,
+            False,
+            False,
+            {},
+            ["merged"],
+        )
 
-    # mat_mwu, 1-d b_mat
-    x, y = compare(
-        many.stats.mat_mwu_naive,
-        many.stats.mat_mwu,
-        100,
-        10,
-        1,
-        a_type,
-        b_type,
-        False,
-        False,
-        {"effect": effect},
-        ["merged"],
-    )
+        # mat_fisher_nan, single-dim comparison
+        compare(
+            many.stats.mat_fisher_naive,
+            many.stats.mat_fisher_nan,
+            100,
+            a_col_count,
+            b_col_count,
+            a_type,
+            b_type,
+            True,
+            True,
+            {},
+            ["merged"],
+        )
 
-    # mat_mwu, 1-d both
-    x, y = compare(
-        many.stats.mat_mwu_naive,
-        many.stats.mat_mwu,
-        100,
-        1,
-        1,
-        a_type,
-        b_type,
-        False,
-        False,
-        {"effect": effect},
-        ["merged"],
-    )
+    else:
+
+        # mat_fisher, full-size comparison
+        compare(
+            many.stats.mat_fisher_naive,
+            many.stats.mat_fisher,
+            100,
+            a_col_count,
+            b_col_count,
+            a_type,
+            b_type,
+            False,
+            False,
+            {},
+            ["corrs", "pvals"],
+        )
+
+        # mat_fisher_nan, single-dim comparison
+        compare(
+            many.stats.mat_fisher_naive,
+            many.stats.mat_fisher_nan,
+            100,
+            a_col_count,
+            b_col_count,
+            a_type,
+            b_type,
+            True,
+            True,
+            {},
+            ["corrs", "pvals"],
+        )
+

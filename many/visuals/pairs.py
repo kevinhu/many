@@ -117,7 +117,8 @@ def regression(
 
     x, y = x.align(y, join="inner")
 
-    assert method in ["pearson", "spearman"], "Method must be 'pearson' or 'spearman'!"
+    if method not in ["pearson", "spearman"]:
+        raise ValueError("Method must be 'pearson' or 'spearman'.")
 
     if method == "pearson":
         r, pval = pearsonr(x, y)
@@ -202,7 +203,8 @@ def dense_regression(
     z = gaussian_kde(xy)(xy)
     z = np.arcsinh(z)
 
-    assert method in ["pearson", "spearman"], "Method must be 'pearson' or 'spearman'!"
+    if method not in ["pearson", "spearman"]:
+        raise ValueError("Method must be 'pearson' or 'spearman'.")
 
     if method == "pearson":
         r, pval = pearsonr(x, y)
@@ -298,7 +300,8 @@ def two_dists(
     c_pos = c[b]
     c_neg = c[~b]
 
-    assert method in ["t_test", "mw_u"], "Method must be 't_test' or 'mw_u'!"
+    if method not in ["t_test", "mw_u"]:
+        raise ValueError("Method must be 't_test' or 'mw_u'.")
 
     if method == "t_test":
         stat, pval = ttest_ind(c_pos, c_neg)

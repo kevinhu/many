@@ -10,6 +10,56 @@ from .fisher import mlog10Test1t
 from .utils import precheck_align
 
 
+def merge(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int):
+    """
+    Flatten matrix-form outputs to column-form.
+
+    Parameters
+    ----------
+    oddsrs: Pandas DataFrame
+        odds ratios matrix
+    pvals: Pandas DataFrame
+        p-values matrix
+    AB, Ab, aB, ab: Pandas DataFrames
+        contingency table counts
+    a_num_cols: int
+        number of columns in first observations matrix
+    b_num_cols: int
+        number of columns in second observations matrix
+
+    Returns
+    -------
+    series form statistics
+    """
+
+    if a_num_cols == 1:
+
+        oddsrs = pd.Series(oddsrs.iloc[0])
+        pvals = pd.Series(pvals.iloc[0])
+
+    elif b_num_cols == 1:
+
+        oddsrs = pd.Series(oddsrs.iloc[:, 0])
+        pvals = pd.Series(pvals.iloc[:, 0])
+
+    merged = pd.DataFrame()
+    merged["oddsr"] = oddsrs
+    merged["pval"] = pvals
+    merged["qval"] = multipletests(
+        10 ** (-merged["pval"]), alpha=0.01, method="fdr_bh"
+    )[1]
+
+    merged["qval"] = -np.log10(merged["qval"])
+    merged["AB"] = AB.reshape(-1)
+    merged["Ab"] = Ab.reshape(-1)
+    merged["aB"] = aB.reshape(-1)
+    merged["ab"] = ab.reshape(-1)
+
+    merged = merged.sort_values(by="pval", ascending=False)
+
+    return merged
+
+
 def mat_fisher_naive(a_mat, b_mat, pbar=False):
     """
     Compute odds ratios and Fisher's exact test 
@@ -94,7 +144,6 @@ def mat_fisher_naive(a_mat, b_mat, pbar=False):
         progress.close()
 
     pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
-
     oddsrs = pd.DataFrame(oddsrs, index=a_names, columns=b_names)
 
     pvals = pvals.fillna(0)
@@ -102,32 +151,7 @@ def mat_fisher_naive(a_mat, b_mat, pbar=False):
 
     if a_num_cols == 1 or b_num_cols == 1:
 
-        if a_num_cols == 1:
-
-            oddsrs = pd.Series(oddsrs.iloc[0])
-            pvals = pd.Series(pvals.iloc[0])
-
-        elif b_num_cols == 1:
-
-            oddsrs = pd.Series(oddsrs.iloc[:, 0])
-            pvals = pd.Series(pvals.iloc[:, 0])
-
-        merged = pd.DataFrame()
-        merged["oddsr"] = oddsrs
-        merged["pval"] = pvals
-        merged["qval"] = multipletests(
-            10 ** (-merged["pval"]), alpha=0.01, method="fdr_bh"
-        )[1]
-
-        merged["qval"] = -np.log10(merged["qval"])
-        merged["AB"] = AB.reshape(-1)
-        merged["Ab"] = Ab.reshape(-1)
-        merged["aB"] = aB.reshape(-1)
-        merged["ab"] = ab.reshape(-1)
-
-        merged = merged.sort_values(by="pval", ascending=False)
-
-        return merged
+        return merge(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
 
     return oddsrs, pvals
 
@@ -224,31 +248,7 @@ def mat_fisher(a_mat, b_mat):
 
     if a_num_cols == 1 or b_num_cols == 1:
 
-        if a_num_cols == 1:
-
-            oddsrs = pd.Series(oddsrs.iloc[0])
-            pvals = pd.Series(pvals.iloc[0])
-
-        elif b_num_cols == 1:
-            oddsrs = pd.Series(oddsrs.iloc[:, 0])
-            pvals = pd.Series(pvals.iloc[:, 0])
-
-        merged = pd.DataFrame()
-        merged["oddsr"] = oddsrs
-        merged["pval"] = pvals
-        merged["qval"] = multipletests(
-            10 ** (-merged["pval"]), alpha=0.01, method="fdr_bh"
-        )[1]
-
-        merged["qval"] = -np.log10(merged["qval"])
-        merged["AB"] = AB.reshape(-1)
-        merged["Ab"] = Ab.reshape(-1)
-        merged["aB"] = aB.reshape(-1)
-        merged["ab"] = ab.reshape(-1)
-
-        merged = merged.sort_values(by="pval", ascending=False)
-
-        return merged
+        return merge(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
 
     return oddsrs, pvals
 
@@ -325,31 +325,6 @@ def mat_fisher_nan(a_mat, b_mat):
 
     if a_num_cols == 1 or b_num_cols == 1:
 
-        if a_num_cols == 1:
-
-            oddsrs = pd.Series(oddsrs.iloc[0])
-            pvals = pd.Series(pvals.iloc[0])
-
-        elif b_num_cols == 1:
-
-            oddsrs = pd.Series(oddsrs.iloc[:, 0])
-            pvals = pd.Series(pvals.iloc[:, 0])
-
-        merged = pd.DataFrame()
-        merged["oddsr"] = oddsrs
-        merged["pval"] = pvals
-        merged["qval"] = multipletests(
-            10 ** (-merged["pval"]), alpha=0.01, method="fdr_bh"
-        )[1]
-
-        merged["qval"] = -np.log10(merged["qval"])
-        merged["AB"] = AB.reshape(-1)
-        merged["Ab"] = Ab.reshape(-1)
-        merged["aB"] = aB.reshape(-1)
-        merged["ab"] = ab.reshape(-1)
-
-        merged = merged.sort_values(by="pval", ascending=False)
-
-        return merged
+        return merge(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
 
     return oddsrs, pvals

@@ -3,7 +3,7 @@ from itertools import product
 import many
 
 a_types = ["continuous", "zero"]
-b_types = ["categorical", "zero"]
+b_types = ["binary", "zero"]
 effects = ["rank_biserial"]
 melts = [False, True]
 

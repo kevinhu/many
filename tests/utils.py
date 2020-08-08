@@ -51,9 +51,9 @@ def generate_test(
         Number of variables for a_mat (equivalent to number of columns in a_mat)
     b_num_cols: int
         Number of variables for b_mat (equivalent to number of columns in b_mat) 
-    a_type: string, "continuous", "categorical", or "zero"
+    a_type: string, "continuous", "binary", or "zero"
         Type of variables in a_mat
-    b_type: string, "continuous", "categorical", or "zero"
+    b_type: string, "continuous", "binary", or "zero"
         Type of variables in b_mat
     a_nan: boolean
         whether or not to simulate missing (NaN) values in a_mat
@@ -65,23 +65,23 @@ def generate_test(
     a_test, b_test: test DataFrames
     """
 
-    if a_type == "categorical":
+    if a_type == "binary":
         a_test = np.random.randint(0, 2, (n_samples, a_num_cols))
     elif a_type == "continuous":
         a_test = np.random.random((n_samples, a_num_cols))
     elif a_type == "zero":
         a_test = np.zeros((n_samples, a_num_cols))
     else:
-        raise ValueError("'a_type' must be 'categorical', 'continuous', or 'zero'")
+        raise ValueError("'a_type' must be 'binary', 'continuous', or 'zero'")
 
-    if b_type == "categorical":
+    if b_type == "binary":
         b_test = np.random.randint(0, 2, (n_samples, b_num_cols))
     elif b_type == "continuous":
         b_test = np.random.random((n_samples, b_num_cols))
     elif b_type == "zero":
         b_test = np.zeros((n_samples, b_num_cols))
     else:
-        raise ValueError("'b_type' must be 'categorical', 'continuous', or 'zero'")
+        raise ValueError("'b_type' must be 'binary', 'continuous', or 'zero'")
 
     if a_nan:
 
@@ -134,9 +134,9 @@ def compare(
         number of columns in a_mat
     b_num_cols: int
         number of columns in b_mat
-    a_type: string, "continuous", "categorical", or "zero"
+    a_type: string, "continuous", "binary", or "zero"
         Type of variables in a_mat
-    b_type: string, "continuous", "categorical", or "zero"
+    b_type: string, "continuous", "binary", or "zero"
         Type of variables in b_mat
     a_nan: boolean
         whether or not to simulate missing (NaN) values in a_mat

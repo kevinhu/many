@@ -4,8 +4,8 @@ import many
 
 a_col_counts = [1, 10]
 b_col_counts = [1, 25]
-a_types = ["categorical", "zero"]
-b_types = ["categorical", "zero"]
+a_types = ["binary", "zero"]
+b_types = ["binary", "zero"]
 melts = [False, True]
 
 mat_fisher_param_combos = product(a_col_counts, b_col_counts, a_types, b_types, melts)

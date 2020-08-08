@@ -52,6 +52,8 @@ def melt_corr(corrs, pvals, sample_counts, method):
 
     melted = melted.sort_values(by="pval", ascending=False)
 
+    melted.index.set_names(["b_col","a_col"], inplace=True)
+
     return melted
 
 

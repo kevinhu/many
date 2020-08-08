@@ -16,7 +16,46 @@ from tqdm import tqdm_notebook as tqdm
 from .utils import precheck_align
 
 
-def mat_corr_naive(a_mat, b_mat, method="pearson", pbar=False):
+def melt_corr(corrs, pvals, sample_counts, method):
+    """
+    Flatten matrix-form outputs to column-form.
+
+    Parameters
+    ----------
+    corrs: Pandas DataFrame
+        correlations matrix
+    pvals: Pandas DataFrame
+        p-values matrix
+    pos_ns neg_ns: Pandas DataFrames
+        sample group counts
+    a_num_cols: int
+        number of columns in first observations matrix
+    b_num_cols: int
+        number of columns in second observations matrix
+    method: String, "pearson" or "spearman"
+        the correlation method
+
+    Returns
+    -------
+    series form statistics
+    """
+
+    melted = pd.DataFrame()
+    melted[method] = corrs.unstack()
+    melted["pval"] = pvals.unstack()
+    melted["qval"] = multipletests(
+        10 ** (-melted["pval"]), alpha=0.01, method="fdr_bh"
+    )[1]
+
+    melted["qval"] = -np.log10(melted["qval"])
+    melted["n"] = sample_counts.unstack()
+
+    melted = melted.sort_values(by="pval", ascending=False)
+
+    return melted
+
+
+def mat_corr_naive(a_mat, b_mat, melt:bool, method="pearson", pbar=False):
     """
     Compute correlations between every column-column pair of A and B
     using a double for loop.
@@ -108,42 +147,16 @@ def mat_corr_naive(a_mat, b_mat, method="pearson", pbar=False):
     corrs = corrs.fillna(0)
     pvals = pvals.fillna(1)
 
-    # if one of the matrices is a single variable,
-    # return correlation results in series form
-    if a_num_cols == 1 or b_num_cols == 1:
-
-        if a_num_cols == 1:
-            corrs = pd.Series(corrs.iloc[0])
-            pvals = pd.Series(pvals.iloc[0])
-            sample_counts = pd.Series(sample_counts.iloc[0])
-
-        elif b_num_cols == 1:
-            corrs = pd.Series(corrs.iloc[:, 0])
-            pvals = pd.Series(pvals.iloc[:, 0])
-            sample_counts = pd.Series(sample_counts.iloc[:, 0])
-
-        merged = pd.DataFrame()
-        merged["corr"] = corrs
-        merged["n"] = sample_counts
-        merged["pval"] = pvals
-
-        # drop correlations with less than 3 samples
-        merged = merged.dropna(how="any")
-
-        merged["qval"] = multipletests(merged["pval"], alpha=0.01, method="fdr_bh")[1]
-
-        merged["pval"] = -np.log10(merged["pval"])
-        merged["qval"] = -np.log10(merged["qval"])
-
-        merged = merged.sort_values(by="pval", ascending=False)
-
-        return merged
-
     pvals = -np.log10(pvals)
+
+    if melt:
+
+        return melt_corr(corrs, pvals, sample_counts, method)
+
     return corrs, pvals
 
 
-def mat_corr(a_mat, b_mat, method="pearson"):
+def mat_corr(a_mat, b_mat, melt:bool, method="pearson"):
     """
     Compute correlations between every column-column pair of A and B
 
@@ -222,31 +235,14 @@ def mat_corr(a_mat, b_mat, method="pearson"):
     # Store correlations in DataFrames
     corrs = pd.DataFrame(corrs, index=a_names, columns=b_names)
     pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
-
-    if a_num_cols == 1 or b_num_cols == 1:
-
-        if a_num_cols == 1:
-            corrs = pd.Series(corrs.iloc[0])
-            pvals = pd.Series(pvals.iloc[0])
-
-        elif b_num_cols == 1:
-            corrs = pd.Series(corrs.iloc[:, 0])
-            pvals = pd.Series(pvals.iloc[:, 0])
-
-        merged = pd.DataFrame()
-        merged["corr"] = corrs
-        merged["n"] = num_samples
-        merged["pval"] = pvals
-        merged["qval"] = multipletests(merged["pval"], alpha=0.01, method="fdr_bh")[1]
-
-        merged["pval"] = -np.log10(merged["pval"])
-        merged["qval"] = -np.log10(merged["qval"])
-
-        merged = merged.sort_values(by="pval", ascending=False)
-
-        return merged
-
+    sample_counts = pd.DataFrame(num_samples, index=a_names, columns=b_names)
+    
     pvals = -np.log10(pvals)
+
+    if melt:
+
+        return melt_corr(corrs, pvals, sample_counts, method)
+
     return corrs, pvals
 
 
@@ -266,7 +262,7 @@ def pearson_significance(row):
     return beta
 
 
-def mat_corr_nan(a_mat, b_mat, method="pearson"):
+def mat_corr_nan(a_mat, b_mat, melt:bool, method="pearson"):
     """
     Compute correlations between A and every column of B. A must be
     a Series for this method to work.
@@ -288,6 +284,8 @@ def mat_corr_nan(a_mat, b_mat, method="pearson"):
     """
 
     a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, np.float64)
+
+    a_name = a_mat.columns[0]
 
     if len(a_mat.columns) != 1:
         raise ValueError("A must contain only a single variable.")
@@ -345,12 +343,17 @@ def mat_corr_nan(a_mat, b_mat, method="pearson"):
 
     corrs = np.array(residual_products / sum_products).reshape(-1)
 
-    corr_df = pd.DataFrame(index=b_names)
+    corrs_index = pd.MultiIndex.from_arrays([b_names,[a_name]*b_num_cols], names=('b_col', 'a_col'))
+
+    corr_df = pd.DataFrame(index=corrs_index)
 
     corr_df["corr"] = corrs
     corr_df["n"] = num_samples - nan_sums
     corr_df["pval"] = corr_df.apply(pearson_significance, axis=1)
     corr_df["qval"] = multipletests(corr_df["pval"], alpha=0.01, method="fdr_bh")[1]
+
+    # rename 'corr' column with name of method used
+    corr_df = corr_df.rename({"corr":method},axis=1)
 
     corr_df["pval"] = -np.log10(corr_df["pval"])
     corr_df["qval"] = -np.log10(corr_df["qval"])
@@ -445,16 +448,16 @@ def mat_corr_subtyped(
         a_subset = a_mat.loc[subtype_rows]
         b_subset = b_mat.loc[subtype_rows]
 
-        if mat_method == "mat_corrs_naive":
-            res = mat_corrs_naive(a_subset, b_subset, **kwargs)
+        if mat_method == "mat_corr_naive":
+            res = mat_corr_naive(a_subset, b_subset, **kwargs)
 
-        elif mat_method == "mat_corrs_nan":
+        elif mat_method == "mat_corr_nan":
 
-            res = mat_corrs_nan(a_subset, b_subset, **kwargs)
+            res = mat_corr_nan(a_subset, b_subset, **kwargs)
 
-        elif mat_method == "mat_corrs":
+        elif mat_method == "mat_corr":
 
-            res = mat_corrs(a_subset, b_subset, **kwargs)
+            res = mat_corr(a_subset, b_subset, **kwargs)
 
         # rename columns for merging
         res.columns = [subtype + "_" + x for x in res.columns]

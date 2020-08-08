@@ -9,13 +9,13 @@ from tqdm import tqdm_notebook as tqdm
 from .utils import precheck_align
 
 
-def melt_mwu(corrs, pvals, pos_ns, neg_ns):
+def melt_mwu(effects, pvals, pos_ns, neg_ns, effect):
     """
     Flatten matrix-form outputs to column-form.
 
     Parameters
     ----------
-    corrs: Pandas DataFrame
+    effects: Pandas DataFrame
         effect sizes matrix
     pvals: Pandas DataFrame
         p-values matrix
@@ -25,6 +25,8 @@ def melt_mwu(corrs, pvals, pos_ns, neg_ns):
         number of columns in first observations matrix
     b_num_cols: int
         number of columns in second observations matrix
+    effect: "mean", "median", or "rank_biserial"
+        the effect statistic
 
     Returns
     -------
@@ -32,7 +34,7 @@ def melt_mwu(corrs, pvals, pos_ns, neg_ns):
     """
 
     melted = pd.DataFrame()
-    melted["corr"] = corrs.unstack()
+    melted[effect] = effects.unstack()
     melted["pval"] = pvals.unstack()
     melted["qval"] = multipletests(
         10 ** (-melted["pval"]), alpha=0.01, method="fdr_bh"
@@ -77,7 +79,7 @@ def mat_mwu_naive(
 
     Returns
     -------
-    corrs: rank-biserial correlations
+    effects: rank-biserial correlations
     pvals: -log10 p-values of correlations
     """
 
@@ -93,7 +95,7 @@ def mat_mwu_naive(
     a_num_cols = a_mat.shape[1]  # number of variables in A
     b_num_cols = b_mat.shape[1]  # number of variables in B
 
-    corrs = np.zeros((a_num_cols, b_num_cols))  # null value of r = 0
+    effects = np.zeros((a_num_cols, b_num_cols))  # null value of r = 0
     pvals = np.zeros((a_num_cols, b_num_cols)) + 1  # null value of p=1
 
     pos_ns = np.zeros((a_num_cols, b_num_cols))
@@ -140,13 +142,13 @@ def mat_mwu_naive(
                     )
 
                     if effect == "rank_biserial":
-                        corrs[a_col_idx][b_col_idx] = (
+                        effects[a_col_idx][b_col_idx] = (
                             2 * U2 / (len(a_pos) * len(a_neg)) - 1
                         )
                     elif effect == "median":
-                        corrs[a_col_idx][b_col_idx] = a_pos.median() - a_neg.median()
+                        effects[a_col_idx][b_col_idx] = a_pos.median() - a_neg.median()
                     elif effect == "mean":
-                        corrs[a_col_idx][b_col_idx] = a_pos.mean() - a_neg.mean()
+                        effects[a_col_idx][b_col_idx] = a_pos.mean() - a_neg.mean()
 
                     pvals[a_col_idx][b_col_idx] = pval
 
@@ -159,21 +161,21 @@ def mat_mwu_naive(
     # account for small p-values rounding to 0
     pvals[pvals == 0] = np.finfo(np.float64).tiny
 
-    corrs = pd.DataFrame(corrs, index=a_names, columns=b_names)
+    effects = pd.DataFrame(effects, index=a_names, columns=b_names)
     pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
     pos_ns = pd.DataFrame(pos_ns, index=a_names, columns=b_names)
     neg_ns = pd.DataFrame(neg_ns, index=a_names, columns=b_names)
 
-    corrs = corrs.fillna(0)
+    effects = effects.fillna(0)
     pvals = pvals.fillna(1)
 
     pvals = -np.log10(pvals)
 
     if melt:
 
-        return melt_mwu(corrs, pvals, pos_ns, neg_ns)
+        return melt_mwu(effects, pvals, pos_ns, neg_ns, effect)
 
-    return corrs, pvals
+    return effects, pvals
 
 
 def mat_mwu(a_mat, b_mat, melt: bool, use_continuity=True, effect="rank_biserial"):
@@ -200,7 +202,7 @@ def mat_mwu(a_mat, b_mat, melt: bool, use_continuity=True, effect="rank_biserial
 
     Returns
     -------
-    corrs: rank-biserial correlations
+    effects: rank-biserial correlations
     pvals: -log10 p-values of correlations
     """
 
@@ -250,10 +252,10 @@ def mat_mwu(a_mat, b_mat, melt: bool, use_continuity=True, effect="rank_biserial
     zero_prod = n_prod == 0
     n_prod[zero_prod] = 1
 
-    corrs = 2 * u2 / (pos_ns * neg_ns) - 1
+    effects = 2 * u2 / (pos_ns * neg_ns) - 1
 
     # set zeros to nan
-    corrs[zero_prod] = 0
+    effects[zero_prod] = 0
 
     a_ties = np.vstack([np.array(a_ties)] * b_num_cols).T
 
@@ -280,17 +282,17 @@ def mat_mwu(a_mat, b_mat, melt: bool, use_continuity=True, effect="rank_biserial
     pvals[pvals == 0] = np.finfo(np.float64).tiny
 
     pvals = pd.DataFrame(pvals, columns=b_names, index=a_names)
-    corrs = pd.DataFrame(corrs, columns=b_names, index=a_names)
+    effects = pd.DataFrame(effects, columns=b_names, index=a_names)
     pos_ns = pd.DataFrame(pos_ns, columns=b_names, index=a_names)
     neg_ns = pd.DataFrame(neg_ns, columns=b_names, index=a_names)
 
-    corrs = corrs.fillna(0)
+    effects = effects.fillna(0)
     pvals = pvals.fillna(1)
 
     pvals = -np.log10(pvals)
 
     if melt:
 
-        return melt_mwu(corrs, pvals, pos_ns, neg_ns)
+        return melt_mwu(effects, pvals, pos_ns, neg_ns, effect)
 
-    return corrs, pvals
+    return effects, pvals

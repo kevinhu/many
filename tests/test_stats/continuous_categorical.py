@@ -19,7 +19,7 @@ for a_type, b_type, effect, melt in mat_mwu_param_combos:
 
     else:
 
-        output_names = ["corrs", "pvals"]
+        output_names = ["effects", "pvals"]
 
     explicit_params = [
         # mat_mwu, full-size comparison

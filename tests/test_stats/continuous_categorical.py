@@ -19,9 +19,10 @@ for a_type, b_type, effect, melt in mat_mwu_param_combos:
 
     else:
 
-        output_names = ["corrs","pvals"]
+        output_names = ["corrs", "pvals"]
 
-    explicit_params = [  # mat_mwu, full-size comparison
+    explicit_params = [
+        # mat_mwu, full-size comparison
         [
             many.stats.mat_mwu_naive,
             many.stats.mat_mwu,
@@ -32,7 +33,7 @@ for a_type, b_type, effect, melt in mat_mwu_param_combos:
             b_type,
             False,
             False,
-            {"effect": effect, "melt":melt},
+            {"effect": effect, "melt": melt},
             output_names,
         ],
         # mat_mwu, 1-d a_mat
@@ -46,7 +47,7 @@ for a_type, b_type, effect, melt in mat_mwu_param_combos:
             b_type,
             False,
             False,
-            {"effect": effect, "melt":melt},
+            {"effect": effect, "melt": melt},
             output_names,
         ],
         # mat_mwu, 1-d b_mat
@@ -60,7 +61,7 @@ for a_type, b_type, effect, melt in mat_mwu_param_combos:
             b_type,
             False,
             False,
-            {"effect": effect, "melt":melt},
+            {"effect": effect, "melt": melt},
             output_names,
         ],
         # mat_mwu, 1-d both
@@ -74,7 +75,7 @@ for a_type, b_type, effect, melt in mat_mwu_param_combos:
             b_type,
             False,
             False,
-            {"effect": effect, "melt":melt},
+            {"effect": effect, "melt": melt},
             output_names,
         ],
     ]

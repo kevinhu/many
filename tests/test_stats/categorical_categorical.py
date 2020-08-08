@@ -34,7 +34,7 @@ for a_col_count, b_col_count, a_type, b_type, melt in mat_fisher_param_combos:
             b_type,
             False,
             False,
-            {"melt":melt},
+            {"melt": melt},
             output_names,
         ],
         # mat_fisher_nan, single-dim comparison
@@ -48,7 +48,7 @@ for a_col_count, b_col_count, a_type, b_type, melt in mat_fisher_param_combos:
             b_type,
             True,
             True,
-            {"melt":melt},
+            {"melt": melt},
             output_names,
         ],
     ]

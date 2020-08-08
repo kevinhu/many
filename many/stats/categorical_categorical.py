@@ -81,7 +81,7 @@ def mat_fisher_naive(a_mat, b_mat, melt: bool, pbar=False):
     fishers: -log10 p-values of Fisher exact test
     """
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat, np.int64, np.int64)
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float16, np.float16)
 
     a_names = a_mat.columns
     b_names = b_mat.columns
@@ -269,7 +269,7 @@ def mat_fisher_nan(a_mat, b_mat, melt: bool):
     fishers: -log10 p-values of Fisher exact test
     """
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat, np.int64, np.int64)
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, np.float64)
 
     a_names = a_mat.columns
     b_names = b_mat.columns

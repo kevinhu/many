@@ -7,12 +7,22 @@ b_col_counts = [1, 25]
 a_types = ["binary", "zero"]
 b_types = ["binary", "zero"]
 melts = [False, True]
+pseudocounts = [0, 1]
 
-mat_fisher_param_combos = product(a_col_counts, b_col_counts, a_types, b_types, melts)
+mat_fisher_param_combos = product(
+    a_col_counts, b_col_counts, a_types, b_types, melts, pseudocounts
+)
 
 params = []
 
-for a_col_count, b_col_count, a_type, b_type, melt in mat_fisher_param_combos:
+for (
+    a_col_count,
+    b_col_count,
+    a_type,
+    b_type,
+    melt,
+    pseudocount,
+) in mat_fisher_param_combos:
 
     if melt:
 
@@ -34,7 +44,7 @@ for a_col_count, b_col_count, a_type, b_type, melt in mat_fisher_param_combos:
             b_type,
             False,
             False,
-            {"melt": melt},
+            {"melt": melt, "pseudocount": pseudocount},
             output_names,
         ],
         # mat_fisher_nan, single-dim comparison
@@ -48,7 +58,7 @@ for a_col_count, b_col_count, a_type, b_type, melt in mat_fisher_param_combos:
             b_type,
             True,
             True,
-            {"melt": melt},
+            {"melt": melt, "pseudocount": pseudocount},
             output_names,
         ],
     ]

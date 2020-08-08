@@ -61,7 +61,7 @@ def melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int)
     return melted
 
 
-def mat_fisher_naive(a_mat, b_mat, melt: bool, pbar=False):
+def mat_fisher_naive(a_mat, b_mat, melt: bool, pseudocount=0, pbar=False):
     """
     Compute odds ratios and Fisher's exact test 
     between every column-column pair of a_mat (binary) and b_mat (binary),
@@ -77,6 +77,8 @@ def mat_fisher_naive(a_mat, b_mat, melt: bool, pbar=False):
         Required to be castable to boolean datatype.
     melt: boolean
         Whether or not to melt the outputs into columns.
+    pseudocount: float
+        value to add to all contingency cells (0 by default)
     pbar: Boolean
         Whether or not to show a progress bar.
 
@@ -86,7 +88,7 @@ def mat_fisher_naive(a_mat, b_mat, melt: bool, pbar=False):
     fishers: -log10 p-values of Fisher exact test
     """
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float16, np.float16)
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.int64, np.int64)
 
     a_names = a_mat.columns
     b_names = b_mat.columns
@@ -98,10 +100,10 @@ def mat_fisher_naive(a_mat, b_mat, melt: bool, pbar=False):
     pvals = np.zeros((a_num_cols, b_num_cols))
 
     # contingency table counts
-    AB = np.zeros((a_num_cols, b_num_cols), dtype=np.int64)
-    Ab = np.zeros((a_num_cols, b_num_cols), dtype=np.int64)
-    aB = np.zeros((a_num_cols, b_num_cols), dtype=np.int64)
-    ab = np.zeros((a_num_cols, b_num_cols), dtype=np.int64)
+    AB = np.zeros((a_num_cols, b_num_cols), dtype=np.float64)
+    Ab = np.zeros((a_num_cols, b_num_cols), dtype=np.float64)
+    aB = np.zeros((a_num_cols, b_num_cols), dtype=np.float64)
+    ab = np.zeros((a_num_cols, b_num_cols), dtype=np.float64)
 
     if pbar:
         sys.stderr.flush()
@@ -115,10 +117,10 @@ def mat_fisher_naive(a_mat, b_mat, melt: bool, pbar=False):
 
             a_col, b_col = a_col.align(b_col, join="inner")
 
-            XY = (a_col & b_col).sum()
-            Xy = (a_col & (~b_col)).sum()
-            xY = ((~a_col) & b_col).sum()
-            xy = ((~a_col) & (~b_col)).sum()
+            XY = (a_col & b_col).sum() + pseudocount
+            Xy = (a_col & (~b_col)).sum() + pseudocount
+            xY = ((~a_col) & b_col).sum() + pseudocount
+            xy = ((~a_col) & (~b_col)).sum() + pseudocount
 
             AB[a_col_idx][b_col_idx] = XY
             Ab[a_col_idx][b_col_idx] = Xy
@@ -176,7 +178,7 @@ def fisher_arr(x):
     return mlog10Test1t(x[0], x[1], x[2], x[3])
 
 
-def mat_fisher(a_mat, b_mat, melt: bool):
+def mat_fisher(a_mat, b_mat, melt: bool, pseudocount=0):
     """
     Compute odds ratios and Fisher's exact test 
     between every column-column pair of a_mat (binary) and b_mat (binary),
@@ -193,6 +195,8 @@ def mat_fisher(a_mat, b_mat, melt: bool):
         Required to be castable to boolean datatype.
     melt: boolean
         Whether or not to melt the outputs into columns.
+    pseudocount: integer
+        value to add to all contingency cells (0 by default)
 
     Returns
     -------
@@ -221,12 +225,12 @@ def mat_fisher(a_mat, b_mat, melt: bool):
     B_pos = b_mat
     B_neg = 1 - b_mat
 
-    AB = np.dot(A_pos.T, B_pos)
-    Ab = np.dot(A_pos.T, B_neg)
-    aB = np.dot(A_neg.T, B_pos)
-    ab = np.dot(A_neg.T, B_neg)
+    AB = np.dot(A_pos.T, B_pos) + pseudocount
+    Ab = np.dot(A_pos.T, B_neg) + pseudocount
+    aB = np.dot(A_neg.T, B_pos) + pseudocount
+    ab = np.dot(A_neg.T, B_neg) + pseudocount
 
-    comb = np.stack([AB, Ab, aB, ab])
+    comb = np.stack([AB, Ab, aB, ab]).astype(np.int64)
 
     pvals = np.apply_along_axis(fisher_arr, 0, comb)
     pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
@@ -251,7 +255,7 @@ def mat_fisher(a_mat, b_mat, melt: bool):
     return oddsrs, pvals
 
 
-def mat_fisher_nan(a_mat, b_mat, melt: bool):
+def mat_fisher_nan(a_mat, b_mat, melt: bool, pseudocount=0):
     """
     Compute odds ratios and Fisher's exact test 
     between every column-column pair of a_mat (binary) and b_mat (binary),
@@ -267,6 +271,8 @@ def mat_fisher_nan(a_mat, b_mat, melt: bool):
         Required to be castable to boolean datatype.
     melt: boolean
         Whether or not to melt the outputs into columns.
+    pseudocount: integer
+        value to add to all contingency cells (0 by default)
 
     Returns
     -------
@@ -274,7 +280,7 @@ def mat_fisher_nan(a_mat, b_mat, melt: bool):
     fishers: -log10 p-values of Fisher exact test
     """
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, np.float64)
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.int64, np.int64)
 
     a_names = a_mat.columns
     b_names = b_mat.columns
@@ -297,10 +303,10 @@ def mat_fisher_nan(a_mat, b_mat, melt: bool):
     b_pos = np.ma.array(b_pos, mask=b_nan, dtype=np.int64)
     b_neg = np.ma.array(b_neg, mask=b_nan, dtype=np.int64)
 
-    AB = np.ma.dot(a_pos.T, b_pos)
-    Ab = np.ma.dot(a_pos.T, b_neg)
-    aB = np.ma.dot(a_neg.T, b_pos)
-    ab = np.ma.dot(a_neg.T, b_neg)
+    AB = np.ma.dot(a_pos.T, b_pos) + pseudocount
+    Ab = np.ma.dot(a_pos.T, b_neg) + pseudocount
+    aB = np.ma.dot(a_neg.T, b_pos) + pseudocount
+    ab = np.ma.dot(a_neg.T, b_neg) + pseudocount
 
     comb = np.stack([AB, Ab, aB, ab])
 

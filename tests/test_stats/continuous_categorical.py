@@ -5,12 +5,21 @@ import many
 a_types = ["continuous", "zero"]
 b_types = ["categorical", "zero"]
 effects = ["rank_biserial"]
+melts = [False, True]
 
-mat_mwu_param_combos = product(a_types, b_types, effects)
+mat_mwu_param_combos = product(a_types, b_types, effects, melts)
 
 params = []
 
-for a_type, b_type, effect in mat_mwu_param_combos:
+for a_type, b_type, effect, melt in mat_mwu_param_combos:
+
+    if melt:
+
+        output_names = ["melted"]
+
+    else:
+
+        output_names = ["corrs","pvals"]
 
     explicit_params = [  # mat_mwu, full-size comparison
         [
@@ -23,8 +32,8 @@ for a_type, b_type, effect in mat_mwu_param_combos:
             b_type,
             False,
             False,
-            {"effect": effect},
-            ["corrs", "pvals"],
+            {"effect": effect, "melt":melt},
+            output_names,
         ],
         # mat_mwu, 1-d a_mat
         [
@@ -37,8 +46,8 @@ for a_type, b_type, effect in mat_mwu_param_combos:
             b_type,
             False,
             False,
-            {"effect": effect},
-            ["merged"],
+            {"effect": effect, "melt":melt},
+            output_names,
         ],
         # mat_mwu, 1-d b_mat
         [
@@ -51,8 +60,8 @@ for a_type, b_type, effect in mat_mwu_param_combos:
             b_type,
             False,
             False,
-            {"effect": effect},
-            ["merged"],
+            {"effect": effect, "melt":melt},
+            output_names,
         ],
         # mat_mwu, 1-d both
         [
@@ -65,8 +74,8 @@ for a_type, b_type, effect in mat_mwu_param_combos:
             b_type,
             False,
             False,
-            {"effect": effect},
-            ["merged"],
+            {"effect": effect, "melt":melt},
+            output_names,
         ],
     ]
 

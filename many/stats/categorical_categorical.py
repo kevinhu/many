@@ -71,7 +71,7 @@ def mat_fisher_naive(a_mat, b_mat, melt: bool, pbar=False):
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
     melt: boolean
-        Whether or not to melt the outputs into a single Series.
+        Whether or not to melt the outputs into columns.
     pbar: Boolean
         Whether or not to show a progress bar.
 
@@ -187,7 +187,7 @@ def mat_fisher(a_mat, b_mat, melt: bool):
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
     melt: boolean
-        Whether or not to melt the outputs into a single Series.
+        Whether or not to melt the outputs into columns.
 
     Returns
     -------
@@ -261,7 +261,7 @@ def mat_fisher_nan(a_mat, b_mat, melt: bool):
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
     melt: boolean
-        Whether or not to melt the outputs into a single Series.
+        Whether or not to melt the outputs into columns.
 
     Returns
     -------

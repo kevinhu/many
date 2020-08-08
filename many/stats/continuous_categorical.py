@@ -9,8 +9,47 @@ from tqdm import tqdm_notebook as tqdm
 from .utils import precheck_align
 
 
+def melt_mwu(corrs, pvals, pos_ns, neg_ns):
+    """
+    Flatten matrix-form outputs to column-form.
+
+    Parameters
+    ----------
+    corrs: Pandas DataFrame
+        effect sizes matrix
+    pvals: Pandas DataFrame
+        p-values matrix
+    pos_ns neg_ns: Pandas DataFrames
+        sample group counts
+    a_num_cols: int
+        number of columns in first observations matrix
+    b_num_cols: int
+        number of columns in second observations matrix
+
+    Returns
+    -------
+    series form statistics
+    """
+
+    melted = pd.DataFrame()
+    melted["corr"] = corrs.unstack()
+    melted["pval"] = pvals.unstack()
+    melted["qval"] = multipletests(
+        10 ** (-melted["pval"]), alpha=0.01, method="fdr_bh"
+    )[1]
+
+    melted["qval"] = -np.log10(melted["qval"])
+
+    melted["pos_n"] = pos_ns.unstack()
+    melted["neg_n"] = neg_ns.unstack()
+
+    melted = melted.sort_values(by="pval", ascending=False)
+
+    return melted
+
+
 def mat_mwu_naive(
-    a_mat, b_mat, use_continuity=True, pbar=False, effect="rank_biserial",
+    a_mat, b_mat, melt: bool, use_continuity=True, pbar=False, effect="rank_biserial",
 ):
     """
     Compute rank-biserial correlations and Mann-Whitney statistics 
@@ -27,9 +66,14 @@ def mat_mwu_naive(
     B: Pandas DataFrame
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
+    melt: boolean
+        Whether or not to melt the outputs into columns.
+    use_continuity: bool
+        Whether or not to use a continuity correction. True by default.
     pbar: Boolean
         Whether or not to show a progress bar.
     effect: "mean", "median", or "rank_biserial"
+        The effect statistic.
 
     Returns
     -------
@@ -41,7 +85,7 @@ def mat_mwu_naive(
 
         raise ValueError("effect must be 'mean', 'median', or 'rank_biserial'")
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, bool)
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, np.float64)
 
     a_names = a_mat.columns
     b_names = b_mat.columns
@@ -123,48 +167,16 @@ def mat_mwu_naive(
     corrs = corrs.fillna(0)
     pvals = pvals.fillna(1)
 
-    if a_num_cols == 1 or b_num_cols == 1:
-
-        if a_num_cols == 1:
-
-            corrs = pd.Series(corrs.iloc[0])
-            pvals = pd.Series(pvals.iloc[0])
-            pos_ns = pd.Series(pos_ns.iloc[0])
-            neg_ns = pd.Series(neg_ns.iloc[0])
-
-        elif b_num_cols == 1:
-
-            corrs = pd.Series(corrs.iloc[:, 0])
-            pvals = pd.Series(pvals.iloc[:, 0])
-            pos_ns = pd.Series(pos_ns.iloc[:, 0])
-            neg_ns = pd.Series(neg_ns.iloc[:, 0])
-
-        merged = pd.DataFrame()
-        merged["corr"] = corrs
-        merged["pval"] = pvals
-        merged["pos_n"] = pos_ns
-        merged["neg_n"] = neg_ns
-
-        merged = merged[(merged["pos_n"] >= 1) & (merged["neg_n"] >= 1)]
-
-        if len(merged) == 0:
-            return merged
-
-        merged["qval"] = multipletests(merged["pval"], alpha=0.01, method="fdr_bh")[1]
-
-        merged["pval"] = -np.log10(merged["pval"])
-        merged["qval"] = -np.log10(merged["qval"])
-
-        merged = merged.sort_values(by="pval", ascending=False)
-
-        return merged
-
     pvals = -np.log10(pvals)
+
+    if melt:
+
+        return melt_mwu(corrs, pvals, pos_ns, neg_ns)
 
     return corrs, pvals
 
 
-def mat_mwu(a_mat, b_mat, use_continuity=True, effect="rank_biserial"):
+def mat_mwu(a_mat, b_mat, melt: bool, use_continuity=True, effect="rank_biserial"):
     """
     Compute rank-biserial correlations and Mann-Whitney statistics 
     between every column-column pair of A (continuous) and B (binary).
@@ -179,6 +191,12 @@ def mat_mwu(a_mat, b_mat, use_continuity=True, effect="rank_biserial"):
     B: Pandas DataFrame
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
+    melt: boolean
+        Whether or not to melt the outputs into columns.
+    use_continuity: bool
+        Whether or not to use a continuity correction. True by default.
+    effect: "mean", "median", or "rank_biserial"
+        The effect statistic.
 
     Returns
     -------
@@ -190,7 +208,14 @@ def mat_mwu(a_mat, b_mat, use_continuity=True, effect="rank_biserial"):
 
         raise ValueError("effect must be 'rank_biserial'")
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, bool)
+    a_nan = a_mat.isna().sum().sum() == 0
+    b_nan = b_mat.isna().sum().sum() == 0
+
+    if not a_nan and not b_nan:
+
+        raise ValueError("a_mat and b_mat cannot have missing values")
+
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, np.bool)
 
     a_names = a_mat.columns
     b_names = b_mat.columns
@@ -198,13 +223,8 @@ def mat_mwu(a_mat, b_mat, use_continuity=True, effect="rank_biserial"):
     a_ranks = a_mat.apply(rankdata)
     a_ties = a_ranks.apply(tiecorrect)
 
-    a_nan = a_mat.isna().sum().sum() == 0
-    b_nan = b_mat.isna().sum().sum() == 0
-
-    if not a_nan and not b_nan:
-        raise ValueError("A and B cannot have missing values")
-
     a_mat, b_mat = np.array(a_mat), np.array(b_mat)
+    b_mat = b_mat.astype(np.bool)
 
     a_num_cols = a_mat.shape[1]  # number of variables in A
     b_num_cols = b_mat.shape[1]  # number of variables in B
@@ -267,42 +287,10 @@ def mat_mwu(a_mat, b_mat, use_continuity=True, effect="rank_biserial"):
     corrs = corrs.fillna(0)
     pvals = pvals.fillna(1)
 
-    if a_num_cols == 1 or b_num_cols == 1:
-
-        if a_num_cols == 1:
-
-            corrs = pd.Series(corrs.iloc[0])
-            pvals = pd.Series(pvals.iloc[0])
-            pos_ns = pd.Series(pos_ns.iloc[0])
-            neg_ns = pd.Series(neg_ns.iloc[0])
-
-        elif b_num_cols == 1:
-
-            corrs = pd.Series(corrs.iloc[:, 0])
-            pvals = pd.Series(pvals.iloc[:, 0])
-            pos_ns = pd.Series(pos_ns.iloc[:, 0])
-            neg_ns = pd.Series(neg_ns.iloc[:, 0])
-
-        merged = pd.DataFrame()
-        merged["corr"] = corrs
-        merged["pval"] = pvals
-        merged["pos_n"] = pos_ns
-        merged["neg_n"] = neg_ns
-
-        merged = merged[(merged["pos_n"] >= 1) & (merged["neg_n"] >= 1)]
-
-        if len(merged) == 0:
-            return merged
-
-        merged["qval"] = multipletests(merged["pval"], alpha=0.01, method="fdr_bh")[1]
-
-        merged["pval"] = -np.log10(merged["pval"])
-        merged["qval"] = -np.log10(merged["qval"])
-
-        merged = merged.sort_values(by="pval", ascending=False)
-
-        return merged
-
     pvals = -np.log10(pvals)
+
+    if melt:
+
+        return melt_mwu(corrs, pvals, pos_ns, neg_ns)
 
     return corrs, pvals

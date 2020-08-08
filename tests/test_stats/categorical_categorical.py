@@ -16,68 +16,41 @@ for a_col_count, b_col_count, a_type, b_type, melt in mat_fisher_param_combos:
 
     if melt:
 
-        explicit_params = [
-            # mat_fisher, single-dim comparison
-            [
-                many.stats.mat_fisher_naive,
-                many.stats.mat_fisher,
-                100,
-                a_col_count,
-                b_col_count,
-                a_type,
-                b_type,
-                False,
-                False,
-                {"melt":melt},
-                ["merged"],
-            ],
-            # mat_fisher_nan, single-dim comparison
-            [
-                many.stats.mat_fisher_naive,
-                many.stats.mat_fisher_nan,
-                100,
-                a_col_count,
-                b_col_count,
-                a_type,
-                b_type,
-                True,
-                True,
-                {"melt":melt},
-                ["merged"],
-            ],
-        ]
+        output_names = ["melted"]
 
     else:
 
-        explicit_params = [
-            # mat_fisher, full-size comparison
-            [
-                many.stats.mat_fisher_naive,
-                many.stats.mat_fisher,
-                100,
-                a_col_count,
-                b_col_count,
-                a_type,
-                b_type,
-                False,
-                False,
-                {"melt":melt},
-                ["corrs", "pvals"],
-            ],
-            # mat_fisher_nan, single-dim comparison
-            [
-                many.stats.mat_fisher_naive,
-                many.stats.mat_fisher_nan,
-                100,
-                a_col_count,
-                b_col_count,
-                a_type,
-                b_type,
-                True,
-                True,
-                {"melt":melt},
-                ["corrs", "pvals"],
-            ],
-        ]
+        output_names = ["corrs", "pvals"]
+
+    explicit_params = [
+        # mat_fisher, single-dim comparison
+        [
+            many.stats.mat_fisher_naive,
+            many.stats.mat_fisher,
+            100,
+            a_col_count,
+            b_col_count,
+            a_type,
+            b_type,
+            False,
+            False,
+            {"melt":melt},
+            output_names,
+        ],
+        # mat_fisher_nan, single-dim comparison
+        [
+            many.stats.mat_fisher_naive,
+            many.stats.mat_fisher_nan,
+            100,
+            a_col_count,
+            b_col_count,
+            a_type,
+            b_type,
+            True,
+            True,
+            {"melt":melt},
+            output_names,
+        ],
+    ]
 
     params = params + explicit_params

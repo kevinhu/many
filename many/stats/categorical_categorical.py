@@ -59,18 +59,15 @@ def melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int)
 def mat_fisher_naive(a_mat, b_mat, melt: bool, pbar=False):
     """
     Compute odds ratios and Fisher's exact test 
-    between every column-column pair of A (binary) and B (binary),
+    between every column-column pair of a_mat (binary) and b_mat (binary),
     using a double for loop.
-
-    In the case that A or B has a single column, the results are re-formatted
-    with the multiple hypothesis-adjusted q-value also returned.
 
     Parameters
     ----------
-    A: Pandas DataFrame
+    a_mat: Pandas DataFrame
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
-    B: Pandas DataFrame
+    b_mat: Pandas DataFrame
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
     melt: boolean
@@ -95,6 +92,7 @@ def mat_fisher_naive(a_mat, b_mat, melt: bool, pbar=False):
     oddsrs = np.zeros((a_num_cols, b_num_cols))
     pvals = np.zeros((a_num_cols, b_num_cols))
 
+    # contingency table counts
     AB = np.zeros((a_num_cols, b_num_cols), dtype=np.int64)
     Ab = np.zeros((a_num_cols, b_num_cols), dtype=np.int64)
     aB = np.zeros((a_num_cols, b_num_cols), dtype=np.int64)
@@ -125,6 +123,7 @@ def mat_fisher_naive(a_mat, b_mat, melt: bool, pbar=False):
             numer = XY * xy
             denom = xY * Xy
 
+            # dummy values for odds ratio
             if denom == 0:
                 oddsr = -1
             else:
@@ -175,19 +174,16 @@ def fisher_arr(x):
 def mat_fisher(a_mat, b_mat, melt: bool):
     """
     Compute odds ratios and Fisher's exact test 
-    between every column-column pair of A (binary) and B (binary),
+    between every column-column pair of a_mat (binary) and b_mat (binary),
     under the assumption that neither array contains missing values
     (np.nan).
 
-    In the case that A or B has a single column, the results are re-formatted
-    with the multiple hypothesis-adjusted q-value also returned.
-
     Parameters
     ----------
-    A: Pandas DataFrame
+    a_mat: Pandas DataFrame
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
-    B: Pandas DataFrame
+    b_mat: Pandas DataFrame
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
     melt: boolean
@@ -204,8 +200,8 @@ def mat_fisher(a_mat, b_mat, melt: bool):
     a_names = a_mat.columns
     b_names = b_mat.columns
 
-    a_num_cols = len(a_names)  # number of variables in A
-    b_num_cols = len(b_names)  # number of variables in B
+    a_num_cols = len(a_names)  # number of variables in a_mat
+    b_num_cols = len(b_names)  # number of variables in b_mat
 
     a_nan = a_mat.isna().sum().sum() == 0
     b_nan = b_mat.isna().sum().sum() == 0
@@ -256,18 +252,15 @@ def mat_fisher(a_mat, b_mat, melt: bool):
 def mat_fisher_nan(a_mat, b_mat, melt: bool):
     """
     Compute odds ratios and Fisher's exact test 
-    between every column-column pair of A (binary) and B (binary),
+    between every column-column pair of a_mat (binary) and b_mat (binary),
     allowing for missing values.
-
-    In the case that A or B has a single column, the results are re-formatted
-    with the multiple hypothesis-adjusted q-value also returned.
 
     Parameters
     ----------
-    A: Pandas DataFrame
+    a_mat: Pandas DataFrame
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
-    B: Pandas DataFrame
+    b_mat: Pandas DataFrame
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
     melt: boolean
@@ -286,8 +279,8 @@ def mat_fisher_nan(a_mat, b_mat, melt: bool):
 
     a_mat, b_mat = np.array(a_mat), np.array(b_mat)
 
-    a_num_cols = a_mat.shape[1]  # number of variables in A
-    b_num_cols = b_mat.shape[1]  # number of variables in B
+    a_num_cols = a_mat.shape[1]  # number of variables in a_mat
+    b_num_cols = b_mat.shape[1]  # number of variables in b_mat
 
     a_pos = a_mat
     a_neg = 1 - a_mat

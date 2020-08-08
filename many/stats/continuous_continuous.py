@@ -14,6 +14,7 @@ from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
 
 from .utils import precheck_align
+from . import config
 
 
 def melt_corr(corrs, pvals, sample_counts, method):
@@ -44,7 +45,9 @@ def melt_corr(corrs, pvals, sample_counts, method):
     melted[method] = corrs.unstack()
     melted["pval"] = pvals.unstack()
     melted["qval"] = multipletests(
-        10 ** (-melted["pval"]), alpha=0.01, method="fdr_bh"
+        10 ** (-melted["pval"]),
+        alpha=config.MULTIPLETESTS_ALPHA,
+        method=config.MULTIPLETESTS_METHOD,
     )[1]
 
     melted["qval"] = -np.log10(melted["qval"])
@@ -52,12 +55,12 @@ def melt_corr(corrs, pvals, sample_counts, method):
 
     melted = melted.sort_values(by="pval", ascending=False)
 
-    melted.index.set_names(["b_col","a_col"], inplace=True)
+    melted.index.set_names(["b_col", "a_col"], inplace=True)
 
     return melted
 
 
-def mat_corr_naive(a_mat, b_mat, melt:bool, method="pearson", pbar=False):
+def mat_corr_naive(a_mat, b_mat, melt: bool, method:str, pbar=False):
     """
     Compute correlations between every column-column pair of A and B
     using a double for loop.
@@ -158,7 +161,7 @@ def mat_corr_naive(a_mat, b_mat, melt:bool, method="pearson", pbar=False):
     return corrs, pvals
 
 
-def mat_corr(a_mat, b_mat, melt:bool, method="pearson"):
+def mat_corr(a_mat, b_mat, melt: bool, method:str):
     """
     Compute correlations between every column-column pair of A and B
 
@@ -238,7 +241,7 @@ def mat_corr(a_mat, b_mat, melt:bool, method="pearson"):
     corrs = pd.DataFrame(corrs, index=a_names, columns=b_names)
     pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
     sample_counts = pd.DataFrame(num_samples, index=a_names, columns=b_names)
-    
+
     pvals = -np.log10(pvals)
 
     if melt:
@@ -264,7 +267,7 @@ def pearson_significance(row):
     return beta
 
 
-def mat_corr_nan(a_mat, b_mat, melt:bool, method="pearson"):
+def mat_corr_nan(a_mat, b_mat, melt: bool, method:str):
     """
     Compute correlations between A and every column of B. A must be
     a Series for this method to work.
@@ -345,7 +348,9 @@ def mat_corr_nan(a_mat, b_mat, melt:bool, method="pearson"):
 
     corrs = np.array(residual_products / sum_products).reshape(-1)
 
-    corrs_index = pd.MultiIndex.from_arrays([b_names,[a_name]*b_num_cols], names=('b_col', 'a_col'))
+    corrs_index = pd.MultiIndex.from_arrays(
+        [b_names, [a_name] * b_num_cols], names=("b_col", "a_col")
+    )
 
     corr_df = pd.DataFrame(index=corrs_index)
 
@@ -355,7 +360,7 @@ def mat_corr_nan(a_mat, b_mat, melt:bool, method="pearson"):
     corr_df["qval"] = multipletests(corr_df["pval"], alpha=0.01, method="fdr_bh")[1]
 
     # rename 'corr' column with name of method used
-    corr_df = corr_df.rename({"corr":method},axis=1)
+    corr_df = corr_df.rename({"corr": method}, axis=1)
 
     corr_df["pval"] = -np.log10(corr_df["pval"])
     corr_df["qval"] = -np.log10(corr_df["qval"])

@@ -7,6 +7,7 @@ from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
 
 from .utils import precheck_align
+from . import config
 
 
 def melt_mwu(effects, pvals, pos_ns, neg_ns, effect):
@@ -37,7 +38,9 @@ def melt_mwu(effects, pvals, pos_ns, neg_ns, effect):
     melted[effect] = effects.unstack()
     melted["pval"] = pvals.unstack()
     melted["qval"] = multipletests(
-        10 ** (-melted["pval"]), alpha=0.01, method="fdr_bh"
+        10 ** (-melted["pval"]),
+        alpha=config.MULTIPLETESTS_ALPHA,
+        method=config.MULTIPLETESTS_METHOD,
     )[1]
 
     melted["qval"] = -np.log10(melted["qval"])
@@ -47,13 +50,13 @@ def melt_mwu(effects, pvals, pos_ns, neg_ns, effect):
 
     melted = melted.sort_values(by="pval", ascending=False)
 
-    melted.index.set_names(["b_col","a_col"], inplace=True)
+    melted.index.set_names(["b_col", "a_col"], inplace=True)
 
     return melted
 
 
 def mat_mwu_naive(
-    a_mat, b_mat, melt: bool, use_continuity=True, pbar=False, effect="rank_biserial",
+    a_mat, b_mat, melt: bool, effect:str, use_continuity=True, pbar=False,
 ):
     """
     Compute rank-biserial correlations and Mann-Whitney statistics 
@@ -180,7 +183,7 @@ def mat_mwu_naive(
     return effects, pvals
 
 
-def mat_mwu(a_mat, b_mat, melt: bool, use_continuity=True, effect="rank_biserial"):
+def mat_mwu(a_mat, b_mat, melt: bool, effect:str, use_continuity=True):
     """
     Compute rank-biserial correlations and Mann-Whitney statistics 
     between every column-column pair of A (continuous) and B (binary).

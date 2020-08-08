@@ -8,6 +8,7 @@ from tqdm import tqdm_notebook as tqdm
 from .fisher import mlog10Test1t
 
 from .utils import precheck_align
+from . import config
 
 
 def melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int):
@@ -36,7 +37,9 @@ def melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int)
     melted["oddsr"] = oddsrs.unstack()
     melted["pval"] = pvals.unstack()
     melted["qval"] = multipletests(
-        10 ** (-melted["pval"]), alpha=0.01, method="fdr_bh"
+        10 ** (-melted["pval"]),
+        alpha=config.MULTIPLETESTS_ALPHA,
+        method=config.MULTIPLETESTS_METHOD,
     )[1]
 
     melted["qval"] = -np.log10(melted["qval"])
@@ -53,7 +56,7 @@ def melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int)
 
     melted = melted.sort_values(by="pval", ascending=False)
 
-    melted.index.set_names(["b_col","a_col"], inplace=True)
+    melted.index.set_names(["b_col", "a_col"], inplace=True)
 
     return melted
 

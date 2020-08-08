@@ -41,7 +41,7 @@ def mat_corr_naive(a_mat, b_mat, method="pearson", pbar=False):
     pvals: -log10 p-values of correlations
     """
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat)
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, np.float64)
 
     # store names before array conversion
     a_names = a_mat.columns
@@ -165,7 +165,7 @@ def mat_corr(a_mat, b_mat, method="pearson"):
     pvals: -log10 p-values of correlations
     """
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat)
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, np.float64)
 
     a_names = a_mat.columns
     b_names = b_mat.columns
@@ -287,7 +287,7 @@ def mat_corr_nan(a_mat, b_mat, method="pearson"):
         correlation coefficient, p-value, and q-value
     """
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat)
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, np.float64)
 
     if len(a_mat.columns) != 1:
         raise ValueError("A must contain only a single variable.")

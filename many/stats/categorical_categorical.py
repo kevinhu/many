@@ -81,7 +81,7 @@ def mat_fisher_naive(a_mat, b_mat, melt: bool, pbar=False):
     fishers: -log10 p-values of Fisher exact test
     """
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat)
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.int64, np.int64)
 
     a_names = a_mat.columns
     b_names = b_mat.columns
@@ -195,7 +195,7 @@ def mat_fisher(a_mat, b_mat, melt: bool):
     fishers: -log10 p-values of Fisher exact test
     """
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat)
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.int64, np.int64)
 
     a_names = a_mat.columns
     b_names = b_mat.columns
@@ -208,9 +208,6 @@ def mat_fisher(a_mat, b_mat, melt: bool):
 
     if not a_nan and not b_nan:
         raise ValueError("A and B cannot have missing values")
-
-    a_mat = a_mat.astype(np.int64)
-    b_mat = b_mat.astype(np.int64)
 
     a_mat, b_mat = np.array(a_mat), np.array(b_mat)
 
@@ -272,7 +269,7 @@ def mat_fisher_nan(a_mat, b_mat, melt: bool):
     fishers: -log10 p-values of Fisher exact test
     """
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat)
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.int64, np.int64)
 
     a_names = a_mat.columns
     b_names = b_mat.columns

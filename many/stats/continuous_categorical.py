@@ -41,7 +41,7 @@ def mat_mwu_naive(
 
         raise ValueError("effect must be 'mean', 'median', or 'rank_biserial'")
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat)
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, bool)
 
     a_names = a_mat.columns
     b_names = b_mat.columns
@@ -190,12 +190,10 @@ def mat_mwu(a_mat, b_mat, use_continuity=True, effect="rank_biserial"):
 
         raise ValueError("effect must be 'rank_biserial'")
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat)
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, bool)
 
     a_names = a_mat.columns
     b_names = b_mat.columns
-
-    b_mat = b_mat.astype(bool)
 
     a_ranks = a_mat.apply(rankdata)
     a_ties = a_ranks.apply(tiecorrect)

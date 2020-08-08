@@ -5,22 +5,26 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-def precheck_align(a_mat, b_mat):
+def precheck_align(a_mat, b_mat, a_cast, b_cast):
     """
-    Perform basic checks and alignment on A, B.
+    Perform basic checks and alignment on a_mat and b_mat.
 
     Parameters
     ----------
-    A: Pandas DataFrame
+    a_mat: Pandas DataFrame
         First set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
-    B: Pandas DataFrame
+    b_mat: Pandas DataFrame
         Second set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
+    a_cast: NumPy DataType
+        DataType to cast a_mat to
+    b_cast: Numpy DataType
+        DataType to cast b_mat to
 
     Returns
     -------
-    A, B: reformatted and aligned versions of inputs
+    Reformatted and aligned versions of inputs
     """
 
     # cast to DataFrame in case either is a Series

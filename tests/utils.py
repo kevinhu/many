@@ -1,3 +1,5 @@
+from typing import List
+
 import many
 
 from config import TOLERANCE
@@ -30,13 +32,13 @@ class ShapeMismatchError(Exception):
 
 
 def generate_test(
-    n_samples,
-    a_num_cols,
-    b_num_cols,
-    a_type="continuous",
-    b_type="continuous",
-    a_nan=False,
-    b_nan=False,
+    n_samples: int,
+    a_num_cols: int,
+    b_num_cols: int,
+    a_type: str,
+    b_type: str,
+    a_nan: bool,
+    b_nan: bool,
 ):
     """
     Generates randomly initialized matrix pairs for testing and benchmarking.
@@ -46,15 +48,17 @@ def generate_test(
     n_samples: int
         Number of samples per matrix (equivalent to number of rows)
     a_num_cols: int
-        Number of variables for A (equivalent to number of columns in A)
+        Number of variables for a_mat (equivalent to number of columns in a_mat)
     b_num_cols: int
-        Number of variables for B (equivalent to number of columns in B) 
+        Number of variables for b_mat (equivalent to number of columns in b_mat) 
     a_type: string, "continuous", "categorical", or "zero"
-        Type of variables in A
+        Type of variables in a_mat
     b_type: string, "continuous", "categorical", or "zero"
-        Type of variables in B
-    nan: boolean
-        whether or not to simulate missing (NaN) values in A and B
+        Type of variables in b_mat
+    a_nan: boolean
+        whether or not to simulate missing (NaN) values in a_mat
+    b_nan: boolean
+        whether or not to simulate missing (NaN) values in b_mat
 
     Returns
     -------
@@ -104,22 +108,54 @@ def generate_test(
 def compare(
     base_method,
     method,
-    num_samples,
-    a_num_cols,
-    b_num_cols,
-    a_type,
-    b_type,
-    a_nan,
-    b_nan,
+    num_samples: int,
+    a_num_cols: int,
+    b_num_cols: int,
+    a_type: str,
+    b_type: str,
+    a_nan: bool,
+    b_nan: bool,
     method_kwargs,
-    output_names,
+    output_names: List[str],
 ):
 
+    """
+    General test handler for comparing two methods.
+
+    Parameters
+    ----------
+    base_method: function
+        first method to compare
+    method: function
+        second method to compare
+    num_samples: int
+        number of samples per column (i.e. row count)
+    a_num_cols: int
+        number of columns in a_mat
+    b_num_cols: int
+        number of columns in b_mat
+    a_type: string, "continuous", "categorical", or "zero"
+        Type of variables in a_mat
+    b_type: string, "continuous", "categorical", or "zero"
+        Type of variables in b_mat
+    a_nan: boolean
+        whether or not to simulate missing (NaN) values in a_mat
+    b_nan: boolean
+        whether or not to simulate missing (NaN) values in b_mat
+    method_kwargs: dict
+        arguments to pass to base_method and method
+    output_names: list of strings
+        names of the output variables (for logging)
+
+    """
+
+    # announce comparison methods
     print(
         f"Comparing {bcolors.BOLD}{bcolors.HEADER}{method.__name__}{bcolors.ENDC} ",
         end="",
     )
 
+    # announce method parameters
     print(f" with {bcolors.BOLD}{bcolors.HEADER}{base_method.__name__}{bcolors.ENDC}")
 
     args_string = ", ".join(
@@ -136,19 +172,23 @@ def compare(
     )
     print(f"\twith {args_string}")
 
+    # announce kwargs
     kwargs_string = ", ".join(
         f"{bcolors.BOLD}{bcolors.OKBLUE}{key}{bcolors.ENDC} = {value}"
         for key, value in method_kwargs.items()
     )
     print(f"\tand {kwargs_string}")
 
+    # generate test cases
     a_test, b_test = generate_test(
         num_samples, a_num_cols, b_num_cols, a_type, b_type, a_nan, b_nan
     )
 
+    # compute outputs
     base_result = base_method(a_test, b_test, **method_kwargs)
     result = method(a_test, b_test, **method_kwargs)
 
+    # cast single outputs to lists
     if len(output_names) == 1:
 
         base_result = [base_result]
@@ -157,6 +197,7 @@ def compare(
     if len(base_result) != len(result):
         raise OutputMismatchError("\tOutputs have different lengths")
 
+    # check outputs one-by-one
     for i, output_name in enumerate(output_names):
 
         base_output = base_result[i]
@@ -175,7 +216,6 @@ def compare(
             )
 
         max_deviation = np.abs(base_output - output).max().max()
-
         max_deviation_str = "{0:.3E}".format(max_deviation)
 
         if max_deviation < TOLERANCE:

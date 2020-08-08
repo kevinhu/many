@@ -10,7 +10,7 @@ from .fisher import mlog10Test1t
 from .utils import precheck_align
 
 
-def merge(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int):
+def melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int):
     """
     Flatten matrix-form outputs to column-form.
 
@@ -32,35 +32,31 @@ def merge(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int):
     series form statistics
     """
 
-    if a_num_cols == 1:
-
-        oddsrs = pd.Series(oddsrs.iloc[0])
-        pvals = pd.Series(pvals.iloc[0])
-
-    elif b_num_cols == 1:
-
-        oddsrs = pd.Series(oddsrs.iloc[:, 0])
-        pvals = pd.Series(pvals.iloc[:, 0])
-
-    merged = pd.DataFrame()
-    merged["oddsr"] = oddsrs
-    merged["pval"] = pvals
-    merged["qval"] = multipletests(
-        10 ** (-merged["pval"]), alpha=0.01, method="fdr_bh"
+    melted = pd.DataFrame()
+    melted["oddsr"] = oddsrs.unstack()
+    melted["pval"] = pvals.unstack()
+    melted["qval"] = multipletests(
+        10 ** (-melted["pval"]), alpha=0.01, method="fdr_bh"
     )[1]
 
-    merged["qval"] = -np.log10(merged["qval"])
-    merged["AB"] = AB.reshape(-1)
-    merged["Ab"] = Ab.reshape(-1)
-    merged["aB"] = aB.reshape(-1)
-    merged["ab"] = ab.reshape(-1)
+    melted["qval"] = -np.log10(melted["qval"])
 
-    merged = merged.sort_values(by="pval", ascending=False)
+    AB = pd.DataFrame(AB, index=oddsrs.index, columns=oddsrs.columns)
+    Ab = pd.DataFrame(Ab, index=oddsrs.index, columns=oddsrs.columns)
+    aB = pd.DataFrame(aB, index=oddsrs.index, columns=oddsrs.columns)
+    ab = pd.DataFrame(ab, index=oddsrs.index, columns=oddsrs.columns)
 
-    return merged
+    melted["AB"] = AB.unstack()
+    melted["Ab"] = Ab.unstack()
+    melted["aB"] = aB.unstack()
+    melted["ab"] = ab.unstack()
+
+    melted = melted.sort_values(by="pval", ascending=False)
+
+    return melted
 
 
-def mat_fisher_naive(a_mat, b_mat, pbar=False):
+def mat_fisher_naive(a_mat, b_mat, melt: bool, pbar=False):
     """
     Compute odds ratios and Fisher's exact test 
     between every column-column pair of A (binary) and B (binary),
@@ -77,6 +73,8 @@ def mat_fisher_naive(a_mat, b_mat, pbar=False):
     B: Pandas DataFrame
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
+    melt: boolean
+        Whether or not to melt the outputs into a single Series.
     pbar: Boolean
         Whether or not to show a progress bar.
 
@@ -130,7 +128,7 @@ def mat_fisher_naive(a_mat, b_mat, pbar=False):
             if denom == 0:
                 oddsr = -1
             else:
-                oddsr = numer/denom
+                oddsr = numer / denom
 
             pval = mlog10Test1t(XY, Xy, xY, xy)
 
@@ -149,9 +147,9 @@ def mat_fisher_naive(a_mat, b_mat, pbar=False):
     pvals = pvals.fillna(0)
     oddsrs = oddsrs.fillna(1)
 
-    if a_num_cols == 1 or b_num_cols == 1:
+    if melt:
 
-        return merge(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
+        return melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
 
     return oddsrs, pvals
 
@@ -174,7 +172,7 @@ def fisher_arr(x):
     return mlog10Test1t(x[0], x[1], x[2], x[3])
 
 
-def mat_fisher(a_mat, b_mat):
+def mat_fisher(a_mat, b_mat, melt: bool):
     """
     Compute odds ratios and Fisher's exact test 
     between every column-column pair of A (binary) and B (binary),
@@ -192,6 +190,8 @@ def mat_fisher(a_mat, b_mat):
     B: Pandas DataFrame
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
+    melt: boolean
+        Whether or not to melt the outputs into a single Series.
 
     Returns
     -------
@@ -239,21 +239,21 @@ def mat_fisher(a_mat, b_mat):
     zero_denom = denom == 0
     denom[zero_denom] = 1
 
-    oddsrs = numer/denom
+    oddsrs = numer / denom
     oddsrs[zero_denom] = -1
     oddsrs = pd.DataFrame(oddsrs, index=a_names, columns=b_names)
 
     pvals = pvals.fillna(0)
     oddsrs = oddsrs.fillna(1)
 
-    if a_num_cols == 1 or b_num_cols == 1:
+    if melt:
 
-        return merge(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
+        return melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
 
     return oddsrs, pvals
 
 
-def mat_fisher_nan(a_mat, b_mat):
+def mat_fisher_nan(a_mat, b_mat, melt: bool):
     """
     Compute odds ratios and Fisher's exact test 
     between every column-column pair of A (binary) and B (binary),
@@ -270,6 +270,8 @@ def mat_fisher_nan(a_mat, b_mat):
     B: Pandas DataFrame
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
+    melt: boolean
+        Whether or not to melt the outputs into a single Series.
 
     Returns
     -------
@@ -316,15 +318,15 @@ def mat_fisher_nan(a_mat, b_mat):
     zero_denom = denom == 0
     denom[zero_denom] = 1
 
-    oddsrs = numer/denom
+    oddsrs = numer / denom
     oddsrs[zero_denom] = -1
     oddsrs = pd.DataFrame(oddsrs, index=a_names, columns=b_names)
 
     pvals = pvals.fillna(0)
     oddsrs = oddsrs.fillna(1)
 
-    if a_num_cols == 1 or b_num_cols == 1:
+    if melt:
 
-        return merge(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
+        return melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
 
     return oddsrs, pvals

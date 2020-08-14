@@ -198,9 +198,9 @@ def compare(
     method_time = end - start
 
     if benchmark:
-        print(f"\tNaive speed: {bcolors.BOLD}{base_time}s{bcolors.ENDC}")
-        print(f"\tVectorized speed: {bcolors.BOLD}{method_time}s{bcolors.ENDC}")
-        print(f"\tSpeedup: {bcolors.BOLD}{base_time/method_time}x{bcolors.ENDC}")
+        print(f"\tNaive speed: {bcolors.BOLD}{base_time:.2f}s{bcolors.ENDC}")
+        print(f"\tVectorized speed: {bcolors.BOLD}{method_time:.2f}s{bcolors.ENDC}")
+        print(f"\tSpeedup: {bcolors.BOLD}{base_time/method_time:.2f}x{bcolors.ENDC}")
 
     # cast single outputs to lists
     if len(output_names) == 1:

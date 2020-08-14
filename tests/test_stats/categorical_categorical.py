@@ -46,6 +46,7 @@ for (
             False,
             {"melt": melt, "pseudocount": pseudocount},
             output_names,
+            False,
         ],
         # mat_fisher_nan, single-dim comparison
         [
@@ -60,6 +61,7 @@ for (
             True,
             {"melt": melt, "pseudocount": pseudocount},
             output_names,
+            False,
         ],
     ]
 

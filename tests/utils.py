@@ -1,4 +1,5 @@
 from typing import List
+import time
 
 import many
 
@@ -117,6 +118,7 @@ def compare(
     b_nan: bool,
     method_kwargs,
     output_names: List[str],
+    benchmark: bool,
 ):
 
     """
@@ -185,8 +187,20 @@ def compare(
     )
 
     # compute outputs
+    start = time.time()
     base_result = base_method(a_test, b_test, **method_kwargs)
+    end = time.time()
+    base_time = end - start
+
+    start = time.time()
     result = method(a_test, b_test, **method_kwargs)
+    end = time.time()
+    method_time = end - start
+
+    if benchmark:
+        print(f"\tNaive speed: {bcolors.BOLD}{base_time}s{bcolors.ENDC}")
+        print(f"\tVectorized speed: {bcolors.BOLD}{method_time}s{bcolors.ENDC}")
+        print(f"\tSpeedup: {bcolors.BOLD}{base_time/method_time}x{bcolors.ENDC}")
 
     # cast single outputs to lists
     if len(output_names) == 1:

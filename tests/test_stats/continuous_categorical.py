@@ -35,6 +35,7 @@ for a_type, b_type, effect, melt in mat_mwu_param_combos:
             False,
             {"effect": effect, "melt": melt},
             output_names,
+            False,
         ],
         # mat_mwu, 1-d a_mat
         [
@@ -49,6 +50,7 @@ for a_type, b_type, effect, melt in mat_mwu_param_combos:
             False,
             {"effect": effect, "melt": melt},
             output_names,
+            False,
         ],
         # mat_mwu, 1-d b_mat
         [
@@ -63,6 +65,7 @@ for a_type, b_type, effect, melt in mat_mwu_param_combos:
             False,
             {"effect": effect, "melt": melt},
             output_names,
+            False,
         ],
         # mat_mwu, 1-d both
         [
@@ -77,6 +80,7 @@ for a_type, b_type, effect, melt in mat_mwu_param_combos:
             False,
             {"effect": effect, "melt": melt},
             output_names,
+            False,
         ],
     ]
 

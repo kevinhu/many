@@ -35,6 +35,7 @@ for a_type, b_type, corr_method, melt in mat_corr_param_combos:
             False,
             {"method": corr_method, "melt": melt},
             output_names,
+            False,
         ],
         # mat_corr, 1-d a_mat
         [
@@ -49,6 +50,7 @@ for a_type, b_type, corr_method, melt in mat_corr_param_combos:
             False,
             {"method": corr_method, "melt": melt},
             output_names,
+            False,
         ],
         # mat_corr, 1-d b_mat
         [
@@ -63,6 +65,7 @@ for a_type, b_type, corr_method, melt in mat_corr_param_combos:
             False,
             {"method": corr_method, "melt": melt},
             output_names,
+            False,
         ],
     ]
 
@@ -83,6 +86,7 @@ for a_type, b_type, corr_method, melt in mat_corr_param_combos:
                 False,
                 {"method": corr_method, "melt": melt},
                 output_names,
+                False,
             ],
             # mat_corr_nan, no nans
             [
@@ -97,6 +101,7 @@ for a_type, b_type, corr_method, melt in mat_corr_param_combos:
                 False,
                 {"method": corr_method, "melt": melt},
                 output_names,
+                False,
             ],
             # mat_corr_nan, nans in a
             [
@@ -111,6 +116,7 @@ for a_type, b_type, corr_method, melt in mat_corr_param_combos:
                 False,
                 {"method": corr_method, "melt": melt},
                 output_names,
+                False,
             ],
             # mat_corr_nan, nans in b
             [
@@ -125,6 +131,7 @@ for a_type, b_type, corr_method, melt in mat_corr_param_combos:
                 True,
                 {"method": corr_method, "melt": melt},
                 output_names,
+                False,
             ],
             # mat_corr_nan, nans in both
             [
@@ -139,6 +146,7 @@ for a_type, b_type, corr_method, melt in mat_corr_param_combos:
                 True,
                 {"method": corr_method, "melt": melt},
                 output_names,
+                False,
             ],
         ]
 

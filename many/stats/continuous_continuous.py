@@ -60,7 +60,7 @@ def melt_corr(corrs, pvals, sample_counts, method):
     return melted
 
 
-def mat_corr_naive(a_mat, b_mat, melt: bool, method:str, pbar=False):
+def mat_corr_naive(a_mat, b_mat, melt: bool, method: str, pbar=False):
     """
     Compute correlations between every column-column pair of A and B
     using a double for loop.
@@ -161,7 +161,7 @@ def mat_corr_naive(a_mat, b_mat, melt: bool, method:str, pbar=False):
     return corrs, pvals
 
 
-def mat_corr(a_mat, b_mat, melt: bool, method:str):
+def mat_corr(a_mat, b_mat, melt: bool, method: str):
     """
     Compute correlations between every column-column pair of A and B
 
@@ -267,7 +267,7 @@ def pearson_significance(row):
     return beta
 
 
-def mat_corr_nan(a_mat, b_mat, melt: bool, method:str):
+def mat_corr_nan(a_mat, b_mat, melt: bool, method: str):
     """
     Compute correlations between A and every column of B. A must be
     a Series for this method to work.

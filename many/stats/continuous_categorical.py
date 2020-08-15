@@ -56,21 +56,22 @@ def melt_mwu(effects, pvals, pos_ns, neg_ns, effect):
 
 
 def mat_mwu_naive(
-    a_mat, b_mat, melt: bool, effect:str, use_continuity=True, pbar=False,
+    a_mat, b_mat, melt: bool, effect: str, use_continuity=True, pbar=False,
 ):
     """
-    Compute rank-biserial correlations and Mann-Whitney statistics 
-    between every column-column pair of A (continuous) and B (binary)
+    Compute rank-biserial correlations and Mann-Whitney statistics
+    between every column-column pair of a_mat (continuous) and b_mat (binary)
     using a double for loop.
 
-    In the case that A or B has a single column, the results are re-formatted
-    with the multiple hypothesis-adjusted q-value also returned.
+    In the case that a_mat or b_mat has a single column, the results are
+    re-formatted with the multiple hypothesis-adjusted q-value also returned.
 
     Parameters
     ----------
-    A: Pandas DataFrame
-        Continuous set of observations, with rows as samples and columns as labels.
-    B: Pandas DataFrame
+    a_mat: Pandas DataFrame
+        Continuous set of observations, with rows as samples and columns
+        as labels.
+    b_mat: Pandas DataFrame
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
     melt: boolean
@@ -151,9 +152,13 @@ def mat_mwu_naive(
                             2 * U2 / (len(a_pos) * len(a_neg)) - 1
                         )
                     elif effect == "median":
-                        effects[a_col_idx][b_col_idx] = a_pos.median() - a_neg.median()
+                        pos_med = a_pos.median()
+                        neg_med = a_neg.median()
+                        effects[a_col_idx][b_col_idx] = pos_med - neg_med
                     elif effect == "mean":
-                        effects[a_col_idx][b_col_idx] = a_pos.mean() - a_neg.mean()
+                        pos_mean = a_pos.mean()
+                        neg_mean = a_neg.mean()
+                        effects[a_col_idx][b_col_idx] = pos_mean - neg_mean
 
                     pvals[a_col_idx][b_col_idx] = pval
 
@@ -183,19 +188,20 @@ def mat_mwu_naive(
     return effects, pvals
 
 
-def mat_mwu(a_mat, b_mat, melt: bool, effect:str, use_continuity=True):
+def mat_mwu(a_mat, b_mat, melt: bool, effect: str, use_continuity=True):
     """
-    Compute rank-biserial correlations and Mann-Whitney statistics 
-    between every column-column pair of A (continuous) and B (binary).
+    Compute rank-biserial correlations and Mann-Whitney statistics
+    between every column-column pair of a_mat (continuous) and b_mat (binary).
 
-    In the case that A or B has a single column, the results are re-formatted
-    with the multiple hypothesis-adjusted q-value also returned.
+    In the case that a_mat or b_mat has a single column, the results are
+    re-formatted with the multiple hypothesis-adjusted q-value also returned.
 
     Parameters
     ----------
-    A: Pandas DataFrame
-        Continuous set of observations, with rows as samples and columns as labels.
-    B: Pandas DataFrame
+    a_mat: Pandas DataFrame
+        Continuous set of observations, with rows as samples and columns
+        as labels.
+    b_mat: Pandas DataFrame
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
     melt: boolean
@@ -247,7 +253,6 @@ def mat_mwu(a_mat, b_mat, melt: bool, effect:str, use_continuity=True):
     neg_ns = np.vstack([neg_ns] * a_num_cols)
 
     pos_ranks = np.dot(a_ranks.T, b_pos)
-    neg_ranks = np.dot(a_ranks.T, b_neg)
 
     u1 = pos_ns * neg_ns + (pos_ns * (pos_ns + 1)) / 2.0 - pos_ranks
     u2 = pos_ns * neg_ns - u1

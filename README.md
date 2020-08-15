@@ -76,5 +76,49 @@ Same functionality as `mat_fishers`, but uses a double loop for direct computati
 
 #### Benchmarks
 
+Benchmarks were run with 1,000 samples per variable (i.e. setting each input matrix to have 1,000 rows). The number of variables in `a_mat` was set to 100, and the number of variables in `b_mat` was varied as shown below. The number of pairwise comparisons (equivalent to the product of the column counts of `a_mat` and `b_mat`) is also indicated.
+
+Benchmarks were run on an i7-7700K with 16GB of 2133 MHz RAM.
+
+##### `mat_corr` (Pearson)
+
+| Column count of `b_mat` | Total comparisons | Runtime, `mat_corr_naive`, seconds | Runtime, `mat_corr`, seconds | Speedup    |
+| ----------------------- | ----------------- | ---------------------------------- | ---------------------------- | ---------- |
+| 10                      | 1,000             | 0.29                               | **0.01**                     | **×25.86** |
+| 100                     | 10,000            | 2.67                               | **0.07**                     | **×37.37** |
+| 1,000                   | 100,000           | 26.36                              | **0.35**                     | **×74.47** |
+
+##### `mat_corr` (Spearman)
+
+| Column count of `b_mat` | Total comparisons | Runtime, `mat_corr_naive`, seconds | Runtime, `mat_corr`, seconds | Speedup     |
+| ----------------------- | ----------------- | ---------------------------------- | ---------------------------- | ----------- |
+| 10                      | 1,000             | 0.74                               | **0.02**                     | **×46.74**  |
+| 100                     | 10,000            | 7.28                               | **0.08**                     | **×94.21**  |
+| 1,000                   | 100,000           | 72.06                              | **0.38**                     | **×190.58** |
+
+##### `mat_mwu`
+
+| Column count of `b_mat` | Total comparisons | Runtime, `mat_mwu_naive`, seconds | Runtime, `mat_mwu`, seconds | Speedup    |
+| ----------------------- | ----------------- | --------------------------------- | --------------------------- | ---------- |
+| 10                      | 1,000             | 1.06                              | **0.14**                    | **×7.55**  |
+| 100                     | 10,000            | 10.38                             | **0.71**                    | **×14.62** |
+| 1,000                   | 100,000           | 103.17                            | **6.52**                    | **×15.82** |
+
+##### `mat_fisher`
+
+| Column count of `b_mat` | Total comparisons | Runtime, `mat_fisher_naive`, seconds | Runtime, `mat_fisher`, seconds | Speedup   |
+| ----------------------- | ----------------- | ------------------------------------ | ------------------------------ | --------- |
+| 10                      | 1,000             | 1.18                                 | **0.24**                       | **×5.01** |
+| 100                     | 10,000            | 11.72                                | **2.42**                       | **×4.83** |
+| 1,000                   | 100,000           | 116.48                               | **23.77**                      | **×4.90** |
+
+##### `mat_fisher_nan`
+
+| Column count of `b_mat` | Total comparisons | Runtime, `mat_fisher_naive`, seconds | Runtime, `mat_fisher_nan`, seconds | Speedup   |
+| ----------------------- | ----------------- | ------------------------------------ | ---------------------------------- | --------- |
+| 10                      | 1,000             | 1.23                                 | **0.14**                           | **×8.56** |
+| 100                     | 10,000            | 12.04                                | **1.43**                           | **×8.40** |
+| 1,000                   | 100,000           | 120.20                               | **14.46**                          | **×8.31** |
+
 ### Visual methods
 

@@ -18,7 +18,7 @@ for b_num_col in b_num_cols:
             False,
             False,
             {"method": "pearson", "melt": False},
-            ["cirrs", "pvals"],
+            ["corrs", "pvals"],
             True,
         ]
     )
@@ -37,7 +37,7 @@ for b_num_col in b_num_cols:
             False,
             False,
             {"method": "spearman", "melt": False},
-            ["cirrs", "pvals"],
+            ["corrs", "pvals"],
             True,
         ]
     )

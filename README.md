@@ -1,6 +1,6 @@
 # many
 
-This package serves as a general-use toolkit for statistical and visual methods that I frequently implement.
+This package serves as a general-use toolkit for frequently-implemented statistical and visual methods.
 
 ## Installation
 
@@ -12,13 +12,13 @@ pip install many
 
 ### Statistical methods
 
-The statistical methods comprise several functions for explorative data analysis with a focus on association mining between variable pairs. The methods used here are optimized for `pandas` DataFrames and are inspired by the `corrcoef` function provided by `numpy`.
+The statistical methods comprise several functions for association mining between variable pairs. The methods used here are optimized for `pandas` DataFrames and are inspired by the `corrcoef` function provided by `numpy`.
 
-Because these functions rely on native matrix-level operations provided by `numpy`, many are orders of magnitude faster than naive looping-based alternatives. This makes them useful for constructing large association networks or for feature extraction, which have important uses in areas such as biomarker discovery. 
+Because these functions rely on native matrix-level operations provided by `numpy`, many are orders of magnitude faster than naive looping-based alternatives. This makes them useful for constructing large association networks or for feature extraction, which have important uses in areas such as biomarker discovery. All methods also return estimates of statistical significance.
 
-In certain cases, such as the computation of correlation coefficients, **these vectorized methods come with the caveat of [numerical instability](https://stats.stackexchange.com/questions/94056/instability-of-one-pass-algorithm-for-correlation-coefficient)**. As a compromise, "naive" loop-based implementations are also provided for testing and comparison.
+In certain cases such as the computation of correlation coefficients, **these vectorized methods come with the caveat of [numerical instability](https://stats.stackexchange.com/questions/94056/instability-of-one-pass-algorithm-for-correlation-coefficient)**. As a compromise, "naive" loop-based implementations are also provided for testing and comparison. It is recommended that any significant results obtained with the vectorized methods be verified with these base methods.
 
-The current functions available are listed below by variable comparison type. Benchmarks are also provided with comparisons to an equivalent looping-based method. In all methods, a `melt` option is provided to return the outputs as a set of variable-variable pair statistic matrices or as a single `DataFrame` with each statistic melted to a column.
+The current functions available are listed below by variable comparison type. Benchmarks are also provided with comparisons to the equivalent looping-based method. In all methods, a `melt` option is provided to return the outputs as a set of row-column variable-variable pair statistic matrices or as a single `DataFrame` with each statistic melted to a column.
 
 #### Continuous vs. continuous
 
@@ -43,36 +43,36 @@ Same functionality as `mat_corr`, but uses a double loop for direct computation 
 #### Continuous vs. categorical
 
 ```python
-mat_mwus(a_mat, b_mat, melt: bool, effect:str, use_continuity=True)
+mat_mwu(a_mat, b_mat, melt: bool, effect:str, use_continuity=True)
 ```
 
 Computes pairwise Mann-Whitney U tests between columns of `a_mat` (continuous samples) and `b_mat` (binary samples). Assumes that `a_mat` and `b_mat` both do not contain any missing values. `effect` can only be `rank_biserial`. `use_continuity` specifies whether a continuity correction should be applied.
 
 ```python
-mat_mwus_naive( a_mat, b_mat, melt: bool, effect:str, use_continuity=True, pbar=False)
+mat_mwu_naive( a_mat, b_mat, melt: bool, effect:str, use_continuity=True, pbar=False)
 ```
 
-Same functionality as `mat_mwus`, but uses a double loop for direct computation of statistics. Unlike `mat_mwus`, `effect` parameters of "mean", "median", and "rank_biserial" are all supported.
+Same functionality as `mat_mwu`, but uses a double loop for direct computation of statistics. Unlike `mat_mwus, ` `effect` parameters of "mean", "median", and "rank_biserial" are all supported.
 
 #### Categorical vs. categorical
 
 ```python
-mat_fishers(a_mat, b_mat, melt: bool, pseudocount=0)
+mat_fisher(a_mat, b_mat, melt: bool, pseudocount=0)
 ```
 
 Computes pairwise Fisher's exact tests between columns of `a_mat` and `b_mat`, provided that both are boolean-castable matrices and do not contain any missing values. The `pseudocount` parameter (which must be an integer) specifies the value that should be added to all cells of the contingency matrices.
 
 ```python
-mat_fishers_nan(a_mat, b_mat, melt: bool, pseudocount=0)
+mat_fisher_nan(a_mat, b_mat, melt: bool, pseudocount=0)
 ```
 
 Computes pairwise Fisher's exact tests between columns of `a_mat` and `b_mat`, provided that both are boolean-castable matrices and may or may not contain missing values.
 
 ```python
-mat_fishers_naive(a_mat, b_mat, melt: bool, pseudocount=0, pbar=False)
+mat_fisher_naive(a_mat, b_mat, melt: bool, pseudocount=0, pbar=False)
 ```
 
-Same functionality as `mat_fishers`, but uses a double loop for direct computation of statistics.
+Same functionality as `mat_fisher`, but uses a double loop for direct computation of statistics.
 
 #### Benchmarks
 

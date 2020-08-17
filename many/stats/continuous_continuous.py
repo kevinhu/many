@@ -491,7 +491,7 @@ def mat_corr_subtyped(
 
     # extract corrs, ns, and pvals
     subtype_corrs = [x.iloc[:, 0] for x in subtype_res]
-    subtype_pvals = [x.iloc[:, 2] for x in subtype_res]
+    subtype_pvals = [x.iloc[:, 1] for x in subtype_res]
     subtype_ns = [x.iloc[:, 3] for x in subtype_res]
 
     subtype_corrs = pd.concat(subtype_corrs, axis=1, sort=True, join="outer")

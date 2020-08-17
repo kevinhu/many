@@ -51,6 +51,7 @@ def melt_mwu(effects, pvals, pos_ns, neg_ns, effect):
     melted = melted.sort_values(by="pval", ascending=False)
 
     melted.index.set_names(["b_col", "a_col"], inplace=True)
+    melted.index = melted.index.swaplevel(0,1)
 
     return melted
 

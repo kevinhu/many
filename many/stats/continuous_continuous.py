@@ -56,6 +56,7 @@ def melt_corr(corrs, pvals, sample_counts, method):
     melted = melted.sort_values(by="pval", ascending=False)
 
     melted.index.set_names(["b_col", "a_col"], inplace=True)
+    melted.index = melted.index.swaplevel(0, 1)
 
     return melted
 
@@ -374,26 +375,31 @@ def mat_corr_subtyped(
     a_mat,
     b_mat,
     subtypes,
-    min_count=5,
+    min_count: int,
+    stack: bool,
+    mat_method,
     pbar=False,
-    stack=False,
-    mat_method="mat_corrs_naive",
     **kwargs
 ):
     """
-    Compute correlations between A and every column of B. A must be
-    a Series for this method to work. Allows for missing values in B.
+    Compute correlations between a_mat and every column of b_mat, within
+    each subsample specified by subtypes. a_mat must be a Series for this 
+    method to work. Allows for missing values in b_mat.
 
     Parameters
     ----------
-    A: Pandas Series
+    a_mat: Pandas Series
         First set of observations, with rows as samples
-    B: Pandas DataFrame
+    b_mat: Pandas DataFrame
         Second set of observations, with rows as samples and columns as labels
     subtypes: Pandas Series
         Categories to compute correlations within
     min_count: integer
         Minimum number of samples per subtype to keep for consideration
+    stack: boolean
+        Whether or not to aggregate statistics into single DataFrame
+    mat_method: string
+        Correlation method to use, either "mat_corr_naive" or "mat_corr_nan"
     pbar: boolean
         Whether or not to show a progress bar with subtypes
     **kwargs: additional parameters
@@ -405,19 +411,19 @@ def mat_corr_subtyped(
     if stack is False:
 
         subtype_corrs: DataFrame
-            DataFrame of correlations between A and each variable of B (rows) within
+            DataFrame of correlations between a_mat and each variable of b_mat (rows) within
             each subtype (columns)
         subtype_ns: DataFrame
-            DataFrame of sample sizes between A and each variable of B (rows) within
+            DataFrame of sample sizes between a_mat and each variable of b_mat (rows) within
             each subtype (columns)
         subtype_pvals: DataFrame
-            DataFrame of p-values between A and each variable of B (rows) within
+            DataFrame of p-values between a_mat and each variable of b_mat (rows) within
             each subtype (columns)
 
     if stack is True:
 
         stacked: DataFrame
-            DataFrame of correlations between A and each variable of B within each
+            DataFrame of correlations between a_mat and each variable of b_mat within each
             subtypes, along with sample sizes, and p-values, with each value in a
             column
     """
@@ -456,15 +462,16 @@ def mat_corr_subtyped(
         b_subset = b_mat.loc[subtype_rows]
 
         if mat_method == "mat_corr_naive":
-            res = mat_corr_naive(a_subset, b_subset, **kwargs)
+
+            res = mat_corr_naive(a_subset, b_subset, **kwargs, melt=True)
 
         elif mat_method == "mat_corr_nan":
 
-            res = mat_corr_nan(a_subset, b_subset, **kwargs)
+            res = mat_corr_nan(a_subset, b_subset, **kwargs, melt=True)
 
-        elif mat_method == "mat_corr":
+        else:
 
-            res = mat_corr(a_subset, b_subset, **kwargs)
+            raise ValueError("mat_method must be 'mat_corr_naive' or 'mat_corr_nan'")
 
         # rename columns for merging
         res.columns = [subtype + "_" + x for x in res.columns]
@@ -502,7 +509,7 @@ def mat_corr_subtyped(
             sort=True,
         )
 
-        stacked.index = stacked.index.rename([A.name, subtypes.name])
+        stacked.index = stacked.index.rename(["a_col", "b_col", subtypes.name])
         stacked = stacked.reset_index()
 
         return stacked

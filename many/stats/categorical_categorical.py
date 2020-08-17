@@ -57,6 +57,7 @@ def melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int)
     melted = melted.sort_values(by="pval", ascending=False)
 
     melted.index.set_names(["b_col", "a_col"], inplace=True)
+    melted.index = melted.index.swaplevel(0,1)
 
     return melted
 

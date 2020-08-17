@@ -188,8 +188,6 @@ def mat_corr(a_mat, b_mat, melt: bool, method: str):
 
     a_names = a_mat.columns
     b_names = b_mat.columns
-    a_num_cols = len(a_names)  # number of variables in A
-    b_num_cols = len(b_names)  # number of variables in B
     num_samples = len(a_mat.index)  # number of samples
 
     a_nan = a_mat.isna().sum().sum() == 0
@@ -325,7 +323,8 @@ def mat_corr_nan(a_mat, b_mat, melt: bool, method: str):
         a_nan = np.ma.array(np.array(a_nan), mask=b_nan)
 
     elif method == "pearson":
-        a_nan = np.ma.array(np.repeat(np.array(a_mat), b_num_cols, axis=1), mask=b_nan)
+        a_repeat = np.repeat(np.array(a_mat), b_num_cols, axis=1)
+        a_nan = np.ma.array(a_repeat, mask=b_nan)
 
     # convert to arrays
     a_mat, b_mat = np.array(a_mat), np.array(b_mat)
@@ -358,7 +357,11 @@ def mat_corr_nan(a_mat, b_mat, melt: bool, method: str):
     corr_df["corr"] = corrs
     corr_df["n"] = num_samples - nan_sums
     corr_df["pval"] = corr_df.apply(pearson_significance, axis=1)
-    corr_df["qval"] = multipletests(corr_df["pval"], alpha=0.01, method="fdr_bh")[1]
+    corr_df["qval"] = multipletests(
+        corr_df["pval"],
+        alpha=config.MULTIPLETESTS_ALPHA,
+        method=config.MULTIPLETESTS_METHOD,
+    )[1]
 
     # rename 'corr' column with name of method used
     corr_df = corr_df.rename({"corr": method}, axis=1)
@@ -383,7 +386,7 @@ def mat_corr_subtyped(
 ):
     """
     Compute correlations between a_mat and every column of b_mat, within
-    each subsample specified by subtypes. a_mat must be a Series for this 
+    each subsample specified by subtypes. a_mat must be a Series for this
     method to work. Allows for missing values in b_mat.
 
     Parameters
@@ -411,21 +414,21 @@ def mat_corr_subtyped(
     if stack is False:
 
         subtype_corrs: DataFrame
-            DataFrame of correlations between a_mat and each variable of b_mat (rows) within
-            each subtype (columns)
+            DataFrame of correlations between a_mat and each variable
+            of b_mat (rows) within each subtype (columns)
         subtype_ns: DataFrame
-            DataFrame of sample sizes between a_mat and each variable of b_mat (rows) within
-            each subtype (columns)
+            DataFrame of sample sizes between a_mat and each variable
+            of b_mat (rows) within each subtype (columns)
         subtype_pvals: DataFrame
-            DataFrame of p-values between a_mat and each variable of b_mat (rows) within
-            each subtype (columns)
+            DataFrame of p-values between a_mat and each variable of
+            b_mat (rows) within each subtype (columns)
 
     if stack is True:
 
         stacked: DataFrame
-            DataFrame of correlations between a_mat and each variable of b_mat within each
-            subtypes, along with sample sizes, and p-values, with each value in a
-            column
+            DataFrame of correlations between a_mat and each variable
+            of b_mat within each subtype, along with sample sizes and p-values,
+            with each value in a column
     """
 
     # remove missing values in A
@@ -471,7 +474,9 @@ def mat_corr_subtyped(
 
         else:
 
-            raise ValueError("mat_method must be 'mat_corr_naive' or 'mat_corr_nan'")
+            error = "mat_method must be 'mat_corr_naive' or 'mat_corr_nan'"
+
+            raise ValueError(error)
 
         # rename columns for merging
         res.columns = [subtype + "_" + x for x in res.columns]
@@ -486,8 +491,8 @@ def mat_corr_subtyped(
 
     # extract corrs, ns, and pvals
     subtype_corrs = [x.iloc[:, 0] for x in subtype_res]
-    subtype_ns = [x.iloc[:, 1] for x in subtype_res]
     subtype_pvals = [x.iloc[:, 2] for x in subtype_res]
+    subtype_ns = [x.iloc[:, 3] for x in subtype_res]
 
     subtype_corrs = pd.concat(subtype_corrs, axis=1, sort=True, join="outer")
     subtype_ns = pd.concat(subtype_ns, axis=1, sort=True, join="outer")

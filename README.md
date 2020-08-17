@@ -122,3 +122,8 @@ Benchmarks were run on an i7-7700K with 16GB of 2133 MHz RAM.
 
 ### Visual methods
 
+## Development
+
+1. Install dependencies with `poetry install`
+2. Initialize environment with `poetry shell`
+3. Initialize pre-commit hooks with `pre-commit install`

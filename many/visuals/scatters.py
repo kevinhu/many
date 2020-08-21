@@ -1,12 +1,10 @@
-import numpy as np
-import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
-
-from scipy.stats import spearmanr, pearsonr, ttest_ind, mannwhitneyu, gaussian_kde
-
 from adjustText import adjust_text
+from scipy.stats import gaussian_kde, mannwhitneyu, pearsonr, spearmanr, ttest_ind
 
 from .utils import *
 

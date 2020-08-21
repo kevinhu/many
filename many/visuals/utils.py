@@ -1,5 +1,5 @@
-import seaborn as sns
 import pandas as pd
+import seaborn as sns
 
 
 def as_si(x: float, decimals: int) -> str:

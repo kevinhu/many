@@ -5,10 +5,9 @@ import pandas as pd
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
 
-from .fisher import mlog10Test1t
-
-from .utils import precheck_align
 from . import config
+from .fisher import mlog10Test1t
+from .utils import precheck_align
 
 
 def melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int):
@@ -57,7 +56,7 @@ def melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int)
     melted = melted.sort_values(by="pval", ascending=False)
 
     melted.index.set_names(["b_col", "a_col"], inplace=True)
-    melted.index = melted.index.swaplevel(0,1)
+    melted.index = melted.index.swaplevel(0, 1)
 
     return melted
 

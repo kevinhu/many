@@ -5,16 +5,16 @@ import numpy as np
 import pandas as pd
 import scipy.special as special
 from scipy.stats import (
+    PearsonRConstantInputWarning,
+    SpearmanRConstantInputWarning,
     pearsonr,
     spearmanr,
-    SpearmanRConstantInputWarning,
-    PearsonRConstantInputWarning,
 )
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
 
-from .utils import precheck_align
 from . import config
+from .utils import precheck_align
 
 
 def melt_corr(corrs, pvals, sample_counts, method):

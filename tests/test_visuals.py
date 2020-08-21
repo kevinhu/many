@@ -3,8 +3,10 @@
 
 # import importlib
 
-# import many
-# import utils
+import config
+import many
+import matplotlib.pyplot as plt
+import utils
 
 # p = Path("./test_stats").glob("*.py")
 # all_submodules = [x.stem for x in p if x.is_file()]
@@ -30,3 +32,16 @@ print(
         ["a", "b", "c", "a", "a", "b", "c", "d", "b", "d", "a"], cmap="Blues"
     )
 )
+
+a, b = utils.generate_test(
+    n_samples=100,
+    a_num_cols=1,
+    b_num_cols=1,
+    a_type="continuous",
+    b_type="continuous",
+    a_nan=False,
+    b_nan=False,
+)
+
+many.visuals.dense_plot(a[0], b[0], text_adjust=False)
+plt.savefig(config.PLOTS_DIR / "dense_plot_default.pdf", bbox_inches="tight")

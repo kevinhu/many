@@ -2,7 +2,7 @@ import seaborn as sns
 import pandas as pd
 
 
-def as_si(x, ndp):
+def as_si(x: float, decimals: int) -> str:
     """
     Convert a number to scientific notation
 
@@ -10,7 +10,7 @@ def as_si(x, ndp):
     ----------
     x : float
         number to convert
-    ndp: float
+    decimals: float
         number of decimal places
 
     Returns
@@ -19,23 +19,23 @@ def as_si(x, ndp):
         x formatted in scientific notation
     """
 
-    s = "{x:0.{ndp:d}e}".format(x=x, ndp=ndp)
+    s = "{x:0.{ndp:d}e}".format(x=x, ndp=decimals)
     m, e = s.split("e")
     x_si = r"{m:s} × $10^{{{e:d}}}$".format(m=m, e=int(e))
 
     return x_si
 
 
-def get_clustermap_colors(s, cmap="Blues"):
+def colorize(s, cmap):
     """
-    Map a Pandas series to colors, useful for
+    Map an array-like to colors, useful for
     col_colors/row_colors in Seaborn clustermaps
 
     Parameters
     ----------
     s : Pandas series
         series of values to colorize
-    cmap: string, Matplotlib color map, or Seaborn palette
+    cmap: string, MatPlotLib color map, or Seaborn palette
         colormap to generate colors from
 
     Returns
@@ -46,6 +46,8 @@ def get_clustermap_colors(s, cmap="Blues"):
         mapping scheme from each unique element of s
         to corresponding color
     """
+
+    s = pd.Series(s)
 
     pal = sns.color_palette(cmap, len(s.unique()))
     mapping = dict(zip(s.unique(), pal))

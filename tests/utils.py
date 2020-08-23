@@ -1,12 +1,10 @@
-from typing import List
 import time
+from typing import List
 
 import many
-
-from config import TOLERANCE
-
 import numpy as np
 import pandas as pd
+from config import TOLERANCE
 
 
 class bcolors:

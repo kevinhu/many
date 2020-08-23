@@ -1,22 +1,19 @@
-import numpy as np
-import pandas as pd
+from collections import Counter
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
-
-from collections import Counter
 from scipy.stats import (
     fisher_exact,
-    ttest_ind,
+    gaussian_kde,
     mannwhitneyu,
     pearsonr,
     spearmanr,
-    gaussian_kde,
+    ttest_ind,
 )
-
-from sklearn.metrics import roc_curve, auc
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import auc, precision_recall_curve, roc_auc_score, roc_curve
 
 from .utils import *
 

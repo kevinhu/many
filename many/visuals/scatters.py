@@ -1,12 +1,10 @@
-import numpy as np
-import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
-
-from scipy.stats import spearmanr, pearsonr, ttest_ind, mannwhitneyu, gaussian_kde
-
 from adjustText import adjust_text
+from scipy.stats import gaussian_kde, mannwhitneyu, pearsonr, spearmanr, ttest_ind
 
 from .utils import *
 
@@ -74,18 +72,19 @@ def scatter_grid(df):
 def dense_plot(
     x,
     y,
+    text_adjust: bool,
     labels_mask=None,
     labels=None,
-    colormap="Blues",
-    adjust=True,
-    color_density=False,
-    cmap_offset=-0.4,
+    colormap=None,
+    cmap_offset=0,
     ax=None,
-    **kwargs
+    scatter_kwargs={},
+    x_offset=0,
+    y_offset=0,
 ):
     """
     Plot two sets of points, coloring by density and inserting labels given a
-    set of significant value masks
+    set of significant value masks. Density estimated by Gaussian KDE.
 
     Parameters
     ----------
@@ -97,18 +96,14 @@ def dense_plot(
         Boolean mask for values to label
     labels: Series or 1-dimensional array
         Text labels to plot based on labels_mask
+    colormap: String or Matplotlib colormap
+        Colormap to color point density by. Leave empty for all black.
     adjust_text: Boolean
         Whether or not to adjust the label positions automatically
-    colormap: String or Matplotlib colormap
-        Colormap to color point density by
     x_offset: Float
         offset to use when plotting x text labels
     y_offset: Float
         offset to use when plotting y text labels
-    x_bins: Integer
-        Number of bins to compute x point densities
-    y_bins: Integer
-        Number of bins to compute y point densities
 
     Returns
     -------
@@ -116,11 +111,12 @@ def dense_plot(
         axis with plot data
     """
 
+    # cast and align
     x = pd.Series(x).dropna()
     y = pd.Series(y).dropna()
-
     x, y = x.align(y, axis=0, join="inner")
 
+    # align labels if specified
     if labels is not None:
 
         _, labels = x.align(labels, axis=0, join="left")
@@ -129,7 +125,7 @@ def dense_plot(
 
         ax = plt.subplot(111)
 
-    if color_density:
+    if colormap is not None:
 
         xy = np.vstack([x, y])
 
@@ -144,11 +140,11 @@ def dense_plot(
             lw=0,
             rasterized=True,
             vmin=min(z) - cmap_offset,
-            **kwargs
+            **scatter_kwargs
         )
 
     else:
-        ax.scatter(x, y, cmap=colormap, lw=0, rasterized=True, **kwargs)
+        ax.scatter(x, y, c="black", lw=0, rasterized=True, **scatter_kwargs)
 
     xlims = ax.get_xlim()
     ylims = ax.get_ylim()
@@ -171,18 +167,30 @@ def dense_plot(
 
             ax.scatter(x_pos, y_pos, c="red", s=24)
 
-            if adjust:
+            if text_adjust:
 
                 texts.append(ax.text(x_pos, y_pos, label, ha="center", va="center"))
             else:
 
                 if x_pos <= 0:
-                    ax.text(x_pos, y_pos, label, ha="left", va="center")
+                    ax.text(
+                        x_pos + x_offset,
+                        y_pos + y_offset,
+                        label,
+                        ha="left",
+                        va="center",
+                    )
 
                 elif x_pos > 0:
-                    ax.text(x_pos, y_pos, label, ha="right", va="center")
+                    ax.text(
+                        x_pos + x_offset,
+                        y_pos + y_offset,
+                        label,
+                        ha="right",
+                        va="center",
+                    )
 
-        if adjust:
+        if text_adjust:
 
             adjust_text(
                 texts, autoalign="", arrowprops=dict(arrowstyle="-", color="black")

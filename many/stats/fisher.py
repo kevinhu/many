@@ -4,7 +4,7 @@
 
 # sourced from https://github.com/painyeph/FishersExactTest
 
-from math import log, exp
+from math import exp, log
 
 try:
 

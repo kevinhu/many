@@ -2,12 +2,12 @@ import sys
 
 import numpy as np
 import pandas as pd
-from scipy.stats import rankdata, tiecorrect, norm, mannwhitneyu
+from scipy.stats import mannwhitneyu, norm, rankdata, tiecorrect
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
 
-from .utils import precheck_align
 from . import config
+from .utils import precheck_align
 
 
 def melt_mwu(effects, pvals, pos_ns, neg_ns, effect):
@@ -51,7 +51,7 @@ def melt_mwu(effects, pvals, pos_ns, neg_ns, effect):
     melted = melted.sort_values(by="pval", ascending=False)
 
     melted.index.set_names(["b_col", "a_col"], inplace=True)
-    melted.index = melted.index.swaplevel(0,1)
+    melted.index = melted.index.swaplevel(0, 1)
 
     return melted
 

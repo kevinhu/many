@@ -8,5 +8,5 @@ from .pairs import (
     roc_auc_curve,
     two_dists,
 )
-from .scatters import dense_plot
+from .scatters import dense_plot, scatter_grid
 from .utils import as_si, colorize

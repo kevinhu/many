@@ -81,7 +81,7 @@ def binary_contingency(a, b, ax=None, heatmap_kwargs={}):
         cbar=False,
         linewidths=2,
         ax=ax,
-        **heatmap_kwargs
+        **heatmap_kwargs,
     )
 
     plt.ylabel(a_name)
@@ -270,7 +270,7 @@ def dense_regression(
         rasterized=True,
         cmap=palette,
         vmin=min(z) + cmap_offset,
-        **scatter_kwargs
+        **scatter_kwargs,
     )
 
     ax.spines["top"].set_visible(False)
@@ -287,8 +287,9 @@ def two_dists(
     ax=None,
     pal=["#eaeaea", "#a5dee5"],
     annotate=True,
-    scatter=True,
+    stripplot=False,
     seaborn_kwargs={},
+    stripplot_kwargs={},
 ):
     """
     Plot two sets of points, one as a binary variable
@@ -307,8 +308,12 @@ def two_dists(
         colors to use when plotting
     summary_type : string
         type of summary plot to use
+    stripplot : boolean
+        whether or not to plot the raw values
     seaborn_kwargs : dictionary
         additional arguments to pass to Seaborn boxplot/violinplot
+    stripplot_kwargs : dictionary
+        additional arguments to pass to Seaborn stripplot (if stripplot=True)
 
     Returns
     -------
@@ -381,7 +386,7 @@ def two_dists(
             notch=True,
             palette=pal,
             ax=ax,
-            **seaborn_kwargs
+            **seaborn_kwargs,
         )
 
     elif summary_type == "violin":
@@ -392,14 +397,14 @@ def two_dists(
             inner=None,
             palette=pal,
             ax=ax,
-            **seaborn_kwargs
+            **seaborn_kwargs,
         )
 
     else:
 
         raise ValueError("Method must be 'box' or 'violin'")
 
-    if scatter:
+    if stripplot:
 
         sns.stripplot(
             binary,
@@ -409,6 +414,7 @@ def two_dists(
             alpha=0.5,
             size=2,
             ax=ax,
+            **stripplot_kwargs,
         )
 
     # adjust range to fit text
@@ -432,7 +438,8 @@ def multi_dists(
     newline_counts=False,
     xtick_rotation=45,
     xtick_ha="right",
-    **kwargs
+    seaborn_kwargs={},
+    stripplot_kwargs={},
 ):
     """
     Plot two sets of points, one as a categorical variable and the other
@@ -446,7 +453,7 @@ def multi_dists(
         categorical values (groups) to plot
     method : string, "pearson" or "spearman"
         regression method
-    ax : matplotlib axis
+    ax : MatPlotLib axis
         axis to plot in (will create new one if not provided)
     summary_type : string, "box" or "violin"
         type of summary plot to make
@@ -454,17 +461,21 @@ def multi_dists(
         whether or not to plot the raw values
     order : "ascending", "descending", or list of categories
         how to sort categories in the plot
-    newline_counts: boolean
+    newline_counts : boolean
         whether to add category counts as a separate line
         in the axis labels
-    xtick_rotation: float
+    xtick_rotation : float
         how much to rotate the xtick labels by (in degree)
-    xtick_ha: string
+    xtick_ha : string
         horizontal alignment of the xtick labels
+    seaborn_kwargs : dictionary
+        additional arguments to pass to Seaborn boxplot/violinplot
+    stripplot_kwargs : dictionary
+        additional arguments to pass to Seaborn stripplot (if stripplot=True)
 
     Returns
     -------
-    ax : matplotlib axis
+    ax : MatPlotLib axis
         axis with plot data
     """
 
@@ -472,12 +483,12 @@ def multi_dists(
         ax = plt.subplot(111)
 
     # remove NaNs and convert continuous
-    continuous = continuous.dropna()
-    categorical = categorical.dropna().astype(str)
+    continuous = pd.Series(continuous).dropna()
+    categorical = pd.Series(categorical).dropna().astype(str)
 
     # Series names
-    continuous_name = continuous.name
-    categorical_name = categorical.name
+    continuous_name = str(continuous.name)
+    categorical_name = str(categorical.name)
 
     if continuous_name is None:
         continuous_name = "continuous"
@@ -485,13 +496,18 @@ def multi_dists(
     if categorical_name is None:
         categorical_name = "categorical"
 
+    if continuous_name == categorical_name:
+
+        continuous_name += "_continuous"
+        categorical_name += "_categorical"
+
     merged = pd.concat([continuous, categorical], axis=1, join="inner")
+    merged.columns = [continuous_name, categorical_name]
 
     # counts per category, with cutoff
     categorical_counts = Counter(merged[categorical_name])
-    merged["count"] = merged[categorical_name].apply(
-        lambda x: categorical_counts[x]
-    )
+    merged["count"] = merged[categorical_name].apply(categorical_counts.get)
+
     merged = merged[merged["count"] >= count_cutoff]
 
     merged_sorted = (
@@ -520,25 +536,19 @@ def multi_dists(
 
     else:
 
-        def get_order_idx(x):
-            return order.index(x)
-
         merged_sorted["continuous_idx"] = merged_sorted[
             categorical_name
-        ].apply(get_order_idx)
+        ].apply(order.index)
 
         merged_sorted = merged_sorted.sort_values(
             "continuous_idx", ascending=True
         )
 
-    # counts per category
-    counts = merged_sorted[categorical_name].apply(
-        lambda x: categorical_counts[x]
-    )
+    # recompute category counts after applying cutoff
+    counts = merged_sorted[categorical_name].apply(categorical_counts.get)
     counts = counts.astype(str)
 
     # x-axis labels with counts
-
     if newline_counts:
 
         x_labels = merged_sorted[categorical_name] + "\n(" + counts + ")"
@@ -556,7 +566,7 @@ def multi_dists(
             order=merged_sorted[categorical_name],
             inner=None,
             ax=ax,
-            **kwargs
+            **seaborn_kwargs,
         )
 
     elif summary_type == "box":
@@ -568,7 +578,7 @@ def multi_dists(
             order=merged_sorted[categorical_name],
             notch=True,
             ax=ax,
-            **kwargs
+            **seaborn_kwargs,
         )
 
     if stripplot:
@@ -584,6 +594,7 @@ def multi_dists(
             jitter=0.1,
             edgecolor="black",
             ax=ax,
+            **stripplot_kwargs,
         )
 
     ax.spines["right"].set_visible(False)

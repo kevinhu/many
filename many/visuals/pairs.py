@@ -18,7 +18,7 @@ from sklearn.metrics import auc, precision_recall_curve, roc_auc_score, roc_curv
 from .utils import *
 
 
-def binary_contingency(a, b, ax=None, **kwargs):
+def binary_contingency(a, b, ax=None, heatmap_kwargs={}):
     """
     Plot agreement between two binary variables, along with
     the odds ratio and Fisher's exact test p-value.
@@ -29,15 +29,15 @@ def binary_contingency(a, b, ax=None, **kwargs):
         Boolean series of first variable
     y : Boolean series
         Boolean series of second variable
-    ax : matplotlib axis
+    ax : MatPlotLib axis
         axis to plot in (will create new one if not provided)
 
     Returns
     -------
-    ax : matplotlib axis
+    ax : MatPlotLib axis
         axis with plot data
     """
-
+    a, b = pd.Series(a), pd.Series(b)
     a, b = a.dropna(), b.dropna()
     a, b = a.astype(bool), b.astype(bool)
 
@@ -68,7 +68,13 @@ def binary_contingency(a, b, ax=None, **kwargs):
         ax = plt.subplot(111)
 
     g = sns.heatmap(
-        contingency, fmt="d", annot=True, cbar=False, linewidths=2, ax=ax, **kwargs
+        contingency,
+        fmt="d",
+        annot=True,
+        cbar=False,
+        linewidths=2,
+        ax=ax,
+        **heatmap_kwargs
     )
 
     plt.ylabel(a_name)

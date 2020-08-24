@@ -1,4 +1,3 @@
-from . import stats
-from . import visuals
+from . import stats, visuals
 
-__version__ = '0.1.0'
+__version__ = "0.1.0"

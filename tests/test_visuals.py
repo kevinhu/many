@@ -45,3 +45,16 @@ a, b = utils.generate_test(
 
 many.visuals.dense_plot(a[0], b[0], text_adjust=False)
 plt.savefig(config.PLOTS_DIR / "dense_plot_default.pdf", bbox_inches="tight")
+
+a, b = utils.generate_test(
+    n_samples=100,
+    a_num_cols=1,
+    b_num_cols=1,
+    a_type="binary",
+    b_type="binary",
+    a_nan=False,
+    b_nan=False,
+)
+
+many.visuals.binary_contingency(a[0], b[0])
+plt.savefig(config.PLOTS_DIR / "binary_contingency_default.pdf", bbox_inches="tight")

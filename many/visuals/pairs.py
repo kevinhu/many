@@ -280,25 +280,25 @@ def dense_regression(
 
 
 def two_dists(
-    c,
-    b,
-    method="mw_u",
+    binary,
+    continuous,
+    method,
+    summary_type,
     ax=None,
     pal=["#eaeaea", "#a5dee5"],
-    summary_type="violin",
     annotate=True,
     scatter=True,
-    **kwargs
+    seaborn_kwargs={},
 ):
     """
     Plot two sets of points, one as a binary variable
 
     Parameters
     ----------
-    c : Series
-        continuous values to plot
-    b : Series
+    binary : Series
         binary values to plot
+    continuous : Series
+        continuous values to plot
     method : string, "pearson" or "spearman"
         regression method
     ax : matplotlib axis
@@ -307,6 +307,8 @@ def two_dists(
         colors to use when plotting
     summary_type : string
         type of summary plot to use
+    seaborn_kwargs : dictionary
+        additional arguments to pass to Seaborn boxplot/violinplot
 
     Returns
     -------
@@ -318,28 +320,30 @@ def two_dists(
         plt.figure(figsize=(3, 4))
         ax = plt.subplot(111)
 
-    c = c.dropna()
-    b = b.dropna()
+    binary = pd.Series(binary).dropna()
+    continuous = pd.Series(continuous).dropna()
 
-    b = b.astype(bool)
+    binary = binary.astype(bool)
 
-    c, b = c.align(b, join="inner")
+    continuous, binary = continuous.align(binary, join="inner")
 
     # extract positive and negative sets
-    c_pos = c[b]
-    c_neg = c[~b]
-
-    if method not in ["t_test", "mw_u"]:
-        raise ValueError("Method must be 't_test' or 'mw_u'.")
+    continuous_pos = continuous[binary]
+    continuous_neg = continuous[~binary]
 
     if method == "t_test":
-        stat, pval = ttest_ind(c_pos, c_neg)
-        diff = c_pos.mean() - c_neg.mean()
+        stat, pval = ttest_ind(continuous_pos, continuous_neg)
+        diff = continuous_pos.mean() - continuous_neg.mean()
     elif method == "mw_u":
-        stat, pval = mannwhitneyu(c_pos, c_neg, alternative="two-sided")
-        diff = c_pos.median() - c_neg.median()
+        stat, pval = mannwhitneyu(
+            continuous_pos, continuous_neg, alternative="two-sided"
+        )
+        diff = continuous_pos.median() - continuous_neg.median()
+    else:
+        raise ValueError("Method must be 't_test' or 'mw_u'")
 
-    n = len(c)
+    # number of samples
+    n = len(continuous)
 
     # add text of statistics
     diff_text = "Diff = {:.2f}".format(diff)
@@ -369,17 +373,43 @@ def two_dists(
     # plot points
     pal = sns.color_palette(pal)
 
-    if summary_type == "violin":
+    if summary_type == "box":
 
-        sns.violinplot(b, c, inner=None, palette=pal, ax=ax, **kwargs)
+        sns.boxplot(
+            binary,
+            continuous,
+            notch=True,
+            palette=pal,
+            ax=ax,
+            **seaborn_kwargs
+        )
 
-    elif summary_type == "box":
+    elif summary_type == "violin":
 
-        sns.boxplot(b, c, notch=True, palette=pal, ax=ax, **kwargs)
+        sns.violinplot(
+            binary,
+            continuous,
+            inner=None,
+            palette=pal,
+            ax=ax,
+            **seaborn_kwargs
+        )
+
+    else:
+
+        raise ValueError("Method must be 'box' or 'violin'")
 
     if scatter:
 
-        sns.stripplot(b, c, linewidth=1, palette=pal, alpha=0.5, size=2, ax=ax)
+        sns.stripplot(
+            binary,
+            continuous,
+            linewidth=1,
+            palette=pal,
+            alpha=0.5,
+            size=2,
+            ax=ax,
+        )
 
     # adjust range to fit text
     y_range = plt.ylim()[1] - plt.ylim()[0]
@@ -394,9 +424,9 @@ def two_dists(
 def multi_dists(
     continuous,
     categorical,
-    count_cutoff=5,
+    count_cutoff,
+    summary_type,
     ax=None,
-    summary_type="violin",
     stripplot=False,
     order="ascending",
     newline_counts=False,

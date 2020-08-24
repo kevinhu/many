@@ -136,3 +136,17 @@ a, b = utils.generate_test(
 many.visuals.roc_auc_curve(a[0], b[0])
 plt.savefig(config.PLOTS_DIR / "roc_auc_curve.pdf", bbox_inches="tight")
 plt.clf()
+
+a, b = utils.generate_test(
+    n_samples=100,
+    a_num_cols=1,
+    b_num_cols=1,
+    a_type="binary",
+    b_type="continuous",
+    a_nan=False,
+    b_nan=False,
+)
+
+many.visuals.pr_curve(a[0], b[0])
+plt.savefig(config.PLOTS_DIR / "pr_curve.pdf", bbox_inches="tight")
+plt.clf()

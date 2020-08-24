@@ -684,7 +684,7 @@ def pr_curve(y, y_pred, ax=None):
     ax.text(
         0.9,
         0.1,
-        "AP = {:f}".format(np.mean(precision)),
+        f"Avg. precision = {np.mean(precision):.3f}",
         ha="right",
         va="bottom",
         bbox=bbox_props,

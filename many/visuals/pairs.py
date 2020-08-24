@@ -611,6 +611,10 @@ def roc_auc_curve(y, y_pred, ax=None):
         plt.figure(figsize=(3, 3))
         ax = plt.subplot(111)
 
+    y = pd.Series(y).dropna()
+    y_pred = pd.Series(y_pred).dropna()
+    y, y_pred = y.align(y_pred, join="inner")
+
     # compute false and true positive rates
     fpr, tpr, _ = roc_curve(y, y_pred)
     auroc = auc(fpr, tpr)
@@ -656,6 +660,10 @@ def pr_curve(y, y_pred, ax=None):
     if ax is None:
         plt.figure(figsize=(3, 3))
         ax = plt.subplot(111)
+
+    y = pd.Series(y).dropna()
+    y_pred = pd.Series(y_pred).dropna()
+    y, y_pred = y.align(y_pred, join="inner")
 
     precision, recall, thres = precision_recall_curve(y, y_pred)
 
@@ -715,18 +723,23 @@ def binary_metrics(y, y_pred):
         for x in range(len(axes_widths))
     ]
 
-    y_s = pd.Series(y.reshape(-1))
-    y_pred_s = pd.Series(y_pred.reshape(-1))
+    y = pd.Series(y).dropna()
+    y_pred = pd.Series(y_pred).dropna()
+    y, y_pred = y.align(y_pred, join="inner")
 
     # boxplot
     ax = axes[0]
-    two_dists(y_pred_s, y_s, ax=ax, summary_type="box", annotate=False)
+    two_dists(
+        y, y_pred, ax=ax, method="mw_u", summary_type="box", annotate=False
+    )
     ax.set_xlabel("Truth")
     ax.set_ylabel("Prediction")
 
     # violinplot
     ax = axes[1]
-    two_dists(y_pred_s, y_s, ax=ax, summary_type="violin", annotate=False)
+    two_dists(
+        y, y_pred, ax=ax, method="mw_u", summary_type="violin", annotate=False
+    )
     ax.set_xlabel("Truth")
     ax.set_ylabel("Prediction")
 

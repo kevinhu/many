@@ -611,6 +611,7 @@ def roc_auc_curve(y, y_pred, ax=None):
         plt.figure(figsize=(3, 3))
         ax = plt.subplot(111)
 
+    # compute false and true positive rates
     fpr, tpr, _ = roc_curve(y, y_pred)
     auroc = auc(fpr, tpr)
 
@@ -621,6 +622,7 @@ def roc_auc_curve(y, y_pred, ax=None):
     ax.set_xlabel("False positive rate")
     ax.set_ylabel("True positive rate")
 
+    # summary box properties
     bbox_props = dict(
         boxstyle="round,pad=0.5",
         fc="lightgrey",
@@ -629,10 +631,11 @@ def roc_auc_curve(y, y_pred, ax=None):
         alpha=0.33,
     )
 
+    # add summary text
     ax.text(
         0.9,
         0.1,
-        "AUC = {:f}".format(auroc),
+        f"AUC = {auroc:.3f}",
         ha="right",
         va="bottom",
         bbox=bbox_props,

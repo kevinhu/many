@@ -122,3 +122,17 @@ b = (b * 10).astype(int)
 many.visuals.multi_dists(a[0], b[0], count_cutoff=0, summary_type="box")
 plt.savefig(config.PLOTS_DIR / "multi_dists_box.pdf", bbox_inches="tight")
 plt.clf()
+
+a, b = utils.generate_test(
+    n_samples=100,
+    a_num_cols=1,
+    b_num_cols=1,
+    a_type="binary",
+    b_type="continuous",
+    a_nan=False,
+    b_nan=False,
+)
+
+many.visuals.roc_auc_curve(a[0], b[0])
+plt.savefig(config.PLOTS_DIR / "roc_auc_curve.pdf", bbox_inches="tight")
+plt.clf()

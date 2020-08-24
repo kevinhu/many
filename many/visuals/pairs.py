@@ -87,7 +87,7 @@ def binary_contingency(a, b, ax=None, heatmap_kwargs={}):
 
 
 def regression(
-    x, y, method="pearson", ax=None, alpha=0.5, text_pos=(0.1, 0.9), **kwargs
+    x, y, method, ax=None, alpha=0.5, text_pos=(0.1, 0.9), scatter_kwargs={}
 ):
     """
     Plot two sets of points with regression coefficient
@@ -100,26 +100,18 @@ def regression(
         y-coordinate values to plot
     method: string, "pearson" or "spearman"
         regression method
-    ax : matplotlib axis
+    ax : MatPlotLib axis
         axis to plot in (will create new one if not provided)
+    scatter_kwargs : dictionary
+        additional arguments to pass to plt.scatter()
 
     Returns
     -------
-    ax : matplotlib axis
+    ax : MatPlotLib axis
         axis with plot data
     """
 
-    if ax is None:
-        ax = plt.subplot(111)
-
-    x = pd.Series(x).dropna()
-    y = pd.Series(y).dropna()
-
-    x = x.dropna()
-    y = y.dropna()
-
-    x, y = x.align(y, join="inner")
-
+    # check that method is valid
     if method not in ["pearson", "spearman"]:
         raise ValueError("Method must be 'pearson' or 'spearman'.")
 
@@ -128,6 +120,15 @@ def regression(
     elif method == "spearman":
         r, pval = spearmanr(x, y)
 
+    if ax is None:
+        ax = plt.subplot(111)
+
+    x = pd.Series(x).dropna()
+    y = pd.Series(y).dropna()
+
+    x, y = x.align(y, join="inner")
+
+    # number of samples
     n = len(x)
 
     # add text of statistics
@@ -150,7 +151,7 @@ def regression(
     )
 
     # plot points
-    ax.scatter(x, y, linewidth=0, alpha=alpha, rasterized=True, **kwargs)
+    ax.scatter(x, y, linewidth=0, alpha=alpha, rasterized=True, **scatter_kwargs)
 
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)

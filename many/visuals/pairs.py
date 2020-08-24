@@ -13,9 +13,14 @@ from scipy.stats import (
     spearmanr,
     ttest_ind,
 )
-from sklearn.metrics import auc, precision_recall_curve, roc_auc_score, roc_curve
+from sklearn.metrics import (
+    auc,
+    precision_recall_curve,
+    roc_auc_score,
+    roc_curve,
+)
 
-from .utils import *
+from .utils import as_si
 
 
 def binary_contingency(a, b, ax=None, heatmap_kwargs={}):
@@ -54,7 +59,9 @@ def binary_contingency(a, b, ax=None, heatmap_kwargs={}):
     yy = np.sum(~a & ~b)
 
     contingency = pd.DataFrame(
-        [[xx, xy], [yx, yy]], columns=["True", "False"], index=["True", "False"]
+        [[xx, xy], [yx, yy]],
+        columns=["True", "False"],
+        index=["True", "False"],
     )
 
     odds_ratio, p_val = fisher_exact([[xx, xy], [yx, yy]])
@@ -98,10 +105,14 @@ def regression(
         x-coordinate values to plot
     y : Series or 1-dimensional array
         y-coordinate values to plot
-    method: string, "pearson" or "spearman"
+    method : string, "pearson" or "spearman"
         regression method
     ax : MatPlotLib axis
         axis to plot in (will create new one if not provided)
+    alpha : float
+        opacity of plotted points
+    text_pos : (float, float)
+        (x,y) relative position to place regression statistics
     scatter_kwargs : dictionary
         additional arguments to pass to plt.scatter()
 
@@ -137,7 +148,11 @@ def regression(
     n_text = "n = " + str(n)
 
     bbox_props = dict(
-        boxstyle="round,pad=0.5", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33
+        boxstyle="round,pad=0.5",
+        fc="lightgrey",
+        ec="lightgrey",
+        lw=0,
+        alpha=0.33,
     )
 
     ax.text(
@@ -151,7 +166,9 @@ def regression(
     )
 
     # plot points
-    ax.scatter(x, y, linewidth=0, alpha=alpha, rasterized=True, **scatter_kwargs)
+    ax.scatter(
+        x, y, linewidth=0, alpha=alpha, rasterized=True, **scatter_kwargs
+    )
 
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -162,12 +179,12 @@ def regression(
 def dense_regression(
     x,
     y,
-    method="pearson",
+    method,
     ax=None,
     palette="Blues",
-    cmap_offset=-0.4,
+    cmap_offset=0,
     text_pos=(0.1, 0.9),
-    **kwargs
+    scatter_kwargs={},
 ):
     """
     Plot two sets of points with regression coefficient with density-based coloring
@@ -178,12 +195,18 @@ def dense_regression(
         x-coordinate values to plot
     y : Series or 1-dimensional array
         y-coordinate values to plot
-    method: string, "pearson" or "spearman"
+    method : string, "pearson" or "spearman"
         regression method
     ax : matplotlib axis
         axis to plot in (will create new one if not provided)
-    palette: MatplotLib color map
+    palette : MatPlotLib color map
         color map to color points by
+    cmap_offset : float
+        Value to add to KDE to offset colormap
+    text_pos : (float, float)
+        (x,y) relative position to place regression statistics
+    scatter_kwargs : dictionary
+        additional arguments to pass to plt.scatter()
 
     Returns
     -------
@@ -191,22 +214,7 @@ def dense_regression(
         axis with plot data
     """
 
-    if ax is None:
-        ax = plt.subplot(111)
-
-    x = pd.Series(x).dropna()
-    y = pd.Series(y).dropna()
-
-    x = x.dropna()
-    y = y.dropna()
-
-    x, y = x.align(y, join="inner")
-
-    xy = np.vstack([x, y])
-
-    z = gaussian_kde(xy)(xy)
-    z = np.arcsinh(z)
-
+    # check that method is valid
     if method not in ["pearson", "spearman"]:
         raise ValueError("Method must be 'pearson' or 'spearman'.")
 
@@ -214,6 +222,19 @@ def dense_regression(
         r, pval = pearsonr(x, y)
     elif method == "spearman":
         r, pval = spearmanr(x, y)
+
+    if ax is None:
+        ax = plt.subplot(111)
+
+    x = pd.Series(x).dropna()
+    y = pd.Series(y).dropna()
+
+    x, y = x.align(y, join="inner")
+
+    xy = np.vstack([x, y])
+
+    z = gaussian_kde(xy)(xy)
+    z = np.arcsinh(z)
 
     n = len(x)
 
@@ -223,7 +244,11 @@ def dense_regression(
     n_text = "n = " + str(n)
 
     bbox_props = dict(
-        boxstyle="round,pad=0.5", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33
+        boxstyle="round,pad=0.5",
+        fc="lightgrey",
+        ec="lightgrey",
+        lw=0,
+        alpha=0.33,
     )
 
     ax.text(
@@ -245,7 +270,7 @@ def dense_regression(
         rasterized=True,
         cmap=palette,
         vmin=min(z) + cmap_offset,
-        **kwargs
+        **scatter_kwargs
     )
 
     ax.spines["top"].set_visible(False)
@@ -324,7 +349,11 @@ def two_dists(
     if annotate:
 
         bbox_props = dict(
-            boxstyle="round,pad=1", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33
+            boxstyle="round,pad=1",
+            fc="lightgrey",
+            ec="lightgrey",
+            lw=0,
+            alpha=0.33,
         )
 
         ax.text(
@@ -430,7 +459,9 @@ def multi_dists(
 
     # counts per category, with cutoff
     categorical_counts = Counter(merged[categorical_name])
-    merged["count"] = merged[categorical_name].apply(lambda x: categorical_counts[x])
+    merged["count"] = merged[categorical_name].apply(
+        lambda x: categorical_counts[x]
+    )
     merged = merged[merged["count"] >= count_cutoff]
 
     merged_sorted = (
@@ -443,13 +474,17 @@ def multi_dists(
 
     if order == "ascending":
 
-        merged_sorted = merged_sorted.sort_values(continuous_name, ascending=True)
+        merged_sorted = merged_sorted.sort_values(
+            continuous_name, ascending=True
+        )
 
         order = merged_sorted[continuous_name]
 
     elif order == "descending":
 
-        merged_sorted = merged_sorted.sort_values(continuous_name, ascending=False)
+        merged_sorted = merged_sorted.sort_values(
+            continuous_name, ascending=False
+        )
 
         order = merged_sorted[continuous_name]
 
@@ -458,14 +493,18 @@ def multi_dists(
         def get_order_idx(x):
             return order.index(x)
 
-        merged_sorted["continuous_idx"] = merged_sorted[categorical_name].apply(
-            get_order_idx
+        merged_sorted["continuous_idx"] = merged_sorted[
+            categorical_name
+        ].apply(get_order_idx)
+
+        merged_sorted = merged_sorted.sort_values(
+            "continuous_idx", ascending=True
         )
 
-        merged_sorted = merged_sorted.sort_values("continuous_idx", ascending=True)
-
     # counts per category
-    counts = merged_sorted[categorical_name].apply(lambda x: categorical_counts[x])
+    counts = merged_sorted[categorical_name].apply(
+        lambda x: categorical_counts[x]
+    )
     counts = counts.astype(str)
 
     # x-axis labels with counts
@@ -542,7 +581,11 @@ def roc_auc_curve(y, y_pred, ax=None):
     ax.set_ylabel("True positive rate")
 
     bbox_props = dict(
-        boxstyle="round,pad=0.5", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33
+        boxstyle="round,pad=0.5",
+        fc="lightgrey",
+        ec="lightgrey",
+        lw=0,
+        alpha=0.33,
     )
 
     ax.text(
@@ -587,7 +630,11 @@ def pr_curve(y, y_pred, ax=None):
     ax.set_xlabel("Recall")
 
     bbox_props = dict(
-        boxstyle="round,pad=0.5", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33
+        boxstyle="round,pad=0.5",
+        fc="lightgrey",
+        ec="lightgrey",
+        lw=0,
+        alpha=0.33,
     )
 
     ax.text(

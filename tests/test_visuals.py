@@ -58,7 +58,9 @@ a, b = utils.generate_test(
 )
 
 many.visuals.binary_contingency(a[0], b[0])
-plt.savefig(config.PLOTS_DIR / "binary_contingency_default.pdf", bbox_inches="tight")
+plt.savefig(
+    config.PLOTS_DIR / "binary_contingency_default.pdf", bbox_inches="tight"
+)
 plt.clf()
 
 a, b = utils.generate_test(
@@ -73,4 +75,20 @@ a, b = utils.generate_test(
 
 many.visuals.regression(a[0], b[0], method="pearson")
 plt.savefig(config.PLOTS_DIR / "regression_pearson.pdf", bbox_inches="tight")
+plt.clf()
+
+a, b = utils.generate_test(
+    n_samples=1000,
+    a_num_cols=1,
+    b_num_cols=1,
+    a_type="continuous",
+    b_type="continuous",
+    a_nan=False,
+    b_nan=False,
+)
+
+many.visuals.dense_regression(a[0], b[0], method="pearson")
+plt.savefig(
+    config.PLOTS_DIR / "dense_regression_pearson.pdf", bbox_inches="tight"
+)
 plt.clf()

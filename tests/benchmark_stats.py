@@ -1,6 +1,9 @@
 import argparse
 import importlib
 from pathlib import Path
+import inspect
+
+import pandas as pd
 
 from utils import compare
 
@@ -29,6 +32,32 @@ for submodule in submodules:
 
     params = importlib.import_module(f"benchmark_stats.{submodule}").params
 
+    base_times = []
+    method_times = []
+    ratios = []
+
     for param_set in params:
 
-        compare(*param_set)
+        base_result, result, benchmark_results = compare(*param_set)
+
+        base_time = benchmark_results["base_time"]
+        method_time = benchmark_results["method_time"]
+
+        ratio = base_time / method_time
+
+        base_times.append(base_time)
+        method_times.append(method_time)
+        ratios.append(ratio)
+
+        break
+
+    # print(inspect.getfullargspec(compare))
+
+    benchmarks_df = pd.DataFrame(
+        params, columns=inspect.getfullargspec(compare)[0]
+    )
+    benchmarks_df["base_times"] = base_times
+    benchmarks_df["method_times"] = method_times
+    benchmarks_df["ratios"] = ratios
+
+    print(benchmarks_df)

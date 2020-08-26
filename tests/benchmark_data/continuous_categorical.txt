@@ -1,0 +1,4 @@
+	base_method	method	num_samples	a_num_cols	b_num_cols	a_type	b_type	a_nan	b_nan	method_kwargs	output_names	report_benchmark	base_times	method_times	ratios
+0	mat_mwu_naive	mat_mwu	1000	100	10	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	0.9743542671203613	0.12685322761535645	7.68095763455694
+1	mat_mwu_naive	mat_mwu	1000	100	100	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	9.400108337402344	0.6708700656890869	14.011816621668734
+2	mat_mwu_naive	mat_mwu	1000	100	1000	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	94.0718719959259	6.1242592334747314	15.360530704143983

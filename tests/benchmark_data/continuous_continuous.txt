@@ -1,0 +1,7 @@
+	base_method	method	num_samples	a_num_cols	b_num_cols	a_type	b_type	a_nan	b_nan	method_kwargs	output_names	report_benchmark	base_times	method_times	ratios
+0	mat_corr_naive	mat_corr	1000	100	10	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	0.26015782356262207	0.010579109191894531	24.59165690074822
+1	mat_corr_naive	mat_corr	1000	100	100	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	2.3771345615386963	0.06983137130737305	34.041069465403865
+2	mat_corr_naive	mat_corr	1000	100	1000	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	23.6244637966156	0.3233177661895752	73.06886990788979
+3	mat_corr_naive	mat_corr	1000	100	10	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	0.6887092590332031	0.0151824951171875	45.36206030150754
+4	mat_corr_naive	mat_corr	1000	100	100	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	6.644232988357544	0.07658600807189941	86.7551809479337
+5	mat_corr_naive	mat_corr	1000	100	1000	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	66.0822446346283	0.34893178939819336	189.3844202289539

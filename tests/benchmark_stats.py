@@ -1,13 +1,13 @@
 import argparse
 import importlib
-from pathlib import Path
 import inspect
+from pathlib import Path
 
+import config
 import pandas as pd
-
 from utils import compare
 
-p = Path("./benchmark_stats").glob("*.py")
+p = Path("./stats_benchmark_params").glob("*.py")
 all_submodules = [x.stem for x in p if x.is_file()]
 all_submodules = [x for x in all_submodules if x != "__init__"]
 
@@ -30,7 +30,9 @@ if submodules is None:
 
 for submodule in submodules:
 
-    params = importlib.import_module(f"benchmark_stats.{submodule}").params
+    params = importlib.import_module(
+        f"stats_benchmark_params.{submodule}"
+    ).params
 
     base_times = []
     method_times = []
@@ -49,15 +51,21 @@ for submodule in submodules:
         method_times.append(method_time)
         ratios.append(ratio)
 
-        break
-
-    # print(inspect.getfullargspec(compare))
-
     benchmarks_df = pd.DataFrame(
         params, columns=inspect.getfullargspec(compare)[0]
     )
+
+    benchmarks_df["base_method"] = benchmarks_df["base_method"].apply(
+        lambda x: x.__name__
+    )
+    benchmarks_df["method"] = benchmarks_df["method"].apply(
+        lambda x: x.__name__
+    )
+
     benchmarks_df["base_times"] = base_times
     benchmarks_df["method_times"] = method_times
     benchmarks_df["ratios"] = ratios
 
-    print(benchmarks_df)
+    benchmarks_df.to_csv(
+        config.BENCHMARK_DATA_DIR / f"{submodule}.txt", sep="\t"
+    )

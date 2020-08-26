@@ -1,0 +1,7 @@
+	base_method	method	num_samples	a_num_cols	b_num_cols	a_type	b_type	a_nan	b_nan	method_kwargs	output_names	report_benchmark	base_times	method_times	ratios
+0	mat_fisher_naive	mat_fisher	1000	100	10	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	1.0579743385314941	0.23467278480529785	4.508295835877471
+1	mat_fisher_naive	mat_fisher	1000	100	100	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	10.343127250671387	2.261554002761841	4.573460212774145
+2	mat_fisher_naive	mat_fisher	1000	100	1000	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	102.02229428291321	22.780009508132935	4.478588748897982
+3	mat_fisher_naive	mat_fisher_nan	1000	100	10	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	1.0575573444366455	0.13927865028381348	7.593104487167417
+4	mat_fisher_naive	mat_fisher_nan	1000	100	100	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	10.426411390304565	1.340477466583252	7.778132531299079
+5	mat_fisher_naive	mat_fisher_nan	1000	100	1000	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	103.80005288124084	13.374037742614746	7.76131000068099

@@ -49,7 +49,7 @@ def generate_test(
     a_num_cols: int
         Number of variables for a_mat (equivalent to number of columns in a_mat)
     b_num_cols: int
-        Number of variables for b_mat (equivalent to number of columns in b_mat) 
+        Number of variables for b_mat (equivalent to number of columns in b_mat)
     a_type: string, "continuous", "binary", or "zero"
         Type of variables in a_mat
     b_type: string, "continuous", "binary", or "zero"
@@ -116,7 +116,7 @@ def compare(
     b_nan: bool,
     method_kwargs,
     output_names: List[str],
-    benchmark: bool,
+    report_benchmark: bool,
 ):
 
     """
@@ -146,6 +146,8 @@ def compare(
         arguments to pass to base_method and method
     output_names: list of strings
         names of the output variables (for logging)
+    report_benchmark: bool
+        whether to print comparison of runtimes
 
     """
 
@@ -156,7 +158,9 @@ def compare(
     )
 
     # announce method parameters
-    print(f" with {bcolors.BOLD}{bcolors.HEADER}{base_method.__name__}{bcolors.ENDC}")
+    print(
+        f" with {bcolors.BOLD}{bcolors.HEADER}{base_method.__name__}{bcolors.ENDC}"
+    )
 
     args_string = ", ".join(
         f"{bcolors.BOLD}{key}{bcolors.ENDC} = {value}"
@@ -195,10 +199,16 @@ def compare(
     end = time.time()
     method_time = end - start
 
-    if benchmark:
+    if report_benchmark:
         print(f"\tNaive speed: {bcolors.BOLD}{base_time:.2f}s{bcolors.ENDC}")
-        print(f"\tVectorized speed: {bcolors.BOLD}{method_time:.2f}s{bcolors.ENDC}")
-        print(f"\tSpeedup: {bcolors.BOLD}{base_time/method_time:.2f}x{bcolors.ENDC}")
+        print(
+            f"\tVectorized speed: {bcolors.BOLD}{method_time:.2f}s{bcolors.ENDC}"
+        )
+        print(
+            f"\tSpeedup: {bcolors.BOLD}{base_time/method_time:.2f}x{bcolors.ENDC}"
+        )
+
+    benchmark_results = {"base_time": base_time, "method_time": method_time}
 
     # cast single outputs to lists
     if len(output_names) == 1:
@@ -217,14 +227,19 @@ def compare(
 
         output_name = output_names[i]
 
-        print(f"\tChecking {bcolors.BOLD}{output_name}{bcolors.ENDC} outputs: ", end="")
+        print(
+            f"\tChecking {bcolors.BOLD}{output_name}{bcolors.ENDC} outputs: ",
+            end="",
+        )
 
         if type(base_output) != type(output):
             raise TypeMismatchError("Outputs have different types")
 
         if base_output.shape != output.shape:
             raise ShapeMismatchError(
-                "Outputs have different shapes", base_output.shape, output.shape
+                "Outputs have different shapes",
+                base_output.shape,
+                output.shape,
             )
 
         max_deviation = np.abs(base_output - output).max().max()
@@ -238,6 +253,8 @@ def compare(
 
         else:
 
-            print(f"max deviation is {bcolors.FAIL}{max_deviation_str}{bcolors.ENDC}")
+            print(
+                f"max deviation is {bcolors.FAIL}{max_deviation_str}{bcolors.ENDC}"
+            )
 
-    return base_result, result
+    return base_result, result, benchmark_results

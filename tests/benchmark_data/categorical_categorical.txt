@@ -1,7 +1,19 @@
 	base_method	method	num_samples	a_num_cols	b_num_cols	a_type	b_type	a_nan	b_nan	method_kwargs	output_names	report_benchmark	base_times	method_times	ratios
-0	mat_fisher_naive	mat_fisher	1000	100	10	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	1.0579743385314941	0.23467278480529785	4.508295835877471
-1	mat_fisher_naive	mat_fisher	1000	100	100	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	10.343127250671387	2.261554002761841	4.573460212774145
-2	mat_fisher_naive	mat_fisher	1000	100	1000	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	102.02229428291321	22.780009508132935	4.478588748897982
-3	mat_fisher_naive	mat_fisher_nan	1000	100	10	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	1.0575573444366455	0.13927865028381348	7.593104487167417
-4	mat_fisher_naive	mat_fisher_nan	1000	100	100	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	10.426411390304565	1.340477466583252	7.778132531299079
-5	mat_fisher_naive	mat_fisher_nan	1000	100	1000	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	103.80005288124084	13.374037742614746	7.76131000068099
+0	mat_fisher_naive	mat_fisher	1000	100	8	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	0.8474302291870117	0.18228578567504883	4.648910094930169
+1	mat_fisher_naive	mat_fisher	1000	100	16	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	1.6692299842834473	0.36599206924438477	4.560836489516521
+2	mat_fisher_naive	mat_fisher	1000	100	32	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	3.2843873500823975	0.7344887256622314	4.471664758531345
+3	mat_fisher_naive	mat_fisher	1000	100	64	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	6.565284490585327	1.4864888191223145	4.4166389993176995
+4	mat_fisher_naive	mat_fisher	1000	100	128	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	13.056265354156494	2.929616928100586	4.456645928319888
+5	mat_fisher_naive	mat_fisher	1000	100	256	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	26.29167127609253	5.9466822147369385	4.421233610051851
+6	mat_fisher_naive	mat_fisher	1000	100	512	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	52.51446056365967	12.01719617843628	4.36994285388233
+7	mat_fisher_naive	mat_fisher	1000	100	1024	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	104.89645481109619	23.380632400512695	4.486467817217639
+8	mat_fisher_naive	mat_fisher	1000	100	2048	binary	binary	False	False	{'melt': False}	['corrs', 'pvals']	True	209.88345336914062	48.33955097198486	4.341857736551553
+9	mat_fisher_naive	mat_fisher_nan	1000	100	8	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	0.8682472705841064	0.10996508598327637	7.895663089975218
+10	mat_fisher_naive	mat_fisher_nan	1000	100	16	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	1.6910896301269531	0.2232065200805664	7.576345124311576
+11	mat_fisher_naive	mat_fisher_nan	1000	100	32	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	3.369142770767212	0.42465686798095703	7.933800262753068
+12	mat_fisher_naive	mat_fisher_nan	1000	100	64	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	6.754700660705566	0.8755395412445068	7.714900746920373
+13	mat_fisher_naive	mat_fisher_nan	1000	100	128	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	13.482261419296265	1.7026898860931396	7.918213134061434
+14	mat_fisher_naive	mat_fisher_nan	1000	100	256	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	27.0326189994812	3.55749773979187	7.598773344846238
+15	mat_fisher_naive	mat_fisher_nan	1000	100	512	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	54.15818119049072	6.858755111694336	7.896211529428974
+16	mat_fisher_naive	mat_fisher_nan	1000	100	1024	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	108.27884364128113	14.002618789672852	7.73275665557206
+17	mat_fisher_naive	mat_fisher_nan	1000	100	2048	binary	binary	True	True	{'melt': False}	['corrs', 'pvals']	True	215.7724061012268	28.12323808670044	7.67238841544588

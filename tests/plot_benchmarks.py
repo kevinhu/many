@@ -53,16 +53,31 @@ for submodule in submodules:
                 * method_benchmarks["b_num_cols"]
             )
 
+            plt.figure(figsize=(5, 3))
+
             ax = plt.subplot(111)
 
             ax.scatter(
                 method_benchmarks["num_comparisons"],
                 method_benchmarks["base_times"],
+                c="#222831",
+                label="Naive",
             )
             ax.scatter(
                 method_benchmarks["num_comparisons"],
                 method_benchmarks["method_times"],
+                c="#71c9ce",
+                label="Vectorized",
             )
+
+            plt.legend()
+
+            for x, y, ratio in zip(
+                method_benchmarks["num_comparisons"],
+                method_benchmarks["method_times"],
+                method_benchmarks["ratios"],
+            ):
+                plt.text(x * 1.1, y, f"×{int(ratio)}", va="center")
 
             ax.set_xscale("log")
             ax.set_yscale("log")

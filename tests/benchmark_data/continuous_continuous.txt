@@ -1,7 +1,19 @@
 	base_method	method	num_samples	a_num_cols	b_num_cols	a_type	b_type	a_nan	b_nan	method_kwargs	output_names	report_benchmark	base_times	method_times	ratios
-0	mat_corr_naive	mat_corr	1000	100	10	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	0.26015782356262207	0.010579109191894531	24.59165690074822
-1	mat_corr_naive	mat_corr	1000	100	100	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	2.3771345615386963	0.06983137130737305	34.041069465403865
-2	mat_corr_naive	mat_corr	1000	100	1000	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	23.6244637966156	0.3233177661895752	73.06886990788979
-3	mat_corr_naive	mat_corr	1000	100	10	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	0.6887092590332031	0.0151824951171875	45.36206030150754
-4	mat_corr_naive	mat_corr	1000	100	100	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	6.644232988357544	0.07658600807189941	86.7551809479337
-5	mat_corr_naive	mat_corr	1000	100	1000	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	66.0822446346283	0.34893178939819336	189.3844202289539
+0	mat_corr_naive	mat_corr	1000	100	8	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	0.20998859405517578	0.008786678314208984	23.898518478319858
+1	mat_corr_naive	mat_corr	1000	100	16	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	0.4097869396209717	0.014534711837768555	28.193674851959386
+2	mat_corr_naive	mat_corr	1000	100	32	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	0.7872998714447021	0.025976896286010742	30.307695837731174
+3	mat_corr_naive	mat_corr	1000	100	64	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	1.5770018100738525	0.04876995086669922	32.335521813097635
+4	mat_corr_naive	mat_corr	1000	100	128	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	3.0896968841552734	0.07842707633972168	39.39579324328843
+5	mat_corr_naive	mat_corr	1000	100	256	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	6.0798420906066895	0.11150026321411133	54.52760303293376
+6	mat_corr_naive	mat_corr	1000	100	512	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	12.291309595108032	0.20125102996826172	61.07451771574254
+7	mat_corr_naive	mat_corr	1000	100	1024	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	24.44705891609192	0.3351707458496094	72.93911899775787
+8	mat_corr_naive	mat_corr	1000	100	2048	continuous	binary	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	48.84303116798401	0.6571807861328125	74.32206205449395
+9	mat_corr_naive	mat_corr	1000	100	8	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	0.5592598915100098	0.013559103012084961	41.24608324101915
+10	mat_corr_naive	mat_corr	1000	100	16	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	1.1093940734863281	0.019372940063476562	57.26513734370385
+11	mat_corr_naive	mat_corr	1000	100	32	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	2.180964708328247	0.030765056610107422	70.89097010183046
+12	mat_corr_naive	mat_corr	1000	100	64	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	4.3438427448272705	0.05374932289123535	80.81669705155673
+13	mat_corr_naive	mat_corr	1000	100	128	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	8.612005710601807	0.08466315269470215	101.72082466214027
+14	mat_corr_naive	mat_corr	1000	100	256	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	17.160234689712524	0.12309908866882324	139.40180122599577
+15	mat_corr_naive	mat_corr	1000	100	512	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	34.46914863586426	0.20151782035827637	171.04764518880728
+16	mat_corr_naive	mat_corr	1000	100	1024	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	68.71623086929321	0.3600881099700928	190.83171303545808
+17	mat_corr_naive	mat_corr	1000	100	2048	continuous	binary	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	137.08834433555603	0.6946227550506592	197.35654114233287

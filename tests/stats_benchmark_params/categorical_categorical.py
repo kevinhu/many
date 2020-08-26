@@ -1,6 +1,6 @@
 import many
 
-b_num_cols = [10, 100, 1000]
+b_num_cols = [8, 16, 32, 64, 128, 256, 512, 1024, 2048]
 
 params = []
 

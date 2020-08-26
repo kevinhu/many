@@ -85,6 +85,9 @@ for submodule in submodules:
             ax.spines["top"].set_visible(False)
             ax.spines["right"].set_visible(False)
 
+            plt.xlabel("Number of compared variables")
+            plt.ylabel("Speed, seconds")
+
             plt.savefig(
                 config.BENCHMARK_PLOTS_DIR
                 / f"{submodule}_{method}_{method_kwarg}.png",

@@ -7,26 +7,16 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
+SUBPLOT_COLS = 3
+SUBPLOT_ROWS = 3
+
 p = Path("./stats_benchmark_params").glob("*.py")
-all_submodules = [x.stem for x in p if x.is_file()]
-all_submodules = [x for x in all_submodules if x != "__init__"]
+submodules = [x.stem for x in p if x.is_file()]
+submodules = [x for x in submodules if x != "__init__"]
 
-parser = argparse.ArgumentParser(description="Benchmark statistical methods")
-parser.add_argument(
-    "-s",
-    "--submodules",
-    nargs="+",
-    help=f"submodules to benchmark: any of {all_submodules} (leave empty for all)",
-    default=None,
-    required=False,
-)
+fig = plt.figure(figsize=(15, 10))
 
-args = parser.parse_args()
-submodules = args.submodules
-
-if submodules is None:
-
-    submodules = all_submodules
+position = 1
 
 for submodule in submodules:
 
@@ -50,9 +40,7 @@ for submodule in submodules:
             benchmarks_df["method_id"] == method_id
         ]
 
-        plt.figure(figsize=(5, 3))
-
-        ax = plt.subplot(111)
+        ax = fig.add_subplot(SUBPLOT_ROWS, SUBPLOT_COLS, position)
 
         ax.scatter(
             method_benchmarks["num_comparisons"],
@@ -82,14 +70,24 @@ for submodule in submodules:
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
 
-        plt.xlabel("Number of compared variables")
-        plt.ylabel("Speed, seconds")
+        ax.set_xlabel("Number of compared variables")
+        ax.set_ylabel("Speed, seconds")
 
-        plt.savefig(
-            config.BENCHMARK_PLOTS_DIR / f"{submodule}_{method_id}.png",
-            dpi=256,
-            bbox_inches="tight",
-            transparent=True,
-        )
+        # plt.savefig(
+        #     config.BENCHMARK_PLOTS_DIR / f"{submodule}_{method_id}.png",
+        #     dpi=256,
+        #     bbox_inches="tight",
+        #     transparent=True,
+        # )
 
-        plt.clf()
+        # plt.clf()
+
+        position += 1
+
+plt.subplots_adjust(hspace=0.4, wspace=0.4)
+
+plt.savefig(
+    config.BENCHMARK_PLOTS_DIR / "all_benchmarks.png",
+    dpi=256,
+    bbox_inches="tight",
+)

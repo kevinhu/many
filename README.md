@@ -80,34 +80,8 @@ Benchmarks were run with 1,000 samples per variable (i.e. setting each input mat
 
 Benchmarks were run on an i7-7700K with 16GB of 2133 MHz RAM.
 
-##### `mat_corr` (Pearson)
-
 <p align="center">
-  <img width=512 src="https://github.com/kevinhu/many/raw/master/tests/benchmark_plots/continuous_continuous_mat_corr_%7B'method':%20'pearson'%2C%20'melt':%20False%7D.png">
-</p>
-
-##### `mat_corr` (Spearman)
-
-<p align="center">
-  <img width=512 src="https://github.com/kevinhu/many/raw/master/tests/benchmark_plots/continuous_continuous_mat_corr_%7B'method':%20'spearman'%2C%20'melt':%20False%7D.png">
-</p>
-
-##### `mat_mwu`
-
-<p align="center">
-  <img width=512 src="https://github.com/kevinhu/many/raw/master/tests/benchmark_plots/continuous_categorical_mat_mwu_%7B'effect':%20'rank_biserial'%2C%20'melt':%20False%7D.png">
-</p>
-
-##### `mat_fisher`
-
-<p align="center">
-  <img width=512 src="https://github.com/kevinhu/many/raw/master/tests/benchmark_plots/categorical_categorical_mat_fisher_%7B'melt':%20False%7D.png">
-</p>
-
-##### `mat_fisher_nan`
-
-<p align="center">
-  <img width=512 src="https://github.com/kevinhu/many/raw/master/tests/benchmark_plots/categorical_categorical_mat_fisher_nan_%7B'melt':%20False%7D.png">
+  <img src="https://github.com/kevinhu/many/raw/master/tests/benchmark_plots/all_benchmarks.png">
 </p>
 
 ### Visual methods

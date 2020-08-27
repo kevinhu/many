@@ -34,66 +34,62 @@ for submodule in submodules:
         config.BENCHMARK_DATA_DIR / f"{submodule}.txt", sep="\t", index_col=0
     )
 
-    methods = list(set(benchmarks_df["method"]))
-    method_kwargs = list(set(benchmarks_df["method_kwargs"]))
+    benchmarks_df["num_comparisons"] = (
+        benchmarks_df["a_num_cols"] * benchmarks_df["b_num_cols"]
+    )
 
-    for method in methods:
+    benchmarks_df["method_id"] = (
+        benchmarks_df["method"] + "-" + benchmarks_df["method_kwargs"]
+    )
 
-        for method_kwarg in method_kwargs:
+    method_ids = list(set(benchmarks_df["method_id"]))
 
-            method_benchmarks = benchmarks_df[
-                benchmarks_df["method"] == method
-            ]
-            method_benchmarks = method_benchmarks[
-                method_benchmarks["method_kwargs"] == method_kwarg
-            ]
+    for method_id in method_ids:
 
-            method_benchmarks["num_comparisons"] = (
-                method_benchmarks["a_num_cols"]
-                * method_benchmarks["b_num_cols"]
-            )
+        method_benchmarks = benchmarks_df[
+            benchmarks_df["method_id"] == method_id
+        ]
 
-            plt.figure(figsize=(5, 3))
+        plt.figure(figsize=(5, 3))
 
-            ax = plt.subplot(111)
+        ax = plt.subplot(111)
 
-            ax.scatter(
-                method_benchmarks["num_comparisons"],
-                method_benchmarks["base_times"],
-                c="#222831",
-                label="Naive",
-            )
-            ax.scatter(
-                method_benchmarks["num_comparisons"],
-                method_benchmarks["method_times"],
-                c="#71c9ce",
-                label="Vectorized",
-            )
+        ax.scatter(
+            method_benchmarks["num_comparisons"],
+            method_benchmarks["base_times"],
+            c="#222831",
+            label="Naive",
+        )
+        ax.scatter(
+            method_benchmarks["num_comparisons"],
+            method_benchmarks["method_times"],
+            c="#71c9ce",
+            label="Vectorized",
+        )
 
-            plt.legend()
+        plt.legend()
 
-            for x, y, ratio in zip(
-                method_benchmarks["num_comparisons"],
-                method_benchmarks["method_times"],
-                method_benchmarks["ratios"],
-            ):
-                plt.text(x * 1.1, y, f"×{int(ratio)}", va="center")
+        for x, y, ratio in zip(
+            method_benchmarks["num_comparisons"],
+            method_benchmarks["method_times"],
+            method_benchmarks["ratios"],
+        ):
+            plt.text(x * 1.1, y, f"×{int(ratio)}", va="center")
 
-            ax.set_xscale("log")
-            ax.set_yscale("log")
+        ax.set_xscale("log")
+        ax.set_yscale("log")
 
-            ax.spines["top"].set_visible(False)
-            ax.spines["right"].set_visible(False)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
 
-            plt.xlabel("Number of compared variables")
-            plt.ylabel("Speed, seconds")
+        plt.xlabel("Number of compared variables")
+        plt.ylabel("Speed, seconds")
 
-            plt.savefig(
-                config.BENCHMARK_PLOTS_DIR
-                / f"{submodule}_{method}_{method_kwarg}.png",
-                dpi=256,
-                bbox_inches="tight",
-                transparent=True,
-            )
+        plt.savefig(
+            config.BENCHMARK_PLOTS_DIR / f"{submodule}_{method_id}.png",
+            dpi=256,
+            bbox_inches="tight",
+            transparent=True,
+        )
 
-            plt.clf()
+        plt.clf()

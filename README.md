@@ -82,43 +82,33 @@ Benchmarks were run on an i7-7700K with 16GB of 2133 MHz RAM.
 
 ##### `mat_corr` (Pearson)
 
-| Column count of `b_mat` | Total comparisons | Runtime, `mat_corr_naive`, seconds | Runtime, `mat_corr`, seconds | Speedup    |
-| ----------------------- | ----------------- | ---------------------------------- | ---------------------------- | ---------- |
-| 10                      | 1,000             | 0.29                               | **0.01**                     | **×25.86** |
-| 100                     | 10,000            | 2.67                               | **0.07**                     | **×37.37** |
-| 1,000                   | 100,000           | 26.36                              | **0.35**                     | **×74.47** |
+<p align="center">
+  <img width=512 src="https://github.com/kevinhu/many/raw/master/tests/benchmark_plots/continuous_continuous_mat_corr_%7B'method':%20'pearson'%2C%20'melt':%20False%7D.png">
+</p>
 
 ##### `mat_corr` (Spearman)
 
-| Column count of `b_mat` | Total comparisons | Runtime, `mat_corr_naive`, seconds | Runtime, `mat_corr`, seconds | Speedup     |
-| ----------------------- | ----------------- | ---------------------------------- | ---------------------------- | ----------- |
-| 10                      | 1,000             | 0.74                               | **0.02**                     | **×46.74**  |
-| 100                     | 10,000            | 7.28                               | **0.08**                     | **×94.21**  |
-| 1,000                   | 100,000           | 72.06                              | **0.38**                     | **×190.58** |
+<p align="center">
+  <img width=512 src="https://github.com/kevinhu/many/raw/master/tests/benchmark_plots/continuous_continuous_mat_corr_%7B'method':%20'spearman'%2C%20'melt':%20False%7D.png">
+</p>
 
 ##### `mat_mwu`
 
-| Column count of `b_mat` | Total comparisons | Runtime, `mat_mwu_naive`, seconds | Runtime, `mat_mwu`, seconds | Speedup    |
-| ----------------------- | ----------------- | --------------------------------- | --------------------------- | ---------- |
-| 10                      | 1,000             | 1.06                              | **0.14**                    | **×7.55**  |
-| 100                     | 10,000            | 10.38                             | **0.71**                    | **×14.62** |
-| 1,000                   | 100,000           | 103.17                            | **6.52**                    | **×15.82** |
+<p align="center">
+  <img width=512 src="https://github.com/kevinhu/many/raw/master/tests/benchmark_plots/continuous_categorical_mat_mwu_%7B'effect':%20'rank_biserial'%2C%20'melt':%20False%7D.png">
+</p>
 
 ##### `mat_fisher`
 
-| Column count of `b_mat` | Total comparisons | Runtime, `mat_fisher_naive`, seconds | Runtime, `mat_fisher`, seconds | Speedup   |
-| ----------------------- | ----------------- | ------------------------------------ | ------------------------------ | --------- |
-| 10                      | 1,000             | 1.18                                 | **0.24**                       | **×5.01** |
-| 100                     | 10,000            | 11.72                                | **2.42**                       | **×4.83** |
-| 1,000                   | 100,000           | 116.48                               | **23.77**                      | **×4.90** |
+<p align="center">
+  <img width=512 src="https://github.com/kevinhu/many/raw/master/tests/benchmark_plots/categorical_categorical_mat_fisher_%7B'melt':%20False%7D.png">
+</p>
 
 ##### `mat_fisher_nan`
 
-| Column count of `b_mat` | Total comparisons | Runtime, `mat_fisher_naive`, seconds | Runtime, `mat_fisher_nan`, seconds | Speedup   |
-| ----------------------- | ----------------- | ------------------------------------ | ---------------------------------- | --------- |
-| 10                      | 1,000             | 1.23                                 | **0.14**                           | **×8.56** |
-| 100                     | 10,000            | 12.04                                | **1.43**                           | **×8.40** |
-| 1,000                   | 100,000           | 120.20                               | **14.46**                          | **×8.31** |
+<p align="center">
+  <img width=512 src="https://github.com/kevinhu/many/raw/master/tests/benchmark_plots/categorical_categorical_mat_fisher_nan_%7B'melt':%20False%7D.png">
+</p>
 
 ### Visual methods
 

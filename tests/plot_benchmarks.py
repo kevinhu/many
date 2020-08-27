@@ -14,7 +14,7 @@ p = Path("./stats_benchmark_params").glob("*.py")
 submodules = [x.stem for x in p if x.is_file()]
 submodules = [x for x in submodules if x != "__init__"]
 
-fig = plt.figure(figsize=(15, 10))
+fig = plt.figure(figsize=(15, 12))
 
 position = 1
 
@@ -41,6 +41,11 @@ for submodule in submodules:
         ]
 
         ax = fig.add_subplot(SUBPLOT_ROWS, SUBPLOT_COLS, position)
+
+        method_name = method_id.split("-", 1)[0]
+        method_args = method_id.split("-", 1)[1]
+
+        ax.set_title(method_name + "\n" + method_args)
 
         ax.scatter(
             method_benchmarks["num_comparisons"],
@@ -73,18 +78,9 @@ for submodule in submodules:
         ax.set_xlabel("Number of compared variables")
         ax.set_ylabel("Speed, seconds")
 
-        # plt.savefig(
-        #     config.BENCHMARK_PLOTS_DIR / f"{submodule}_{method_id}.png",
-        #     dpi=256,
-        #     bbox_inches="tight",
-        #     transparent=True,
-        # )
-
-        # plt.clf()
-
         position += 1
 
-plt.subplots_adjust(hspace=0.4, wspace=0.4)
+plt.subplots_adjust(hspace=0.6, wspace=0.35)
 
 plt.savefig(
     config.BENCHMARK_PLOTS_DIR / "all_benchmarks.png",

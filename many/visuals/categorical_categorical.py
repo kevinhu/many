@@ -13,13 +13,13 @@ def binary_contingency(a, b, ax=None, heatmap_kwargs={}):
     Parameters
     ----------
     a : Boolean series
-        Boolean series of first variable
+        boolean series of first variable
     y : Boolean series
-        Boolean series of second variable
+        boolean series of second variable
     ax : MatPlotLib axis
-        Axis to plot in (will create new one if not provided)
+        axis to plot in (will create new one if not provided)
     heatmap_kwargs : dictionary
-        Additional arguments to pass to seaborn.heatmap()
+        additional arguments to pass to seaborn.heatmap()
 
     Returns
     -------

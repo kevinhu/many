@@ -44,12 +44,14 @@ def two_dists(
         continuous values to plot
     method : string, "pearson" or "spearman"
         regression method
+    summary_type : string
+        type of summary plot to use
     ax : matplotlib axis
         axis to plot in (will create new one if not provided)
     pal : list of length two
         colors to use when plotting
-    summary_type : string
-        type of summary plot to use
+    annotate : boolean
+        whether or not to show summary statistics
     stripplot : boolean
         whether or not to plot the raw values
     seaborn_kwargs : dictionary
@@ -67,37 +69,38 @@ def two_dists(
         plt.figure(figsize=(3, 4))
         ax = plt.subplot(111)
 
+    # convert, align, and cast
     binary = pd.Series(binary).dropna()
     continuous = pd.Series(continuous).dropna()
-
     binary = binary.astype(bool)
-
     continuous, binary = continuous.align(binary, join="inner")
 
     # extract positive and negative sets
     continuous_pos = continuous[binary]
     continuous_neg = continuous[~binary]
 
-    if method == "t_test":
-        stat, pval = ttest_ind(continuous_pos, continuous_neg)
-        diff = continuous_pos.mean() - continuous_neg.mean()
-    elif method == "mw_u":
-        stat, pval = mannwhitneyu(
-            continuous_pos, continuous_neg, alternative="two-sided"
-        )
-        diff = continuous_pos.median() - continuous_neg.median()
-    else:
-        raise ValueError("Method must be 't_test' or 'mw_u'")
-
-    # number of samples
-    n = len(continuous)
-
-    # add text of statistics
-    diff_text = "Diff = {:.2f}".format(diff)
-    pval_text = "P = " + as_si(pval, 2)
-    n_text = "n = " + str(n)
-
+    # add summary statistics
     if annotate:
+
+        # compute summary statistics
+        if method == "t_test":
+            stat, pval = ttest_ind(continuous_pos, continuous_neg)
+            diff = continuous_pos.mean() - continuous_neg.mean()
+        elif method == "mw_u":
+            stat, pval = mannwhitneyu(
+                continuous_pos, continuous_neg, alternative="two-sided"
+            )
+            diff = continuous_pos.median() - continuous_neg.median()
+        else:
+            raise ValueError("Method must be 't_test' or 'mw_u'")
+
+        # number of samples
+        n = len(continuous)
+
+        # add text of statistics
+        diff_text = "Diff = {:.2f}".format(diff)
+        pval_text = "P = " + as_si(pval, 2)
+        n_text = "n = " + str(n)
 
         bbox_props = dict(
             boxstyle="round,pad=1",
@@ -117,9 +120,10 @@ def two_dists(
             transform=ax.transAxes,
         )
 
-    # plot points
+    # cast palette
     pal = sns.color_palette(pal)
 
+    # plot distributions
     if summary_type == "box":
 
         sns.boxplot(
@@ -146,6 +150,7 @@ def two_dists(
 
         raise ValueError("Method must be 'box' or 'violin'")
 
+    # plot points themselves
     if stripplot:
 
         sns.stripplot(
@@ -193,12 +198,12 @@ def multi_dists(
         continuous values to plot
     categorical : Series
         categorical values (groups) to plot
-    method : string, "pearson" or "spearman"
-        regression method
-    ax : MatPlotLib axis
-        axis to plot in (will create new one if not provided)
+    count_cutoff : boolean
+        minimum number of samples per groups to include
     summary_type : string, "box" or "violin"
         type of summary plot to make
+    ax : MatPlotLib axis
+        axis to plot in (will create new one if not provided)
     stripplot : boolean
         whether or not to plot the raw values
     order : "ascending", "descending", or list of categories
@@ -228,10 +233,11 @@ def multi_dists(
     continuous = pd.Series(continuous).dropna()
     categorical = pd.Series(categorical).dropna().astype(str)
 
-    # Series names
+    # series names
     continuous_name = str(continuous.name)
     categorical_name = str(categorical.name)
 
+    # handle cases where series names are missing or identical
     if continuous_name is None:
         continuous_name = "continuous"
 
@@ -259,7 +265,6 @@ def multi_dists(
     )
 
     # sort categories by mean
-
     if order == "ascending":
 
         merged_sorted = merged_sorted.sort_values(
@@ -348,11 +353,30 @@ def multi_dists(
 
 
 def roc_auc_curve(y, y_pred, ax=None):
+    """
+    Plot the ROC curve along with the AUC statistic.
 
+    Parameters
+    ----------
+    y : list-like
+        ground truth values
+    y_pred : list-like
+        predicted values
+    ax : MatPlotLib axis
+        axis to plot in (will create new one if not provided)
+
+    Returns
+    -------
+    ax : MatPlotLib axis
+        axis with plot data
+    """
+
+    # create axis if not provided
     if ax is None:
         plt.figure(figsize=(3, 3))
         ax = plt.subplot(111)
 
+    # cast and align
     y = pd.Series(y).dropna()
     y_pred = pd.Series(y_pred).dropna()
     y, y_pred = y.align(y_pred, join="inner")
@@ -398,15 +422,35 @@ def roc_auc_curve(y, y_pred, ax=None):
 
 
 def pr_curve(y, y_pred, ax=None):
+    """
+    Plot the precision-recall curve.
 
+    Parameters
+    ----------
+    y : list-like
+        ground truth values
+    y_pred : list-like
+        predicted values
+    ax : MatPlotLib axis
+        axis to plot in (will create new one if not provided)
+
+    Returns
+    -------
+    ax : MatPlotLib axis
+        axis with plot data
+    """
+
+    # create axis if not provided
     if ax is None:
         plt.figure(figsize=(3, 3))
         ax = plt.subplot(111)
 
+    # cast and align
     y = pd.Series(y).dropna()
     y_pred = pd.Series(y_pred).dropna()
     y, y_pred = y.align(y_pred, join="inner")
 
+    # compute statistics
     precision, recall, thres = precision_recall_curve(y, y_pred)
 
     ax.plot(recall, precision)
@@ -445,14 +489,33 @@ def pr_curve(y, y_pred, ax=None):
 
 
 def binary_metrics(y, y_pred):
+    """
+    Make several plots to evaluate a binary classifier:
+
+        1. Boxplots of predicted values
+        2. Violinplots of predicted values
+        3. ROC-AUC plot
+        4. Precision-recall curve
+
+    Parameters
+    ----------
+    y : list-like
+        ground truth values
+    y_pred : list-like
+        predicted values
+
+    Returns
+    -------
+    ax : MatPlotLib axis
+        axis with plot data
+    """
 
     plt.figure(figsize=(12, 3))
 
+    # define axis dimensions
     axes_widths = [2, 2, 3, 3]
     total_width = sum(axes_widths)
-
     cumulative_widths = [sum(axes_widths[:x]) for x in range(len(axes_widths))]
-
     axes_height = 2
 
     axes = [
@@ -465,6 +528,7 @@ def binary_metrics(y, y_pred):
         for x in range(len(axes_widths))
     ]
 
+    # cast and align
     y = pd.Series(y).dropna()
     y_pred = pd.Series(y_pred).dropna()
     y, y_pred = y.align(y_pred, join="inner")

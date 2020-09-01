@@ -27,7 +27,7 @@ if submodules is None:
 
 for submodule in submodules:
 
-    params = importlib.import_module(f"test_stats.{submodule}").params
+    params = importlib.import_module(f"stats_test_params.{submodule}").params
 
     for param_set in params:
 

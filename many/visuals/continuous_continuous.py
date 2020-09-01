@@ -9,8 +9,27 @@ from .utils import as_si
 
 
 def corrfunc(x, y, **kwargs):
+    """
+    `scatter_grid` helper function for annotating Pearson correlation
+    between two variables.
+
+    Parameters
+    ----------
+    x : list-like
+        x-axis values
+    y : list-like
+        y-axis values
+
+    Returns
+    -------
+    ax : MatPlotLib axis
+        annotated axis
+    """
+
+    # drop missing values
     nans = np.isnan(x) | np.isnan(y)
     x, y = x[~nans], y[~nans]
+
     r, pval = pearsonr(x, y)
     n = len(x)
     ax = plt.gca()
@@ -27,13 +46,48 @@ def corrfunc(x, y, **kwargs):
 
 
 def nan_dist(x, **kwargs):
+    """
+    `scatter_grid` helper function for plotting distribution of
+    values after removing missing ones.
+
+    Parameters
+    ----------
+    x : list-like
+        values to plot
+
+    Returns
+    -------
+    ax : MatPlotLib axis
+        annotated axis
+    """
+
     nans = np.isnan(x)
     x = x[~nans]
+
     ax = plt.gca()
     sns.distplot(x, ax=ax, kde=False, norm_hist=True, bins=25, color="#364f6b")
 
 
 def scatter(x, y, ci=99, **kwargs):
+    """
+    `scatter_grid` helper function for plotting distribution of
+    values after removing missing ones.
+
+    Parameters
+    ----------
+    x : list-like
+        x-axis values
+    y : list-like
+        y-axis values
+    ci : float in (0, 100)
+        confidence interval for regression
+
+    Returns
+    -------
+    ax : MatPlotLib axis
+        annotated axis
+    """
+
     nans = np.isnan(x) | np.isnan(y)
     x, y = x[~nans], y[~nans]
 
@@ -47,8 +101,8 @@ def scatter(x, y, ci=99, **kwargs):
 
 def scatter_grid(df):
     """
-    Plot two sets of points, coloring by density and inserting labels given a
-    set of significant value masks
+    Plot relationships between columns, coloring by density and inserting
+    labels given a set of significant value masks
 
     Parameters
     ----------
@@ -64,7 +118,7 @@ def scatter_grid(df):
     g = sns.PairGrid(df)
     g.map_upper(scatter)
     g.map_lower(scatter)
-    g.map_diag(nan_dist, kde=False)
+    g.map_diag(nan_dist)
     g.map_upper(corrfunc)
 
     return g
@@ -99,14 +153,12 @@ def regression(
         axis with plot data
     """
 
-    # check that method is valid
-    if method not in ["pearson", "spearman"]:
-        raise ValueError("Method must be 'pearson' or 'spearman'.")
-
     if method == "pearson":
         r, pval = pearsonr(x, y)
     elif method == "spearman":
         r, pval = spearmanr(x, y)
+    else:
+        raise ValueError("Method must be 'pearson' or 'spearman'.")
 
     if ax is None:
         ax = plt.subplot(111)
@@ -174,7 +226,7 @@ def dense_regression(
         y-coordinate values to plot
     method : string, "pearson" or "spearman"
         regression method
-    ax : matplotlib axis
+    ax : MatPlotLib axis
         axis to plot in (will create new one if not provided)
     palette : MatPlotLib color map
         color map to color points by
@@ -187,18 +239,16 @@ def dense_regression(
 
     Returns
     -------
-    ax : matplotlib axis
+    ax : MatPlotLib axis
         axis with plot data
     """
-
-    # check that method is valid
-    if method not in ["pearson", "spearman"]:
-        raise ValueError("Method must be 'pearson' or 'spearman'.")
 
     if method == "pearson":
         r, pval = pearsonr(x, y)
     elif method == "spearman":
         r, pval = spearmanr(x, y)
+    else:
+        raise ValueError("Method must be 'pearson' or 'spearman'.")
 
     if ax is None:
         ax = plt.subplot(111)
@@ -260,11 +310,11 @@ def dense_plot(
     x,
     y,
     text_adjust: bool,
+    ax=None,
     labels_mask=None,
     labels=None,
     colormap=None,
     cmap_offset=0,
-    ax=None,
     scatter_kwargs={},
     x_offset=0,
     y_offset=0,
@@ -279,14 +329,16 @@ def dense_plot(
         x-coordinate values to plot
     y : Series or 1-dimensional array
         y-coordinate values to plot
+    adjust_text: Boolean
+        Whether or not to adjust the label positions automatically
+    ax : MatPlotLib axis
+        axis to plot in (will create new one if not provided)
     labels_mask: Boolean Series or 1-dimensional array
         Boolean mask for values to label
     labels: Series or 1-dimensional array
         Text labels to plot based on labels_mask
     colormap: String or Matplotlib colormap
         Colormap to color point density by. Leave empty for all black.
-    adjust_text: Boolean
-        Whether or not to adjust the label positions automatically
     x_offset: Float
         offset to use when plotting x text labels
     y_offset: Float
@@ -294,7 +346,7 @@ def dense_plot(
 
     Returns
     -------
-    ax : matplotlib axis
+    ax : MatPlotLib axis
         axis with plot data
     """
 
@@ -312,6 +364,7 @@ def dense_plot(
 
         ax = plt.subplot(111)
 
+    # apply density colormap if specifed
     if colormap is not None:
 
         xy = np.vstack([x, y])
@@ -344,6 +397,7 @@ def dense_plot(
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
 
+    # if point labels are provided, apply the mask and plot them
     if labels is not None:
 
         texts = []

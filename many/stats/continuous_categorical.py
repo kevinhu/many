@@ -1,7 +1,9 @@
 import sys
 
+import cupy as cp
 import numpy as np
 import pandas as pd
+from cupyx.scipy.special import ndtr
 from scipy.stats import mannwhitneyu, norm, rankdata, tiecorrect
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
@@ -301,6 +303,128 @@ def mat_mwu(a_mat, b_mat, melt: bool, effect: str, use_continuity=True):
     pvals = pvals.fillna(1)
 
     pvals = -np.log10(pvals)
+
+    if melt:
+
+        return melt_mwu(effects, pvals, pos_ns, neg_ns, effect)
+
+    return effects, pvals
+
+
+def mat_mwu_gpu(a_mat, b_mat, melt: bool, effect: str, use_continuity=True):
+    """
+    Compute rank-biserial correlations and Mann-Whitney statistics
+    between every column-column pair of a_mat (continuous) and b_mat (binary).
+
+    In the case that a_mat or b_mat has a single column, the results are
+    re-formatted with the multiple hypothesis-adjusted q-value also returned.
+
+    Parameters
+    ----------
+    a_mat: Pandas DataFrame
+        Continuous set of observations, with rows as samples and columns
+        as labels.
+    b_mat: Pandas DataFrame
+        Binary set of observations, with rows as samples and columns as labels.
+        Required to be castable to boolean datatype.
+    melt: boolean
+        Whether or not to melt the outputs into columns.
+    use_continuity: bool
+        Whether or not to use a continuity correction. True by default.
+    effect: "mean", "median", or "rank_biserial"
+        The effect statistic.
+
+    Returns
+    -------
+    effects: rank-biserial correlations
+    pvals: -log10 p-values of correlations
+    """
+
+    if effect not in ["rank_biserial"]:
+
+        raise ValueError("effect must be 'rank_biserial'")
+
+    a_nan = a_mat.isna().sum().sum() == 0
+    b_nan = b_mat.isna().sum().sum() == 0
+
+    if not a_nan and not b_nan:
+
+        raise ValueError("a_mat and b_mat cannot have missing values")
+
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, np.bool)
+
+    a_names = a_mat.columns
+    b_names = b_mat.columns
+
+    a_ranks = a_mat.apply(rankdata)
+    a_ties = a_ranks.apply(tiecorrect)
+
+    a_ranks = cp.array(a_ranks)
+
+    a_mat, b_mat = cp.array(a_mat), cp.array(b_mat)
+    b_mat = b_mat.astype(cp.bool)
+
+    a_num_cols = a_mat.shape[1]  # number of variables in A
+    b_num_cols = b_mat.shape[1]  # number of variables in B
+
+    a_mat = cp.array(a_mat).astype(cp.float64)
+    b_pos = b_mat.astype(cp.float64)
+    b_neg = (~b_mat).astype(cp.float64)
+
+    pos_ns = b_pos.sum(axis=0)
+    neg_ns = b_neg.sum(axis=0)
+
+    pos_ns = cp.vstack([pos_ns] * a_num_cols)
+    neg_ns = cp.vstack([neg_ns] * a_num_cols)
+
+    pos_ranks = cp.dot(a_ranks.T, b_pos)
+
+    u1 = pos_ns * neg_ns + (pos_ns * (pos_ns + 1)) / 2.0 - pos_ranks
+    u2 = pos_ns * neg_ns - u1
+
+    # temporarily mask zeros
+    n_prod = pos_ns * neg_ns
+    zero_prod = n_prod == 0
+    n_prod[zero_prod] = 1
+
+    effects = 2 * u2 / (pos_ns * neg_ns) - 1
+
+    # set zeros to nan
+    effects[zero_prod] = 0
+
+    a_ties = cp.vstack([cp.array(a_ties)] * b_num_cols).T
+
+    #     if T == 0:
+    #         raise ValueError('All numbers are identical in mannwhitneyu')
+
+    sd = cp.sqrt(a_ties * pos_ns * neg_ns * (pos_ns + neg_ns + 1) / 12.0)
+
+    meanrank = pos_ns * neg_ns / 2.0 + 0.5 * use_continuity
+    bigu = cp.maximum(u1, u2)
+
+    # temporarily mask zeros
+    sd_0 = sd == 0
+    sd[sd_0] = 1
+
+    z = (bigu - meanrank) / sd
+
+    z[sd_0] = 0
+
+    # compute p values
+    pvals = 2 * (1 - ndtr(cp.abs(z)))
+
+    # account for small p-values rounding to 0
+    pvals[pvals == 0] = cp.finfo(cp.float64).tiny
+
+    pvals = -cp.log10(pvals)
+
+    pvals = pd.DataFrame(pvals, columns=b_names, index=a_names)
+    effects = pd.DataFrame(effects, columns=b_names, index=a_names)
+    pos_ns = pd.DataFrame(pos_ns, columns=b_names, index=a_names)
+    neg_ns = pd.DataFrame(neg_ns, columns=b_names, index=a_names)
+
+    effects = effects.fillna(0)
+    pvals = pvals.fillna(1)
 
     if melt:
 

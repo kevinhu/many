@@ -1,10 +1,6 @@
 	base_method	method	num_samples	a_num_cols	b_num_cols	a_type	b_type	a_nan	b_nan	method_kwargs	output_names	report_benchmark	base_times	method_times	ratios
-0	mat_mwu_naive	mat_mwu	1000	100	8	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	0.7807323932647705	0.11673235893249512	6.688225958975595
-1	mat_mwu_naive	mat_mwu	1000	100	16	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	1.510941743850708	0.16709470748901367	9.042427295012029
-2	mat_mwu_naive	mat_mwu	1000	100	32	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	3.026573896408081	0.25844383239746094	11.710760780522365
-3	mat_mwu_naive	mat_mwu	1000	100	64	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	6.145181894302368	0.4580259323120117	13.416668054760294
-4	mat_mwu_naive	mat_mwu	1000	100	128	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	12.35214900970459	0.8638966083526611	14.298179770908625
-5	mat_mwu_naive	mat_mwu	1000	100	256	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	24.009310960769653	1.6641879081726074	14.427043270091731
-6	mat_mwu_naive	mat_mwu	1000	100	512	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	48.99766135215759	3.2229719161987305	15.202633664256963
-7	mat_mwu_naive	mat_mwu	1000	100	1024	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	97.0448989868164	6.491662502288818	14.949159626305356
-8	mat_mwu_naive	mat_mwu	1000	100	2048	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	192.08027362823486	12.352092981338501	15.550423229361135
+0	mat_mwu_naive	mat_mwu_gpu	1000	100	8	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	0.7814497947692871	0.35213661193847656	2.21916656285038
+1	mat_mwu_naive	mat_mwu_gpu	1000	100	16	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	1.5020055770874023	0.04091906547546387	36.706741946197276
+2	mat_mwu_naive	mat_mwu_gpu	1000	100	32	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	3.0002260208129883	0.04947090148925781	60.646277518602766
+3	mat_mwu_naive	mat_mwu_gpu	1000	100	64	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	5.978283166885376	0.07529973983764648	79.39314504638571
+4	mat_mwu_naive	mat_mwu_gpu	1000	100	128	continuous	binary	False	False	{'effect': 'rank_biserial', 'melt': False}	['effects', 'pvals']	True	11.990801811218262	0.15318012237548828	78.27909800088406

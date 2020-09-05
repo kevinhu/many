@@ -99,14 +99,14 @@ def scatter(x, y, ci=99, **kwargs):
     ax.spines["right"].set_visible(False)
 
 
-def scatter_grid(df):
+def scatter_grid(dataframe):
     """
-    Plot relationships between columns, coloring by density and inserting
-    labels given a set of significant value masks
+    Plot relationships between columns in a DataFrame, coloring by density
+    and inserting labels given a set of significant value masks.
 
     Parameters
     ----------
-    df : Pandas DataFrame
+    dataframe : Pandas DataFrame
         collection of pairs to plot as columns
 
     Returns
@@ -115,7 +115,7 @@ def scatter_grid(df):
         axis with plot data
     """
 
-    g = sns.PairGrid(df)
+    g = sns.PairGrid(dataframe)
     g.map_upper(scatter)
     g.map_lower(scatter)
     g.map_diag(nan_dist)
@@ -128,7 +128,7 @@ def regression(
     x, y, method, ax=None, alpha=0.5, text_pos=(0.1, 0.9), scatter_kwargs={}
 ):
     """
-    Plot two sets of points with regression coefficient
+    Plot two sets of points with along with their regression coefficient.
 
     Parameters
     ----------
@@ -210,13 +210,13 @@ def dense_regression(
     y,
     method,
     ax=None,
-    palette="Blues",
+    colormap=None,
     cmap_offset=0,
     text_pos=(0.1, 0.9),
     scatter_kwargs={},
 ):
     """
-    Plot two sets of points with regression coefficient with density-based coloring
+    Plot two sets of points and their regression coefficient, along with density-based coloring.
 
     Parameters
     ----------
@@ -288,17 +288,27 @@ def dense_regression(
         transform=ax.transAxes,
     )
 
-    # plot points
-    ax.scatter(
-        x,
-        y,
-        c=z,
-        linewidth=0,
-        rasterized=True,
-        cmap=palette,
-        vmin=min(z) + cmap_offset,
-        **scatter_kwargs,
-    )
+    # apply density colormap if specifed
+    if colormap is not None:
+
+        xy = np.vstack([x, y])
+
+        z = gaussian_kde(xy)(xy)
+        z = np.arcsinh(z)
+
+        ax.scatter(
+            x,
+            y,
+            c=z,
+            cmap=colormap,
+            lw=0,
+            rasterized=True,
+            vmin=min(z) - cmap_offset,
+            **scatter_kwargs,
+        )
+
+    else:
+        ax.scatter(x, y, c="black", lw=0, rasterized=True, **scatter_kwargs)
 
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)

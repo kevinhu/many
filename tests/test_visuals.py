@@ -6,6 +6,7 @@
 import config
 import many
 import matplotlib.pyplot as plt
+import numpy as np
 import utils
 
 DPI = 256
@@ -35,19 +36,41 @@ print(
     )
 )
 
-a, b = utils.generate_test(
-    n_samples=100,
-    a_num_cols=1,
-    b_num_cols=1,
-    a_type="continuous",
-    b_type="continuous",
-    a_nan=False,
-    b_nan=False,
-)
+# -----------
+# dense_plot
+# -----------
 
-many.visuals.dense_plot(a[0], b[0], text_adjust=False)
+plt.figure(figsize=(4, 4))
+ax = plt.subplot(111)
+
+x = np.random.normal(size=1000)
+y = x + np.random.normal(size=1000)
+
+many.visuals.dense_plot(
+    x, y, text_adjust=False, ax=ax, colormap="Blues", cmap_offset=0.1
+)
 plt.savefig(
-    config.PLOTS_DIR / "dense_plot_default.png", bbox_inches="tight", dpi=DPI
+    config.PLOTS_DIR / "dense_plot_default.png", bbox_inches="tight", dpi=DPI,
+)
+plt.clf()
+
+# -----------------
+# dense_regression
+# -----------------
+
+plt.figure(figsize=(4, 4))
+ax = plt.subplot(111)
+
+x = np.random.normal(size=1000)
+y = x + np.random.normal(size=1000)
+
+many.visuals.dense_regression(
+    x, y, method="pearson", colormap="Blues", cmap_offset=0.1
+)
+plt.savefig(
+    config.PLOTS_DIR / "dense_regression_pearson.png",
+    bbox_inches="tight",
+    dpi=DPI,
 )
 plt.clf()
 
@@ -85,23 +108,6 @@ plt.savefig(
 )
 plt.clf()
 
-a, b = utils.generate_test(
-    n_samples=1000,
-    a_num_cols=1,
-    b_num_cols=1,
-    a_type="continuous",
-    b_type="continuous",
-    a_nan=False,
-    b_nan=False,
-)
-
-many.visuals.dense_regression(a[0], b[0], method="pearson")
-plt.savefig(
-    config.PLOTS_DIR / "dense_regression_pearson.png",
-    bbox_inches="tight",
-    dpi=DPI,
-)
-plt.clf()
 
 a, b = utils.generate_test(
     n_samples=100,

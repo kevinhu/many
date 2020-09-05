@@ -34,7 +34,8 @@ def two_dists(
     stripplot_kwargs={},
 ):
     """
-    Plot two sets of points, one as a binary variable
+    Compare the distributions of a continuous variable when grouped
+    by a binary one.
 
     Parameters
     ----------
@@ -189,8 +190,8 @@ def multi_dists(
     stripplot_kwargs={},
 ):
     """
-    Plot two sets of points, one as a categorical variable and the other
-    as a continuous one.
+    Compare the distributions of a continuous variable when grouped
+    by a categorical one.
 
     Parameters
     ----------
@@ -354,7 +355,8 @@ def multi_dists(
 
 def roc_auc_curve(y, y_pred, ax=None):
     """
-    Plot the ROC curve along with the AUC statistic.
+    Plot the ROC curve along with the AUC statistic of
+    predictions against ground truths.
 
     Parameters
     ----------
@@ -423,7 +425,7 @@ def roc_auc_curve(y, y_pred, ax=None):
 
 def pr_curve(y, y_pred, ax=None):
     """
-    Plot the precision-recall curve.
+    Plot the precision-recall curve of predictions against ground truths.
 
     Parameters
     ----------

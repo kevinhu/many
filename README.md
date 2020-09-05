@@ -81,7 +81,7 @@ Benchmarks were run with 1,000 samples per variable (i.e. setting each input mat
 Benchmarks were run on an i7-7700K with 16GB of 2133 MHz RAM. GPU benchmarks were performed on a GTX 1080.
 
 <p align="center">
-  <img src="https://github.com/kevinhu/many/raw/master/tests/benchmark_plots/all_benchmarks.png">
+  <img src="https://raw.githubusercontent.com/kevinhu/many/master/tests/benchmark_plots/all_benchmarks.png">
 </p>
 
 ### Visual methods
@@ -95,7 +95,7 @@ scatter_grid(dataframe)
 Plot relationships between columns in a DataFrame, coloring by density and inserting labels given a set of significant value masks.
 
 <p align="center">
-  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/scatter_grid.png">
+  <img  width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/scatter_grid.png">
 </p>
 
 ```python
@@ -107,7 +107,7 @@ regression(
 Plot two sets of points with along with their regression coefficient.
 
 <p align="center">
-  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/regression_pearson.png">
+  <img  width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/regression_pearson.png">
 </p>
 
 ```python
@@ -126,7 +126,7 @@ dense_regression(
 Plot two sets of points and their regression coefficient, along with density-based coloring.
 
 <p align="center">
-  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/dense_regression_pearson.png">
+  <img  width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/dense_regression_pearson.png">
 </p>
 
 ```python
@@ -148,7 +148,7 @@ dense_plot(
 Plot two sets of points, coloring by density and inserting labels given a set of significant value masks. Density estimated by Gaussian KDE.
 
 <p align="center">
-  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/dense_plot_default.png">
+  <img  width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/dense_plot_default.png">
 </p>
 
 #### Continuous vs. categorical
@@ -171,7 +171,7 @@ two_dists(
 Compare the distributions of a continuous variable when grouped by a binary one.
     
 <p align="center">
-  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/two_dists_t_test_box.png">
+  <img  width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/two_dists_t_test_box.png">
 </p>
 
 ```python
@@ -194,7 +194,7 @@ multi_dists(
 Compare the distributions of a continuous variable when grouped by a categorical one.
 
 <p align="center">
-  <img src="https://github.com/kevinhu/many/raw/master/tests/output_plots/multi_dists_box.png">
+  <img src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/multi_dists_box.png">
 </p>
 
 ```python
@@ -204,7 +204,7 @@ roc_auc_curve(y, y_pred, ax=None)
 Plot the ROC curve along with the AUC statistic of predictions against ground truths.
 
 <p align="center">
-  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/roc_auc_curve.png">
+  <img  width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/roc_auc_curve.png">
 </p>
 
 ```python
@@ -214,7 +214,7 @@ pr_curve(y, y_pred, ax=None)
 Plot the precision-recall curve of predictions against ground truths.
 
 <p align="center">
-  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/pr_curve.png">
+  <img  width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/pr_curve.png">
 </p>
 
 ```python
@@ -229,7 +229,7 @@ Make several plots to evaluate a binary classifier:
     4. Precision-recall curve
 
 <p align="center">
-  <img src="https://github.com/kevinhu/many/raw/master/tests/output_plots/binary_metrics.png">
+  <img src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/binary_metrics.png">
 </p>
 
 #### Categorical vs. categorical

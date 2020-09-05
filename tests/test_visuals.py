@@ -8,6 +8,8 @@ import many
 import matplotlib.pyplot as plt
 import utils
 
+DPI = 256
+
 # p = Path("./test_stats").glob("*.py")
 # all_submodules = [x.stem for x in p if x.is_file()]
 # all_submodules = [x for x in all_submodules if x != "__init__"]
@@ -29,7 +31,7 @@ print(many.visuals.as_si(5.493491349e30, decimals=8))
 print(many.visuals.colorize([0, 0, 0, 0, 1, 1, 1, 2, 2], cmap="Blues"))
 print(
     many.visuals.colorize(
-        ["a", "b", "c", "a", "a", "b", "c", "d", "b", "d", "a"], cmap="Blues"
+        ["a", "b", "c", "a", "a", "b", "c", "d", "b", "d", "a"], cmap="Blues",
     )
 )
 
@@ -44,7 +46,9 @@ a, b = utils.generate_test(
 )
 
 many.visuals.dense_plot(a[0], b[0], text_adjust=False)
-plt.savefig(config.PLOTS_DIR / "dense_plot_default.pdf", bbox_inches="tight")
+plt.savefig(
+    config.PLOTS_DIR / "dense_plot_default.png", bbox_inches="tight", dpi=DPI
+)
 plt.clf()
 
 a, b = utils.generate_test(
@@ -59,7 +63,9 @@ a, b = utils.generate_test(
 
 many.visuals.binary_contingency(a[0], b[0])
 plt.savefig(
-    config.PLOTS_DIR / "binary_contingency_default.pdf", bbox_inches="tight"
+    config.PLOTS_DIR / "binary_contingency_default.png",
+    bbox_inches="tight",
+    dpi=DPI,
 )
 plt.clf()
 
@@ -74,7 +80,9 @@ a, b = utils.generate_test(
 )
 
 many.visuals.regression(a[0], b[0], method="pearson")
-plt.savefig(config.PLOTS_DIR / "regression_pearson.pdf", bbox_inches="tight")
+plt.savefig(
+    config.PLOTS_DIR / "regression_pearson.png", bbox_inches="tight", dpi=DPI
+)
 plt.clf()
 
 a, b = utils.generate_test(
@@ -89,7 +97,9 @@ a, b = utils.generate_test(
 
 many.visuals.dense_regression(a[0], b[0], method="pearson")
 plt.savefig(
-    config.PLOTS_DIR / "dense_regression_pearson.pdf", bbox_inches="tight"
+    config.PLOTS_DIR / "dense_regression_pearson.png",
+    bbox_inches="tight",
+    dpi=DPI,
 )
 plt.clf()
 
@@ -104,7 +114,9 @@ a, b = utils.generate_test(
 )
 
 many.visuals.two_dists(a[0], b[0], method="t_test", summary_type="box")
-plt.savefig(config.PLOTS_DIR / "two_dists_t_test_box.pdf", bbox_inches="tight")
+plt.savefig(
+    config.PLOTS_DIR / "two_dists_t_test_box.png", bbox_inches="tight", dpi=DPI
+)
 plt.clf()
 
 a, b = utils.generate_test(
@@ -120,7 +132,9 @@ a, b = utils.generate_test(
 b = (b * 10).astype(int)
 
 many.visuals.multi_dists(a[0], b[0], count_cutoff=0, summary_type="box")
-plt.savefig(config.PLOTS_DIR / "multi_dists_box.pdf", bbox_inches="tight")
+plt.savefig(
+    config.PLOTS_DIR / "multi_dists_box.png", bbox_inches="tight", dpi=DPI
+)
 plt.clf()
 
 a, b = utils.generate_test(
@@ -134,7 +148,9 @@ a, b = utils.generate_test(
 )
 
 many.visuals.roc_auc_curve(a[0], b[0])
-plt.savefig(config.PLOTS_DIR / "roc_auc_curve.pdf", bbox_inches="tight")
+plt.savefig(
+    config.PLOTS_DIR / "roc_auc_curve.png", bbox_inches="tight", dpi=DPI
+)
 plt.clf()
 
 a, b = utils.generate_test(
@@ -148,7 +164,7 @@ a, b = utils.generate_test(
 )
 
 many.visuals.pr_curve(a[0], b[0])
-plt.savefig(config.PLOTS_DIR / "pr_curve.pdf", bbox_inches="tight")
+plt.savefig(config.PLOTS_DIR / "pr_curve.png", bbox_inches="tight", dpi=DPI)
 plt.clf()
 
 a, b = utils.generate_test(
@@ -162,7 +178,9 @@ a, b = utils.generate_test(
 )
 
 many.visuals.binary_metrics(a[0], b[0])
-plt.savefig(config.PLOTS_DIR / "binary_metrics.pdf", bbox_inches="tight")
+plt.savefig(
+    config.PLOTS_DIR / "binary_metrics.png", bbox_inches="tight", dpi=DPI
+)
 plt.clf()
 
 a, b = utils.generate_test(
@@ -176,5 +194,7 @@ a, b = utils.generate_test(
 )
 
 many.visuals.scatter_grid(a)
-plt.savefig(config.PLOTS_DIR / "scatter_grid.pdf", bbox_inches="tight")
+plt.savefig(
+    config.PLOTS_DIR / "scatter_grid.png", bbox_inches="tight", dpi=DPI
+)
 plt.clf()

@@ -36,6 +36,29 @@ print(
     )
 )
 
+# ------------
+# scatter_grid
+# ------------
+
+a, b = utils.generate_test(
+    n_samples=100,
+    a_num_cols=4,
+    b_num_cols=1,
+    a_type="continuous",
+    b_type="continuous",
+    a_nan=False,
+    b_nan=False,
+)
+a[1] = a[0] + np.random.normal(size=100)
+a[2] = a[1] + np.random.normal(size=100)
+a[3] = a[2] + np.random.normal(size=100)
+
+many.visuals.scatter_grid(a)
+plt.savefig(
+    config.PLOTS_DIR / "scatter_grid.png", bbox_inches="tight", dpi=DPI
+)
+plt.clf()
+
 # -----------
 # dense_plot
 # -----------
@@ -186,21 +209,5 @@ a, b = utils.generate_test(
 many.visuals.binary_metrics(a[0], b[0])
 plt.savefig(
     config.PLOTS_DIR / "binary_metrics.png", bbox_inches="tight", dpi=DPI
-)
-plt.clf()
-
-a, b = utils.generate_test(
-    n_samples=100,
-    a_num_cols=4,
-    b_num_cols=1,
-    a_type="continuous",
-    b_type="continuous",
-    a_nan=False,
-    b_nan=False,
-)
-
-many.visuals.scatter_grid(a)
-plt.savefig(
-    config.PLOTS_DIR / "scatter_grid.png", bbox_inches="tight", dpi=DPI
 )
 plt.clf()

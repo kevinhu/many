@@ -228,7 +228,7 @@ def dense_regression(
         regression method
     ax : MatPlotLib axis
         axis to plot in (will create new one if not provided)
-    palette : MatPlotLib color map
+    colormap : MatPlotLib color map
         color map to color points by
     cmap_offset : float
         Value to add to KDE to offset colormap

@@ -104,11 +104,11 @@ regression(
 )
 ```
 
+Plot two sets of points with along with their regression coefficient.
+
 <p align="center">
   <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/regression_pearson.png">
 </p>
-
-Plot two sets of points with along with their regression coefficient.
 
 ```python
 dense_regression(
@@ -116,18 +116,18 @@ dense_regression(
     y,
     method,
     ax=None,
-    palette="Blues",
+    colormap=None,
     cmap_offset=0,
     text_pos=(0.1, 0.9),
     scatter_kwargs={},
 )
 ```
 
+Plot two sets of points and their regression coefficient, along with density-based coloring.
+
 <p align="center">
   <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/dense_regression_pearson.png">
 </p>
-
-Plot two sets of points and their regression coefficient, along with density-based coloring.
 
 ```python
 dense_plot(
@@ -145,11 +145,11 @@ dense_plot(
 )
 ```
 
+Plot two sets of points, coloring by density and inserting labels given a set of significant value masks. Density estimated by Gaussian KDE.
+
 <p align="center">
   <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/dense_plot_default.png">
 </p>
-
-Plot two sets of points, coloring by density and inserting labels given a set of significant value masks. Density estimated by Gaussian KDE.
 
 #### Continuous vs. categorical
 
@@ -168,12 +168,12 @@ two_dists(
 )
 ```
 
+Compare the distributions of a continuous variable when grouped by a binary one.
+    
 <p align="center">
   <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/two_dists_t_test_box.png">
 </p>
 
-Compare the distributions of a continuous variable when grouped by a binary one.
-    
 ```python
 multi_dists(
     continuous,
@@ -191,39 +191,35 @@ multi_dists(
 )
 ```
 
+Compare the distributions of a continuous variable when grouped by a categorical one.
+
 <p align="center">
   <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/multi_dists_box.png">
 </p>
-
-Compare the distributions of a continuous variable when grouped by a categorical one.
 
 ```python
 roc_auc_curve(y, y_pred, ax=None)
 ```
 
+Plot the ROC curve along with the AUC statistic of predictions against ground truths.
+
 <p align="center">
   <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/roc_auc_curve.png">
 </p>
-
-Plot the ROC curve along with the AUC statistic of predictions against ground truths.
 
 ```python
 pr_curve(y, y_pred, ax=None)
 ```
 
+Plot the precision-recall curve of predictions against ground truths.
+
 <p align="center">
   <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/pr_curve.png">
 </p>
 
-Plot the precision-recall curve of predictions against ground truths.
-
 ```python
 binary_metrics(y, y_pred)
 ```
-
-<p align="center">
-  <img src="https://github.com/kevinhu/many/raw/master/tests/output_plots/binary_metrics.png">
-</p>
 
 Make several plots to evaluate a binary classifier:
 
@@ -232,13 +228,17 @@ Make several plots to evaluate a binary classifier:
     3. ROC-AUC plot
     4. Precision-recall curve
 
+<p align="center">
+  <img src="https://github.com/kevinhu/many/raw/master/tests/output_plots/binary_metrics.png">
+</p>
+
 #### Categorical vs. categorical
+
+Plot agreement between two binary variables, along with the odds ratio and Fisher's exact test p-value.
 
 ```python
 binary_contingency(a, b, ax=None, heatmap_kwargs={})
 ```
-
-Plot agreement between two binary variables, along with the odds ratio and Fisher's exact test p-value.
 
 ## Development
 

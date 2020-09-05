@@ -1,7 +1,37 @@
 	base_method	method	num_samples	a_num_cols	b_num_cols	a_type	b_type	a_nan	b_nan	method_kwargs	output_names	report_benchmark	base_times	method_times	ratios
-0	mat_corr	mat_corr_gpu	1000	100	256	continuous	continuous	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	0.11525154113769531	0.42075228691101074	0.27391780086051215
-1	mat_corr	mat_corr_gpu	1000	100	256	continuous	continuous	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	0.1303720474243164	0.11640524864196777	1.1199842699989144
-2	mat_corr	mat_corr_gpu	1000	100	512	continuous	continuous	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	0.18158817291259766	0.2430105209350586	0.7472440790377333
-3	mat_corr	mat_corr_gpu	1000	100	512	continuous	continuous	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	0.22603821754455566	0.2731950283050537	0.8273877418155574
-4	mat_corr	mat_corr_gpu	1000	100	1024	continuous	continuous	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	0.3414309024810791	0.4652571678161621	0.7338541479837862
-5	mat_corr	mat_corr_gpu	1000	100	1024	continuous	continuous	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	0.3961832523345947	0.5719537734985352	0.6926840431722572
+0	mat_corr_naive	mat_corr	1000	100	8	continuous	continuous	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	0.2331676483154297	0.009014129638671875	25.866906474820144
+1	mat_corr_naive	mat_corr	1000	100	16	continuous	continuous	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	0.4593534469604492	0.014872074127197266	30.886979383757094
+2	mat_corr_naive	mat_corr	1000	100	32	continuous	continuous	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	0.9090638160705566	0.026472091674804688	34.34046040781036
+3	mat_corr_naive	mat_corr	1000	100	64	continuous	continuous	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	1.726334810256958	0.049864768981933594	34.62033105743301
+4	mat_corr_naive	mat_corr	1000	100	128	continuous	continuous	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	3.4671218395233154	0.0857081413269043	40.45265462354584
+5	mat_corr_naive	mat_corr	1000	100	256	continuous	continuous	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	6.828613042831421	0.11673402786254883	58.49719373062265
+6	mat_corr_naive	mat_corr	1000	100	512	continuous	continuous	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	13.800678491592407	0.19069743156433105	72.3695037651139
+7	mat_corr_naive	mat_corr	1000	100	1024	continuous	continuous	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	27.647867918014526	0.3433544635772705	80.52281490667876
+8	mat_corr_naive	mat_corr	1000	100	2048	continuous	continuous	False	False	{'method': 'pearson', 'melt': False}	['corrs', 'pvals']	True	54.85182213783264	0.6631283760070801	82.71674704695037
+9	mat_corr_naive	mat_corr	1000	100	8	continuous	continuous	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	0.5994296073913574	0.013824224472045898	43.360812651984205
+10	mat_corr_naive	mat_corr	1000	100	16	continuous	continuous	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	1.2108900547027588	0.019812583923339844	61.1172202166065
+11	mat_corr_naive	mat_corr	1000	100	32	continuous	continuous	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	2.38850736618042	0.032378435134887695	73.7684621332057
+12	mat_corr_naive	mat_corr	1000	100	64	continuous	continuous	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	4.746474742889404	0.05670332908630371	83.70716180817472
+13	mat_corr_naive	mat_corr	1000	100	128	continuous	continuous	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	9.492769002914429	0.08939099311828613	106.1937972917828
+14	mat_corr_naive	mat_corr	1000	100	256	continuous	continuous	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	18.967901706695557	0.12846970558166504	147.64493793159764
+15	mat_corr_naive	mat_corr	1000	100	512	continuous	continuous	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	37.8795223236084	0.21648454666137695	174.97564102281714
+16	mat_corr_naive	mat_corr	1000	100	1024	continuous	continuous	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	76.04702496528625	0.40316033363342285	188.62724980883831
+17	mat_corr_naive	mat_corr	1000	100	2048	continuous	continuous	False	False	{'method': 'spearman', 'melt': False}	['corrs', 'pvals']	True	151.10073447227478	0.7733650207519531	195.38087503021214
+18	mat_corr_naive	mat_corr_nan	1000	1	800	continuous	continuous	False	False	{'method': 'pearson', 'melt': True}	['melted']	True	0.2455613613128662	0.04319477081298828	5.684978915064138
+19	mat_corr_naive	mat_corr_nan	1000	1	1600	continuous	continuous	False	False	{'method': 'pearson', 'melt': True}	['melted']	True	0.4958488941192627	0.08184051513671875	6.058721567073739
+20	mat_corr_naive	mat_corr_nan	1000	1	3200	continuous	continuous	False	False	{'method': 'pearson', 'melt': True}	['melted']	True	0.9665639400482178	0.1842803955078125	5.245071986006459
+21	mat_corr_naive	mat_corr_nan	1000	1	6400	continuous	continuous	False	False	{'method': 'pearson', 'melt': True}	['melted']	True	1.9170382022857666	0.33982062339782715	5.641323893522186
+22	mat_corr_naive	mat_corr_nan	1000	1	12800	continuous	continuous	False	False	{'method': 'pearson', 'melt': True}	['melted']	True	3.8490207195281982	0.6739585399627686	5.711064540766602
+23	mat_corr_naive	mat_corr_nan	1000	1	25600	continuous	continuous	False	False	{'method': 'pearson', 'melt': True}	['melted']	True	7.862864017486572	1.4016296863555908	5.609801286337609
+24	mat_corr_naive	mat_corr_nan	1000	1	51200	continuous	continuous	False	False	{'method': 'pearson', 'melt': True}	['melted']	True	15.886654615402222	2.9453155994415283	5.393871752967508
+25	mat_corr_naive	mat_corr_nan	1000	1	102400	continuous	continuous	False	False	{'method': 'pearson', 'melt': True}	['melted']	True	31.901510000228882	6.281556129455566	5.078599847358817
+26	mat_corr_naive	mat_corr_nan	1000	1	204800	continuous	continuous	False	False	{'method': 'pearson', 'melt': True}	['melted']	True	64.25053763389587	22.912700176239014	2.8041451744969423
+27	mat_corr_naive	mat_corr_nan	1000	1	800	continuous	continuous	False	False	{'method': 'spearman', 'melt': True}	['melted']	True	0.6854779720306396	0.12286782264709473	5.578986892276048
+28	mat_corr_naive	mat_corr_nan	1000	1	1600	continuous	continuous	False	False	{'method': 'spearman', 'melt': True}	['melted']	True	1.2495543956756592	0.24680709838867188	5.062878676641061
+29	mat_corr_naive	mat_corr_nan	1000	1	3200	continuous	continuous	False	False	{'method': 'spearman', 'melt': True}	['melted']	True	2.490610122680664	0.5057306289672852	4.924776116025548
+30	mat_corr_naive	mat_corr_nan	1000	1	6400	continuous	continuous	False	False	{'method': 'spearman', 'melt': True}	['melted']	True	4.924847841262817	1.099839687347412	4.477786988338765
+31	mat_corr_naive	mat_corr_nan	1000	1	12800	continuous	continuous	False	False	{'method': 'spearman', 'melt': True}	['melted']	True	9.909425973892212	2.1028740406036377	4.712325028772372
+32	mat_corr_naive	mat_corr_nan	1000	1	25600	continuous	continuous	False	False	{'method': 'spearman', 'melt': True}	['melted']	True	19.838725328445435	4.41810941696167	4.4903200568736725
+33	mat_corr_naive	mat_corr_nan	1000	1	51200	continuous	continuous	False	False	{'method': 'spearman', 'melt': True}	['melted']	True	39.91323447227478	9.524271249771118	4.190686449972112
+34	mat_corr_naive	mat_corr_nan	1000	1	102400	continuous	continuous	False	False	{'method': 'spearman', 'melt': True}	['melted']	True	79.86656379699707	19.814918041229248	4.030628016266195
+35	mat_corr_naive	mat_corr_nan	1000	1	204800	continuous	continuous	False	False	{'method': 'spearman', 'melt': True}	['melted']	True	160.21549773216248	74.18382835388184	2.1597092154354804

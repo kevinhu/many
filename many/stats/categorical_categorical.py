@@ -2,6 +2,7 @@ import sys
 
 import numpy as np
 import pandas as pd
+from scipy.stats import fisher_exact
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
 
@@ -10,7 +11,9 @@ from .fisher import mlog10Test1t
 from .utils import precheck_align
 
 
-def melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int):
+def melt_fisher(
+    oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int
+):
     """
     Flatten matrix-form outputs to column-form.
 
@@ -63,7 +66,7 @@ def melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int)
 
 def mat_fisher_naive(a_mat, b_mat, melt: bool, pseudocount=0, pbar=False):
     """
-    Compute odds ratios and Fisher's exact test 
+    Compute odds ratios and Fisher's exact test
     between every column-column pair of a_mat (binary) and b_mat (binary),
     using a double for loop.
 
@@ -155,7 +158,9 @@ def mat_fisher_naive(a_mat, b_mat, melt: bool, pseudocount=0, pbar=False):
 
     if melt:
 
-        return melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
+        return melt_fisher(
+            oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols
+        )
 
     return oddsrs, pvals
 
@@ -180,7 +185,7 @@ def fisher_arr(x):
 
 def mat_fisher(a_mat, b_mat, melt: bool, pseudocount=0):
     """
-    Compute odds ratios and Fisher's exact test 
+    Compute odds ratios and Fisher's exact test
     between every column-column pair of a_mat (binary) and b_mat (binary),
     under the assumption that neither array contains missing values
     (np.nan).
@@ -250,14 +255,16 @@ def mat_fisher(a_mat, b_mat, melt: bool, pseudocount=0):
 
     if melt:
 
-        return melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
+        return melt_fisher(
+            oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols
+        )
 
     return oddsrs, pvals
 
 
 def mat_fisher_nan(a_mat, b_mat, melt: bool, pseudocount=0):
     """
-    Compute odds ratios and Fisher's exact test 
+    Compute odds ratios and Fisher's exact test
     between every column-column pair of a_mat (binary) and b_mat (binary),
     allowing for missing values.
 
@@ -328,6 +335,8 @@ def mat_fisher_nan(a_mat, b_mat, melt: bool, pseudocount=0):
 
     if melt:
 
-        return melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
+        return melt_fisher(
+            oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols
+        )
 
     return oddsrs, pvals

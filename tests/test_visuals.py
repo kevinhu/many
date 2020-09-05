@@ -59,6 +59,22 @@ plt.savefig(
 )
 plt.clf()
 
+# ----------
+# regression
+# ----------
+
+plt.figure(figsize=(4, 4))
+ax = plt.subplot(111)
+
+x = np.random.normal(size=1000)
+y = x + np.random.normal(size=1000)
+
+many.visuals.regression(x, y, method="pearson")
+plt.savefig(
+    config.PLOTS_DIR / "regression_pearson.png", bbox_inches="tight", dpi=DPI
+)
+plt.clf()
+
 # -----------
 # dense_plot
 # -----------
@@ -97,6 +113,10 @@ plt.savefig(
 )
 plt.clf()
 
+# ------------------
+# binary_contingency
+# ------------------
+
 a, b = utils.generate_test(
     n_samples=100,
     a_num_cols=1,
@@ -115,22 +135,9 @@ plt.savefig(
 )
 plt.clf()
 
-a, b = utils.generate_test(
-    n_samples=100,
-    a_num_cols=1,
-    b_num_cols=1,
-    a_type="continuous",
-    b_type="continuous",
-    a_nan=False,
-    b_nan=False,
-)
-
-many.visuals.regression(a[0], b[0], method="pearson")
-plt.savefig(
-    config.PLOTS_DIR / "regression_pearson.png", bbox_inches="tight", dpi=DPI
-)
-plt.clf()
-
+# ---------
+# two_dists
+# ---------
 
 a, b = utils.generate_test(
     n_samples=100,
@@ -147,6 +154,10 @@ plt.savefig(
     config.PLOTS_DIR / "two_dists_t_test_box.png", bbox_inches="tight", dpi=DPI
 )
 plt.clf()
+
+# -----------
+# multi_dists
+# -----------
 
 a, b = utils.generate_test(
     n_samples=100,
@@ -166,6 +177,10 @@ plt.savefig(
 )
 plt.clf()
 
+# -------------
+# roc_auc_curve
+# -------------
+
 a, b = utils.generate_test(
     n_samples=100,
     a_num_cols=1,
@@ -182,6 +197,10 @@ plt.savefig(
 )
 plt.clf()
 
+# --------
+# pr_curve
+# --------
+
 a, b = utils.generate_test(
     n_samples=100,
     a_num_cols=1,
@@ -195,6 +214,10 @@ a, b = utils.generate_test(
 many.visuals.pr_curve(a[0], b[0])
 plt.savefig(config.PLOTS_DIR / "pr_curve.png", bbox_inches="tight", dpi=DPI)
 plt.clf()
+
+# --------------
+# binary_metrics
+# --------------
 
 a, b = utils.generate_test(
     n_samples=100,

@@ -194,7 +194,7 @@ multi_dists(
 Compare the distributions of a continuous variable when grouped by a categorical one.
 
 <p align="center">
-  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/multi_dists_box.png">
+  <img src="https://github.com/kevinhu/many/raw/master/tests/output_plots/multi_dists_box.png">
 </p>
 
 ```python

@@ -163,28 +163,6 @@ plt.savefig(
 )
 plt.clf()
 
-# ------------------
-# binary_contingency
-# ------------------
-
-a, b = utils.generate_test(
-    n_samples=100,
-    a_num_cols=1,
-    b_num_cols=1,
-    a_type="binary",
-    b_type="binary",
-    a_nan=False,
-    b_nan=False,
-)
-
-many.visuals.binary_contingency(a[0], b[0])
-plt.savefig(
-    config.PLOTS_DIR / "binary_contingency_default.png",
-    bbox_inches="tight",
-    dpi=DPI,
-)
-plt.clf()
-
 # -------------
 # roc_auc_curve
 # -------------
@@ -198,6 +176,8 @@ a, b = utils.generate_test(
     a_nan=False,
     b_nan=False,
 )
+
+b[0] = b[0] + a[0] * np.random.random(size=100)
 
 many.visuals.roc_auc_curve(a[0], b[0])
 plt.savefig(
@@ -219,6 +199,8 @@ a, b = utils.generate_test(
     b_nan=False,
 )
 
+b[0] = b[0] + a[0] * np.random.random(size=100)
+
 many.visuals.pr_curve(a[0], b[0])
 plt.savefig(config.PLOTS_DIR / "pr_curve.png", bbox_inches="tight", dpi=DPI)
 plt.clf()
@@ -237,8 +219,32 @@ a, b = utils.generate_test(
     b_nan=False,
 )
 
+b[0] = b[0] + a[0] * np.random.random(size=100)
+
 many.visuals.binary_metrics(a[0], b[0])
 plt.savefig(
     config.PLOTS_DIR / "binary_metrics.png", bbox_inches="tight", dpi=DPI
+)
+plt.clf()
+
+# ------------------
+# binary_contingency
+# ------------------
+
+a, b = utils.generate_test(
+    n_samples=100,
+    a_num_cols=1,
+    b_num_cols=1,
+    a_type="binary",
+    b_type="binary",
+    a_nan=False,
+    b_nan=False,
+)
+
+many.visuals.binary_contingency(a[0], b[0])
+plt.savefig(
+    config.PLOTS_DIR / "binary_contingency_default.png",
+    bbox_inches="tight",
+    dpi=DPI,
 )
 plt.clf()

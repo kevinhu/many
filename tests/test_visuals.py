@@ -75,30 +75,6 @@ plt.savefig(
 )
 plt.clf()
 
-# ---------
-# two_dists
-# ---------
-
-a, b = utils.generate_test(
-    n_samples=100,
-    a_num_cols=1,
-    b_num_cols=1,
-    a_type="binary",
-    b_type="continuous",
-    a_nan=False,
-    b_nan=False,
-)
-
-b[0] = b[0] + a[0]
-
-many.visuals.two_dists(
-    a[0], b[0], method="t_test", summary_type="box", stripplot=True
-)
-plt.savefig(
-    config.PLOTS_DIR / "two_dists_t_test_box.png", bbox_inches="tight", dpi=DPI
-)
-plt.clf()
-
 # -----------
 # dense_plot
 # -----------
@@ -137,6 +113,56 @@ plt.savefig(
 )
 plt.clf()
 
+# ---------
+# two_dists
+# ---------
+
+a, b = utils.generate_test(
+    n_samples=100,
+    a_num_cols=1,
+    b_num_cols=1,
+    a_type="binary",
+    b_type="continuous",
+    a_nan=False,
+    b_nan=False,
+)
+
+b[0] = b[0] + a[0]
+
+many.visuals.two_dists(
+    a[0], b[0], method="t_test", summary_type="box", stripplot=True
+)
+plt.savefig(
+    config.PLOTS_DIR / "two_dists_t_test_box.png", bbox_inches="tight", dpi=DPI
+)
+plt.clf()
+
+# -----------
+# multi_dists
+# -----------
+
+plt.figure(figsize=(8, 4))
+ax = plt.subplot(111)
+
+a, b = utils.generate_test(
+    n_samples=500,
+    a_num_cols=1,
+    b_num_cols=1,
+    a_type="continuous",
+    b_type="continuous",
+    a_nan=False,
+    b_nan=False,
+)
+
+a[0] = np.random.normal(size=500)
+b = (b * 25).astype(int)
+
+many.visuals.multi_dists(a[0], b[0], count_cutoff=0, summary_type="box", ax=ax)
+plt.savefig(
+    config.PLOTS_DIR / "multi_dists_box.png", bbox_inches="tight", dpi=DPI
+)
+plt.clf()
+
 # ------------------
 # binary_contingency
 # ------------------
@@ -156,28 +182,6 @@ plt.savefig(
     config.PLOTS_DIR / "binary_contingency_default.png",
     bbox_inches="tight",
     dpi=DPI,
-)
-plt.clf()
-
-# -----------
-# multi_dists
-# -----------
-
-a, b = utils.generate_test(
-    n_samples=100,
-    a_num_cols=1,
-    b_num_cols=1,
-    a_type="continuous",
-    b_type="continuous",
-    a_nan=False,
-    b_nan=False,
-)
-
-b = (b * 10).astype(int)
-
-many.visuals.multi_dists(a[0], b[0], count_cutoff=0, summary_type="box")
-plt.savefig(
-    config.PLOTS_DIR / "multi_dists_box.png", bbox_inches="tight", dpi=DPI
 )
 plt.clf()
 

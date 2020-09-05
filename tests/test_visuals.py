@@ -75,6 +75,30 @@ plt.savefig(
 )
 plt.clf()
 
+# ---------
+# two_dists
+# ---------
+
+a, b = utils.generate_test(
+    n_samples=100,
+    a_num_cols=1,
+    b_num_cols=1,
+    a_type="binary",
+    b_type="continuous",
+    a_nan=False,
+    b_nan=False,
+)
+
+b[0] = b[0] + a[0]
+
+many.visuals.two_dists(
+    a[0], b[0], method="t_test", summary_type="box", stripplot=True
+)
+plt.savefig(
+    config.PLOTS_DIR / "two_dists_t_test_box.png", bbox_inches="tight", dpi=DPI
+)
+plt.clf()
+
 # -----------
 # dense_plot
 # -----------
@@ -132,26 +156,6 @@ plt.savefig(
     config.PLOTS_DIR / "binary_contingency_default.png",
     bbox_inches="tight",
     dpi=DPI,
-)
-plt.clf()
-
-# ---------
-# two_dists
-# ---------
-
-a, b = utils.generate_test(
-    n_samples=100,
-    a_num_cols=1,
-    b_num_cols=1,
-    a_type="binary",
-    b_type="continuous",
-    a_nan=False,
-    b_nan=False,
-)
-
-many.visuals.two_dists(a[0], b[0], method="t_test", summary_type="box")
-plt.savefig(
-    config.PLOTS_DIR / "two_dists_t_test_box.png", bbox_inches="tight", dpi=DPI
 )
 plt.clf()
 

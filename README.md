@@ -86,6 +86,124 @@ Benchmarks were run on an i7-7700K with 16GB of 2133 MHz RAM. GPU benchmarks wer
 
 ### Visual methods
 
+#### Continuous vs. continuous
+
+```python
+scatter_grid(dataframe)
+```
+
+Plot relationships between columns in a DataFrame, coloring by density and inserting labels given a set of significant value masks.
+
+```python
+regression(
+    x, y, method, ax=None, alpha=0.5, text_pos=(0.1, 0.9), scatter_kwargs={}
+)
+```
+
+Plot two sets of points with along with their regression coefficient.
+
+```python
+dense_regression(
+    x,
+    y,
+    method,
+    ax=None,
+    palette="Blues",
+    cmap_offset=0,
+    text_pos=(0.1, 0.9),
+    scatter_kwargs={},
+)
+```
+
+Plot two sets of points and their regression coefficient, along with density-based coloring.
+
+```python
+dense_plot(
+    x,
+    y,
+    text_adjust: bool,
+    ax=None,
+    labels_mask=None,
+    labels=None,
+    colormap=None,
+    cmap_offset=0,
+    scatter_kwargs={},
+    x_offset=0,
+    y_offset=0,
+)
+```
+
+Plot two sets of points, coloring by density and inserting labels given a set of significant value masks. Density estimated by Gaussian KDE.
+
+#### Continuous vs. categorical
+
+```python
+two_dists(
+    binary,
+    continuous,
+    method,
+    summary_type,
+    ax=None,
+    pal=["#eaeaea", "#a5dee5"],
+    annotate=True,
+    stripplot=False,
+    seaborn_kwargs={},
+    stripplot_kwargs={},
+)
+```
+
+Compare the distributions of a continuous variable when grouped by a binary one.
+    
+```python
+multi_dists(
+    continuous,
+    categorical,
+    count_cutoff,
+    summary_type,
+    ax=None,
+    stripplot=False,
+    order="ascending",
+    newline_counts=False,
+    xtick_rotation=45,
+    xtick_ha="right",
+    seaborn_kwargs={},
+    stripplot_kwargs={},
+)
+```
+
+Compare the distributions of a continuous variable when grouped by a categorical one.
+
+```python
+roc_auc_curve(y, y_pred, ax=None)
+```
+
+Plot the ROC curve along with the AUC statistic of predictions against ground truths.
+
+```python
+pr_curve(y, y_pred, ax=None)
+```
+
+Plot the precision-recall curve of predictions against ground truths.
+
+```python
+binary_metrics(y, y_pred)
+```
+
+Make several plots to evaluate a binary classifier:
+
+    1. Boxplots of predicted values
+    2. Violinplots of predicted values
+    3. ROC-AUC plot
+    4. Precision-recall curve
+
+#### Categorical vs. categorical
+
+```python
+binary_contingency(a, b, ax=None, heatmap_kwargs={})
+```
+
+Plot agreement between two binary variables, along with the odds ratio and Fisher's exact test p-value.
+
 ## Development
 
 1. Install dependencies with `poetry install`

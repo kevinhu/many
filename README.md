@@ -94,11 +94,19 @@ scatter_grid(dataframe)
 
 Plot relationships between columns in a DataFrame, coloring by density and inserting labels given a set of significant value masks.
 
+<p align="center">
+  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/scatter_grid.png">
+</p>
+
 ```python
 regression(
     x, y, method, ax=None, alpha=0.5, text_pos=(0.1, 0.9), scatter_kwargs={}
 )
 ```
+
+<p align="center">
+  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/regression_pearson.png">
+</p>
 
 Plot two sets of points with along with their regression coefficient.
 
@@ -114,6 +122,10 @@ dense_regression(
     scatter_kwargs={},
 )
 ```
+
+<p align="center">
+  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/dense_regression_pearson.png">
+</p>
 
 Plot two sets of points and their regression coefficient, along with density-based coloring.
 
@@ -132,6 +144,10 @@ dense_plot(
     y_offset=0,
 )
 ```
+
+<p align="center">
+  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/dense_plot_default.png">
+</p>
 
 Plot two sets of points, coloring by density and inserting labels given a set of significant value masks. Density estimated by Gaussian KDE.
 
@@ -152,6 +168,10 @@ two_dists(
 )
 ```
 
+<p align="center">
+  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/two_dists_t_test_box.png">
+</p>
+
 Compare the distributions of a continuous variable when grouped by a binary one.
     
 ```python
@@ -171,11 +191,19 @@ multi_dists(
 )
 ```
 
+<p align="center">
+  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/multi_dists_box.png">
+</p>
+
 Compare the distributions of a continuous variable when grouped by a categorical one.
 
 ```python
 roc_auc_curve(y, y_pred, ax=None)
 ```
+
+<p align="center">
+  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/roc_auc_curve.png">
+</p>
 
 Plot the ROC curve along with the AUC statistic of predictions against ground truths.
 
@@ -183,11 +211,19 @@ Plot the ROC curve along with the AUC statistic of predictions against ground tr
 pr_curve(y, y_pred, ax=None)
 ```
 
+<p align="center">
+  <img  width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/pr_curve.png">
+</p>
+
 Plot the precision-recall curve of predictions against ground truths.
 
 ```python
 binary_metrics(y, y_pred)
 ```
+
+<p align="center">
+  <img src="https://github.com/kevinhu/many/raw/master/tests/output_plots/binary_metrics.png">
+</p>
 
 Make several plots to evaluate a binary classifier:
 

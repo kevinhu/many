@@ -8,6 +8,8 @@ This package serves as a general-use toolkit for frequently-implemented statisti
 pip install many
 ```
 
+Note: if you want to use CUDA-accelerated statistical methods (i.e. `many.stats.mat_mwu_gpu`), you must also independently install the corresponding version of [cupy](https://github.com/cupy/cupy).
+
 ## Components
 
 ### Statistical methods

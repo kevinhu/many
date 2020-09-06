@@ -1,15 +1,20 @@
 import sys
 
-import cupy as cp
 import numpy as np
 import pandas as pd
-from cupyx.scipy.special import ndtr
 from scipy.stats import mannwhitneyu, norm, rankdata, tiecorrect
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
 
 from . import config
 from .utils import precheck_align
+
+try:
+    import cupy as cp
+    from cupyx.scipy.special import ndtr
+except ModuleNotFoundError:
+    cupy = None
+    ndtr = None
 
 
 def melt_mwu(effects, pvals, pos_ns, neg_ns, effect):

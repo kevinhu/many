@@ -43,7 +43,7 @@ def two_dists(
         binary values to plot
     continuous : Series
         continuous values to plot
-    method : string, "pearson" or "spearman"
+    method : string, "mw_u" or "t_test"
         regression method
     summary_type : string
         type of summary plot to use

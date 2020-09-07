@@ -153,13 +153,6 @@ def regression(
         axis with plot data
     """
 
-    if method == "pearson":
-        r, pval = pearsonr(x, y)
-    elif method == "spearman":
-        r, pval = spearmanr(x, y)
-    else:
-        raise ValueError("Method must be 'pearson' or 'spearman'.")
-
     if ax is None:
         ax = plt.subplot(111)
 
@@ -167,6 +160,14 @@ def regression(
     y = pd.Series(y).dropna()
 
     x, y = x.align(y, join="inner")
+
+    # compute regression statistics
+    if method == "pearson":
+        r, pval = pearsonr(x, y)
+    elif method == "spearman":
+        r, pval = spearmanr(x, y)
+    else:
+        raise ValueError("Method must be 'pearson' or 'spearman'.")
 
     # number of samples
     n = len(x)
@@ -243,13 +244,6 @@ def dense_regression(
         axis with plot data
     """
 
-    if method == "pearson":
-        r, pval = pearsonr(x, y)
-    elif method == "spearman":
-        r, pval = spearmanr(x, y)
-    else:
-        raise ValueError("Method must be 'pearson' or 'spearman'.")
-
     if ax is None:
         ax = plt.subplot(111)
 
@@ -257,6 +251,14 @@ def dense_regression(
     y = pd.Series(y).dropna()
 
     x, y = x.align(y, join="inner")
+
+    # compute regression statistics
+    if method == "pearson":
+        r, pval = pearsonr(x, y)
+    elif method == "spearman":
+        r, pval = spearmanr(x, y)
+    else:
+        raise ValueError("Method must be 'pearson' or 'spearman'.")
 
     xy = np.vstack([x, y])
 

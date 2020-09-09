@@ -1,6 +1,6 @@
 # many
 
-This package serves as a general-use toolkit for frequently-implemented statistical and visual methods.
+This package provides a general-use toolkit for frequently-implemented statistical and visual methods.
 
 **[Full documentation](https://many.kevinhu.io)**
 
@@ -16,7 +16,7 @@ Note: if you want to use CUDA-accelerated statistical methods (i.e. `many.stats.
 
 ### Statistical methods
 
-The statistical methods comprise several functions for association mining between variable pairs. The methods used here are optimized for `pandas` DataFrames and are inspired by the `corrcoef` function provided by `numpy`.
+The statistical methods comprise several functions for association mining between variable pairs. These methods are optimized for `pandas` DataFrames and are inspired by the `corrcoef` function provided by `numpy`.
 
 Because these functions rely on native matrix-level operations provided by `numpy`, many are orders of magnitude faster than naive looping-based alternatives. This makes them useful for constructing large association networks or for feature extraction, which have important uses in areas such as biomarker discovery. All methods also return estimates of statistical significance.
 

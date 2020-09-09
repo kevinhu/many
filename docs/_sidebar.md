@@ -1,12 +1,9 @@
-- Getting started
-
-  - [Installation](installation.md)
-  
 - Statistical methods
 
   - [Continuous vs. continuous](stats_continuous_continuous.md)
   - [Continuous vs. categorical](stats_continuous_categorical.md)
   - [Categorical vs. categorical](stats_categorical_categorical.md)
+  - [Benchmarks](benchmarks.md)
   
 - Visual methods
 

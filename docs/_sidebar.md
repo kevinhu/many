@@ -1,6 +1,6 @@
 - Getting started
 
-  - [Installation](quickstart.md)
+  - [Installation](installation.md)
   
 - Statistical methods
 

@@ -9,10 +9,9 @@ many.visuals.scatter_grid(dataframe)
 Plot relationships between columns in a DataFrame, coloring by density and inserting labels given a set of significant value masks.
 
 <p align="center">
-  <img width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/scatter_grid.png">
+  <img width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/scatter_grid.png">
 </p>
 ### many.visuals.regression
-
 
 ```python
 many.visuals.regression(
@@ -23,10 +22,9 @@ many.visuals.regression(
 Plot two sets of points with along with their regression coefficient.
 
 <p align="center">
-  <img width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/regression_pearson.png">
+  <img width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/regression_pearson.png">
 </p>
 ### many.visuals.dense_regression
-
 
 ```python
 many.visuals.dense_regression(
@@ -44,10 +42,9 @@ many.visuals.dense_regression(
 Plot two sets of points and their regression coefficient, along with density-based coloring.
 
 <p align="center">
-  <img width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/dense_regression_pearson.png">
+  <img width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/dense_regression_pearson.png">
 </p>
 ### many.visuals.dense_plot
-
 
 ```python
 many.visuals.dense_plot(
@@ -68,5 +65,5 @@ many.visuals.dense_plot(
 Plot two sets of points, coloring by density and inserting labels given a set of significant value masks. Density estimated by Gaussian KDE.
 
 <p align="center">
-  <img width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/dense_plot_default.png">
+  <img width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/dense_plot_default.png">
 </p>

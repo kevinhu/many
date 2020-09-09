@@ -1,4 +1,6 @@
-#### Continuous vs. categorical
+## Continuous vs. categorical
+
+### two_dists
 
 ```python
 two_dists(
@@ -20,6 +22,8 @@ Compare the distributions of a continuous variable when grouped by a binary one.
 <p align="center">
   <img width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/two_dists_t_test_box.png">
 </p>
+### multi_dists
+
 
 ```python
 multi_dists(
@@ -43,6 +47,8 @@ Compare the distributions of a continuous variable when grouped by a categorical
 <p align="center">
   <img src="https://github.com/kevinhu/many/raw/master/tests/output_plots/multi_dists_box.png">
 </p>
+### roc_auc_curve
+
 
 ```python
 roc_auc_curve(y, y_pred, ax=None)
@@ -53,6 +59,8 @@ Plot the ROC curve along with the AUC statistic of predictions against ground tr
 <p align="center">
   <img width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/roc_auc_curve.png">
 </p>
+### pr_curve
+
 
 ```python
 pr_curve(y, y_pred, ax=None)
@@ -63,6 +71,8 @@ Plot the precision-recall curve of predictions against ground truths.
 <p align="center">
   <img width=480 src="https://github.com/kevinhu/many/raw/master/tests/output_plots/pr_curve.png">
 </p>
+### binary_metrics
+
 
 ```python
 binary_metrics(y, y_pred)
@@ -70,10 +80,10 @@ binary_metrics(y, y_pred)
 
 Make several plots to evaluate a binary classifier:
 
-    1. Boxplots of predicted values
-    2. Violinplots of predicted values
-    3. ROC-AUC plot
-    4. Precision-recall curve
+1. Boxplots of predicted values
+2. Violinplots of predicted values
+3. ROC-AUC plot
+4. Precision-recall curve
 
 <p align="center">
   <img src="https://github.com/kevinhu/many/raw/master/tests/output_plots/binary_metrics.png">

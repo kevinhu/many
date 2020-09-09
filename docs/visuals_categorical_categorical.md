@@ -1,4 +1,6 @@
-#### Categorical vs. categorical
+## Categorical vs. categorical
+
+### binary_contingency
 
 ```python
 binary_contingency(a, b, ax=None, heatmap_kwargs={})

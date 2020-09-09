@@ -22,6 +22,9 @@ In certain cases such as the computation of correlation coefficients, **these ve
 
 The current functions available are listed below by variable comparison type. Benchmarks are also provided with comparisons to the equivalent looping-based method. In all methods, a `melt` option is provided to return the outputs as a set of row-column variable-variable pair statistic matrices or as a single `DataFrame` with each statistic melted to a column.
 
+### Visual methods
+
+Several visual methods are also included for interpretation of results from the statistical methods. Like the statistical methods, these are also grouped by variable types plotted.
 
 ## Development
 

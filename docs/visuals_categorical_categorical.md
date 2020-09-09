@@ -1,9 +1,9 @@
 ## Categorical vs. categorical
 
-### binary_contingency
+### many.visuals.binary_contingency
 
 ```python
-binary_contingency(a, b, ax=None, heatmap_kwargs={})
+many.visuals.binary_contingency(a, b, ax=None, heatmap_kwargs={})
 ```
 
 Plot agreement between two binary variables, along with the odds ratio and Fisher's exact test p-value.

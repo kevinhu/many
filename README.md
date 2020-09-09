@@ -2,6 +2,8 @@
 
 This package serves as a general-use toolkit for frequently-implemented statistical and visual methods.
 
+**[Full documentation](https://many.kevinhu.io)**
+
 ## Installation
 
 ```bash

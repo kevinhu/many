@@ -22,6 +22,7 @@ Compare the distributions of a continuous variable when grouped by a binary one.
 <p align="center">
   <img width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/two_dists_t_test_box.png">
 </p>
+
 ### many.visuals.multi_dists
 
 ```python
@@ -46,6 +47,7 @@ Compare the distributions of a continuous variable when grouped by a categorical
 <p align="center">
   <img src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/multi_dists_box.png">
 </p>
+
 ### many.visuals.roc_auc_curve
 
 ```python
@@ -57,6 +59,7 @@ Plot the ROC curve along with the AUC statistic of predictions against ground tr
 <p align="center">
   <img width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/roc_auc_curve.png">
 </p>
+
 ### many.visuals.pr_curve
 
 ```python
@@ -68,6 +71,7 @@ Plot the precision-recall curve of predictions against ground truths.
 <p align="center">
   <img width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/pr_curve.png">
 </p>
+
 ### many.visuals.binary_metrics
 
 ```python

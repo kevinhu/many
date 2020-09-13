@@ -11,6 +11,7 @@ Plot relationships between columns in a DataFrame, coloring by density and inser
 <p align="center">
   <img width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/scatter_grid.png">
 </p>
+
 ### many.visuals.regression
 
 ```python
@@ -24,6 +25,7 @@ Plot two sets of points with along with their regression coefficient.
 <p align="center">
   <img width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/regression_pearson.png">
 </p>
+
 ### many.visuals.dense_regression
 
 ```python
@@ -44,6 +46,7 @@ Plot two sets of points and their regression coefficient, along with density-bas
 <p align="center">
   <img width=480 src="https://raw.githubusercontent.com/kevinhu/many/master/tests/output_plots/dense_regression_pearson.png">
 </p>
+
 ### many.visuals.dense_plot
 
 ```python

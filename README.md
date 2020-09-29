@@ -1,6 +1,6 @@
 # many
 
-This package provides a general-use toolkit for frequently-implemented statistical and visual methods. See the [blog post](https://kevinhu.io/2020/09/01/many.html) for an explanation of the purpose of this package and the methods used.
+This package provides a general-use toolkit for frequently-implemented statistical and visual methods. See the [blog post](https://kevinhu.io/2020/09/17/many.html) for an explanation of the purpose of this package and the methods used.
 
 **[Full documentation](https://many.kevinhu.io)**
 

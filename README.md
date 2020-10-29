@@ -1,4 +1,6 @@
 # many
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkevinhu%2Fmany.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkevinhu%2Fmany?ref=badge_shield)
+
 
 This package provides a general-use toolkit for frequently-implemented statistical and visual methods. See the [blog post](https://kevinhu.io/2020/09/17/many.html) for an explanation of the purpose of this package and the methods used.
 
@@ -33,3 +35,7 @@ Several visual methods are also included for interpretation of results from the 
 1. Install dependencies with `poetry install`
 2. Initialize environment with `poetry shell`
 3. Initialize pre-commit hooks with `pre-commit install`
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkevinhu%2Fmany.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkevinhu%2Fmany?ref=badge_large)

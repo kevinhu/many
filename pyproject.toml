@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "many"
-version = "0.6.1"
+version = "0.5.4"
 description = ""
 authors = ["Kevin Hu <kevinhuwest@gmail.com>"]
 

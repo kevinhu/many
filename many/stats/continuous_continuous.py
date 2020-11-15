@@ -199,8 +199,8 @@ def mat_corr(a_mat, b_mat, melt: bool, method: str):
     # Compute column ranks, as Spearman correlation is equivalent
     # to Pearson correlation between ranks
     if method == "spearman":
-        a_mat = a_mat.rank(method="min")
-        b_mat = b_mat.rank(method="min")
+        a_mat = a_mat.rank(method="average")
+        b_mat = b_mat.rank(method="average")
 
     a_mat, b_mat = np.array(a_mat), np.array(b_mat)
 
@@ -306,7 +306,7 @@ def mat_corr_nan(a_mat, b_mat, melt: bool, method: str):
     if method == "spearman":
 
         b_nan = b_mat.isna()
-        b_mat = b_mat.rank(na_option="top", method="min")
+        b_mat = b_mat.rank(na_option="top", method="average")
         b_mat[b_mat <= b_nan.sum()] = np.nan
         b_mat = b_mat - b_nan.sum()
 
@@ -314,10 +314,10 @@ def mat_corr_nan(a_mat, b_mat, melt: bool, method: str):
         b_num_cols = b_mat.shape[1]
         a_nan = np.repeat(np.array(a_mat), b_num_cols, axis=1)
         a_nan[b_nan] = np.nan
-        a_nan = pd.DataFrame(a_nan)
+        a_nan = pd.DataFrame(a_nan, columns=b_names)
 
         # rank mirrored A matrix
-        a_nan = a_nan.rank(na_option="top", method="min")
+        a_nan = a_nan.rank(na_option="top", method="average")
         a_nan[a_nan <= b_nan.sum()] = np.nan
         a_nan = a_nan - b_nan.sum()
         a_nan = np.ma.array(np.array(a_nan), mask=b_nan)
@@ -359,8 +359,8 @@ def mat_corr_nan(a_mat, b_mat, melt: bool, method: str):
     corr_df["pval"] = corr_df.apply(pearson_significance, axis=1)
     corr_df["qval"] = multipletests(
         corr_df["pval"],
-        alpha=config.MULTIPLETESTS_ALPHA,
-        method=config.MULTIPLETESTS_METHOD,
+        alpha=0.01,
+        method="fdr_bh",
     )[1]
 
     # rename 'corr' column with name of method used

@@ -40,16 +40,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 def _fast_dot_divide(x, y, destination):
-    """helper method for use within the _fast_cov method - carry out the dot product and subsequent
-    division to generate the covariance values.  For use when there are no missing values.
+    """
+    Helper method for use within the _fast_cov method - carry out the dot product and
+    subsequent division to generate the covariance values.  For use when there are no
+    missing values.
     """
     np.dot(x.T, y, out=destination)
     np.divide(destination, (x.shape[0] - 1), out=destination)
 
 
 def calculate_non_mask_overlaps(x_mask, y_mask):
-    """for two mask arrays (x_mask, y_mask - boolean arrays) determine the number of entries in common there would be for each
-    entry if their dot product were taken
+    """
+    For two mask arrays (x_mask, y_mask - boolean arrays) determine the number of
+    entries in common there would be for each entry if their dot product were taken
     """
     x_is_not_nan = 1 * ~x_mask
     y_is_not_nan = 1 * ~y_mask
@@ -59,8 +62,10 @@ def calculate_non_mask_overlaps(x_mask, y_mask):
 
 
 def _nan_dot_divide(x, y, destination):
-    """helper method for use within the _fast_cov method - carry out the dot product and subsequent
-    division to generate the covariance values.  For use when there are missing values.
+    """
+    Helper method for use within the _fast_cov method - carry out the dot
+    product and subsequent division to generate the covariance values.
+    For use when there are missing values.
     """
     np.ma.dot(x.T, y, out=destination)
 
@@ -70,15 +75,22 @@ def _nan_dot_divide(x, y, destination):
 
 
 def fast_cov(x, y=None, destination=None):
-    """calculate the covariance matrix for the columns of x (MxN), or optionally, the covariance matrix between the
-    columns of x and and the columns of y (MxP).  (In the language of statistics, the columns are variables, the rows
-    are observations).
+    """
+    Calculate the covariance matrix for the columns of x (MxN), or optionally, the
+    covariance matrix between the columns of x and and the columns of y (MxP).  (In the
+    language of statistics, the columns are variables, the rows are observations).
+
     Args:
-        x (np array-like) MxN in shape
-        y (np array-like) MxP in shape
-        destination (np array-like) optional location where to store the results as they are calculated (e.g. a np
-            memmap of a file)
-        returns (np array-like) array of the covariance values
+        x
+            (np array-like) MxN in shape
+        y
+            (np array-like) MxP in shape
+        destination
+            (np array-like) optional location where to store the results as they are
+            calculated (e.g. a np memmap of a file)
+
+    Returns:
+        (np array-like) array of the covariance values
             for defaults (y=None), shape is NxN
             if y is provided, shape is NxP
     """
@@ -111,55 +123,61 @@ def validate_inputs(x, y, destination):
     error_msg = ""
 
     if not hasattr(x, "shape"):
-        error_msg += 'x needs to be np array-like but it does not have "shape" attribute - type(x):  {}\n'.format(
-            type(x)
-        )
+        error_msg += f"""x needs to be np array-like but it does not have "shape"
+                        attribute - type(x):  {type(x)}\n"""
 
     if destination is not None and not hasattr(destination, "shape"):
-        error_msg += 'destination needs to be np array-like but it does not have "shape" attribute - type(destination):  {}\n'.format(
-            type(destination)
-        )
+        error_msg += f"""destination needs to be np array-like but it does not have
+                         'shape'attribute - type(destination):  {type(destination)}\n"""
 
     if y is None:
         if destination is not None:
             expected_shape = (x.shape[1], x.shape[1])
             if destination.shape != expected_shape:
-                error_msg += """x and destination provided, therefore destination must have shape matching number of columns of x but it does not -
-                              x.shape:  {}  expected_shape:  {}  destination.shape:  {}\n""".format(
-                    x.shape, expected_shape, destination.shape
-                )
+                error_msg += f"""x and destination provided, therefore destination must
+                                have shape matching number of columns of x but it does
+                                not - x.shape:  {x.shape}
+                                expected_shape:  {expected_shape}
+                                destination.shape:  {destination.shape}\n"""
     else:
         if not hasattr(y, "shape"):
-            error_msg += 'y needs to be np array-like but it does not have "shape" attribute - type(y):  {}\n'.format(
-                type(y)
-            )
+            error_msg += f"""y needs to be np array-like but it does not have "shape"
+                            attribute - type(y):  {type(y)}\n"""
         elif x.shape[0] != y.shape[0]:
-            error_msg += "the number of rows in the x and y matrices must be the same - x.shape:  {}  y.shape:  {}\n".format(
-                x.shape, y.shape
-            )
+            error_msg += """the number of rows in the x and y matrices must be the same
+                            x.shape:  {x.shape}  y.shape:  {y.shape}\n"""
         elif destination is not None:
             expected_shape = (x.shape[1], y.shape[1])
             if destination.shape != expected_shape:
-                error_msg += """x, y, and destination provided, therefore destination must have number of rows matching number of columns of x
-                                and destination needs to have number of columns matching number of columns of y -
-                                x.shape:  {}  y.shape:  {}  expected_shape:  {}  destination.shape:  {}\n""".format(
-                    x.shape, y.shape, expected_shape, destination.shape
-                )
+                error_msg += f"""x, y, and destination provided, therefore destination
+                                 must have number of rows matching number of columns of
+                                 x and destination needs to have number of columns
+                                 matching number of columns of y - x.shape:  {x.shape}
+                                 y.shape:  {y.shape}  expected_shape:  {expected_shape}
+                                 destination.shape:  {destination.shape}\n"""
 
     if error_msg != "":
         raise error_msg
 
 
 def nan_fast_cov(x, y=None, destination=None):
-    """calculate the covariance matrix (ignoring nan values) for the columns of x (MxN), or optionally, the covariance matrix between the
-    columns of x and and the columns of y (MxP).  (In the language of statistics, the columns are variables, the rows
-    are observations).
+    """
+    Calculate the covariance matrix (ignoring nan values) for the columns of x (MxN),
+    or optionally, the covariance matrix between the columns of x and and the columns of
+    y (MxP).  (In the language of statistics, the columns are variables, the rows are
+    observations).
+
     Args:
-        x (np array-like) MxN in shape
-        y (np array-like) MxP in shape
-        destination (np masked array-like) optional location where to store the results as they are calculated (e.g. a np
-            memmap of a file)
-        returns (np array-like) array of the covariance values
+        x
+            (np array-like) MxN in shape
+        y
+            (np array-like) MxP in shape
+        destination
+            (np masked array-like) optional location where to store the results as they
+            are calculated (e.g. a np memmap of a file)
+
+    Returns:
+        (np array-like) array of the covariance values
             for defaults (y=None), shape is NxN
             if y is provided, shape is NxP
     """
@@ -185,15 +203,24 @@ def nan_fast_cov(x, y=None, destination=None):
 
 
 def fast_corr(x, y=None, destination=None):
-    """calculate the pearson correlation matrix for the columns of x (with dimensions MxN), or optionally, the pearson correlaton matrix
-    between x and y (with dimensions OxP).  If destination is provided, put the results there.
-    In the language of statistics the columns are the variables and the rows are the observations.
+    """
+    Calculate the pearson correlation matrix for the columns of x (with dimensions MxN),
+    or optionally, the pearson correlaton matrix between x and y (with dimensions OxP).
+    If destination is provided, put the results there. In the language of statistics the
+    columns are the variables and the rows are the observations.
+
     Args:
-        x (np array-like) MxN in shape
-        y (optional, np array-like) OxP in shape.  M (# rows in x) must equal O (# rows in y)
-        destination (np array-like) optional location where to store the results as they are calculated (e.g. a np
-            memmap of a file)
-        returns (np array-like) array of the covariance values
+        x
+            (np array-like) MxN in shape
+        y
+            (optional, np array-like) OxP in shape.  M (# rows in x) must equal O
+            (# rows in y)
+        destination
+            (np array-like) optional location where to store the results as they are
+            calculated (e.g. a np memmap of a file)
+
+    Returns:
+        (np array-like) array of the covariance values
             for defaults (y=None), shape is NxN
             if y is provied, shape is NxP
     """
@@ -212,11 +239,16 @@ def fast_corr(x, y=None, destination=None):
 
 
 def calculate_moments_with_additional_mask(x, mask):
-    """calculate the moments (y, y^2, and variance) of the columns of x, excluding masked within x, for each of the masking columns in mask
+    """
+    Calculate the moments (y, y^2, and variance) of the columns of x, excluding masked
+    within x, for each of the masking columns in mask.
     Number of rows in x and mask must be the same.
+
     Args:
-        x (np.ma.array like)
-        mask (np array-like boolean)
+        x
+            (np.ma.array like)
+        mask
+            (np array-like boolean)
     """
     non_mask_overlaps = calculate_non_mask_overlaps(x.mask, mask)
 
@@ -240,15 +272,25 @@ def calculate_moments_with_additional_mask(x, mask):
 
 
 def nan_fast_corr(x, y=None, destination=None):
-    """calculate the pearson correlation matrix (ignoring nan values) for the columns of x (with dimensions MxN), or optionally, the pearson correlaton matrix
-    between x and y (with dimensions OxP).  If destination is provided, put the results there.
-    In the language of statistics the columns are the variables and the rows are the observations.
+    """
+    Calculate the pearson correlation matrix (ignoring nan values) for the columns of x
+    (with dimensions MxN), or optionally, the pearson correlaton matrix between x and y
+    (with dimensions OxP).  If destination is provided, put the results there. In the
+    language of statistics the columns are the variables and the rows are the
+    observations.
+
     Args:
-        x (np array-like) MxN in shape
-        y (optional, np array-like) OxP in shape.  M (# rows in x) must equal O (# rows in y)
-        destination (np array-like) optional location where to store the results as they are calculated (e.g. a np
-            memmap of a file)
-        returns (np array-like) array of the covariance values
+        x
+            (np array-like) MxN in shape
+        y
+            (optional, np array-like) OxP in shape.  M (# rows in x) must equal O
+            (# rows in y)
+        destination
+            (np array-like) optional location where to store the results as they are
+            calculated (e.g. a np memmap of a file)
+
+    Returns:
+        (np array-like) array of the covariance values
             for defaults (y=None), shape is NxN
             if y is provied, shape is NxP
     """
@@ -279,26 +321,37 @@ def nan_fast_corr(x, y=None, destination=None):
 
 
 def fast_spearman(x, y=None, destination=None):
-    """calculate the spearman correlation matrix for the columns of x (with dimensions MxN), or optionally, the spearman correlaton
-    matrix between the columns of x and the columns of y (with dimensions OxP).  If destination is provided, put the results there.
-    In the language of statistics the columns are the variables and the rows are the observations.
+    """
+    Calculate the spearman correlation matrix for the columns of x
+    (with dimensions MxN), or optionally, the spearman correlaton matrix between the
+    columns of x and the columns of y (with dimensions OxP).  If destination is
+    provided, put the results there. In the language of statistics the columns are the
+    variables and the rows are the observations.
+
     Args:
-        x (np array-like) MxN in shape
-        y (optional, np array-like) OxP in shape.  M (# rows in x) must equal O (# rows in y)
-        destination (np array-like) optional location where to store the results as they are calculated (e.g. a np
-            memmap of a file)
-        returns:
-            (np array-like) array of the covariance values
-                for defaults (y=None), shape is NxN
-                if y is provied, shape is NxP
+        x
+            (np array-like) MxN in shape
+        y
+            (optional, np array-like) OxP in shape.  M (# rows in x) must equal O
+            (# rows in y)
+        destination
+            (np array-like) optional location where to store the results as they are
+            calculated (e.g. a np memmap of a file)
+
+    Returns:
+        (np array-like) array of the covariance values
+            for defaults (y=None), shape is NxN
+            if y is provied, shape is NxP
     """
     r = _fast_spearman(fast_corr, x, y, destination)
     return r
 
 
 def _fast_spearman(corr_method, x, y, destination):
-    """internal method for calculating spearman correlation, allowing subsititution of methods for calculationg correlation (corr_method),
-    allowing to choose methods that are fast (fast_corr) or tolerant of nan's (nan_fast_corr) to be used
+    """
+    Internal method for calculating spearman correlation, allowing subsititution of
+    methods for calculationg correlation (corr_method), allowing to choose methods that
+    are fast (fast_corr) or tolerant of nan's (nan_fast_corr) to be used
     """
     logger.debug("x.shape:  {}".format(x.shape))
     if hasattr(y, "shape"):
@@ -321,19 +374,29 @@ def _fast_spearman(corr_method, x, y, destination):
 
 
 def nan_fast_spearman(x, y=None, destination=None):
-    """calculate the spearman correlation matrix (ignoring nan values) for the columns of x (with dimensions MxN), or optionally, the spearman correlaton
-    matrix between the columns of x and the columns of y (with dimensions OxP).  If destination is provided, put the results there.
-    In the language of statistics the columns are the variables and the rows are the observations.
-    Note that the ranks will be slightly miscalculated in the masked situations leading to slight errors in the spearman rho value.
+    """
+    Calculate the spearman correlation matrix (ignoring nan values) for the columns of x
+    (with dimensions MxN), or optionally, the spearman correlation matrix between the
+    columns of x and the columns of y (with dimensions OxP).  If destination is
+    provided, put the results there. In the language of statistics the columns are the
+    variables and the rows are the observations. Note that the ranks will be slightly
+    miscalculated in the masked situations leading to slight errors in the spearman rho
+    alue.
+
     Args:
-        x (np array-like) MxN in shape
-        y (optional, np array-like) OxP in shape.  M (# rows in x) must equal O (# rows in y)
-        destination (np array-like) optional location where to store the results as they are calculated (e.g. a np
-            memmap of a file)
-        returns:
-            (np array-like) array of the covariance values
-                for defaults (y=None), shape is NxN
-                if y is provied, shape is NxP
+        x
+            (np array-like) MxN in shape
+        y
+            (optional, np array-like) OxP in shape.  M (# rows in x) must equal O
+            (# rows in y)
+        destination
+            (np array-like) optional location where to store the results as they are
+            calculated (e.g. a np memmap of a file)
+
+    Returns:
+        (np array-like) array of the covariance values
+            for defaults (y=None), shape is NxN
+            if y is provied, shape is NxP
     """
     r = _fast_spearman(nan_fast_corr, x, y, destination)
     return r

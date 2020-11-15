@@ -357,7 +357,7 @@ def _fast_spearman(corr_method, x, y, destination):
     if hasattr(y, "shape"):
         logger.debug("y.shape:  {}".format(y.shape))
 
-    x_ranks = pd.DataFrame(x).rank(method="average", na_option="keep").values
+    x_ranks = pd.DataFrame(x).rank(method="average", na_option="top").values
     logger.debug(
         "some min and max ranks of x_ranks:\n{}\n{}".format(
             np.min(x_ranks[:10], axis=0), np.max(x_ranks[:10], axis=0)
@@ -365,7 +365,7 @@ def _fast_spearman(corr_method, x, y, destination):
     )
 
     y_ranks = (
-        pd.DataFrame(y).rank(method="average", na_option="keep").values
+        pd.DataFrame(y).rank(method="average", na_option="top").values
         if y is not None
         else None
     )

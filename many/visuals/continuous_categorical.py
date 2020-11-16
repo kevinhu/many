@@ -93,11 +93,7 @@ def two_dists(
         n_text = "n = " + str(n)
 
         bbox_props = dict(
-            boxstyle="round,pad=1",
-            fc="lightgrey",
-            ec="lightgrey",
-            lw=0,
-            alpha=0.33,
+            boxstyle="round,pad=1", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33,
         )
 
         ax.text(
@@ -117,23 +113,13 @@ def two_dists(
     if summary_type == "box":
 
         sns.boxplot(
-            binary,
-            continuous,
-            notch=True,
-            palette=pal,
-            ax=ax,
-            **seaborn_kwargs,
+            binary, continuous, notch=True, palette=pal, ax=ax, **seaborn_kwargs,
         )
 
     elif summary_type == "violin":
 
         sns.violinplot(
-            binary,
-            continuous,
-            inner=None,
-            palette=pal,
-            ax=ax,
-            **seaborn_kwargs,
+            binary, continuous, inner=None, palette=pal, ax=ax, **seaborn_kwargs,
         )
 
     else:
@@ -379,11 +365,7 @@ def roc_auc_curve(y, y_pred, ax=None):
 
     # summary box properties
     bbox_props = dict(
-        boxstyle="round,pad=0.5",
-        fc="lightgrey",
-        ec="lightgrey",
-        lw=0,
-        alpha=0.33,
+        boxstyle="round,pad=0.5", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33,
     )
 
     # add summary text
@@ -453,11 +435,7 @@ def pr_curve(y, y_pred, ax=None):
     ax.set_xlabel("Recall")
 
     bbox_props = dict(
-        boxstyle="round,pad=0.5",
-        fc="lightgrey",
-        ec="lightgrey",
-        lw=0,
-        alpha=0.33,
+        boxstyle="round,pad=0.5", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33,
     )
 
     ax.text(

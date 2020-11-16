@@ -91,9 +91,7 @@ def scatter(x, y, ci=99, **kwargs):
     nans = np.isnan(x) | np.isnan(y)
     x, y = x[~nans], y[~nans]
 
-    ax = sns.regplot(
-        x, y, color="#364f6b", scatter_kws={"alpha": 0.5, "s": 8}, ci=ci
-    )
+    ax = sns.regplot(x, y, color="#364f6b", scatter_kws={"alpha": 0.5, "s": 8}, ci=ci)
 
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -178,11 +176,7 @@ def regression(
     n_text = "n = " + str(n)
 
     bbox_props = dict(
-        boxstyle="round,pad=0.5",
-        fc="lightgrey",
-        ec="lightgrey",
-        lw=0,
-        alpha=0.33,
+        boxstyle="round,pad=0.5", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33,
     )
 
     ax.text(
@@ -196,9 +190,7 @@ def regression(
     )
 
     # plot points
-    ax.scatter(
-        x, y, linewidth=0, alpha=alpha, rasterized=True, **scatter_kwargs
-    )
+    ax.scatter(x, y, linewidth=0, alpha=alpha, rasterized=True, **scatter_kwargs)
 
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -273,11 +265,7 @@ def dense_regression(
     n_text = "n = " + str(n)
 
     bbox_props = dict(
-        boxstyle="round,pad=0.5",
-        fc="lightgrey",
-        ec="lightgrey",
-        lw=0,
-        alpha=0.33,
+        boxstyle="round,pad=0.5", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33,
     )
 
     ax.text(
@@ -422,9 +410,7 @@ def dense_plot(
 
             if text_adjust:
 
-                texts.append(
-                    ax.text(x_pos, y_pos, label, ha="center", va="center")
-                )
+                texts.append(ax.text(x_pos, y_pos, label, ha="center", va="center"))
             else:
 
                 if x_pos <= 0:
@@ -448,9 +434,7 @@ def dense_plot(
         if text_adjust:
 
             adjust_text(
-                texts,
-                autoalign="",
-                arrowprops=dict(arrowstyle="-", color="black"),
+                texts, autoalign="", arrowprops=dict(arrowstyle="-", color="black"),
             )
 
     return ax

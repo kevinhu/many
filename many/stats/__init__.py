@@ -12,10 +12,10 @@ from .continuous_continuous import (
     mat_corr_subtyped,
 )
 from .continuous_continuous_cmap import (
-    fast_cov,
-    nan_fast_cov,
     fast_corr,
-    nan_fast_corr,
+    fast_cov,
     fast_spearman,
+    nan_fast_corr,
+    nan_fast_cov,
     nan_fast_spearman,
 )

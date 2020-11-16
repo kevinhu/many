@@ -4,19 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from scipy.stats import (
-    gaussian_kde,
-    mannwhitneyu,
-    pearsonr,
-    spearmanr,
-    ttest_ind,
-)
-from sklearn.metrics import (
-    auc,
-    precision_recall_curve,
-    roc_auc_score,
-    roc_curve,
-)
+from scipy.stats import gaussian_kde, mannwhitneyu, pearsonr, spearmanr, ttest_ind
+from sklearn.metrics import auc, precision_recall_curve, roc_auc_score, roc_curve
 
 from .utils import as_si
 
@@ -104,11 +93,7 @@ def two_dists(
         n_text = "n = " + str(n)
 
         bbox_props = dict(
-            boxstyle="round,pad=1",
-            fc="lightgrey",
-            ec="lightgrey",
-            lw=0,
-            alpha=0.33,
+            boxstyle="round,pad=1", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33,
         )
 
         ax.text(
@@ -128,23 +113,13 @@ def two_dists(
     if summary_type == "box":
 
         sns.boxplot(
-            binary,
-            continuous,
-            notch=True,
-            palette=pal,
-            ax=ax,
-            **seaborn_kwargs,
+            binary, continuous, notch=True, palette=pal, ax=ax, **seaborn_kwargs,
         )
 
     elif summary_type == "violin":
 
         sns.violinplot(
-            binary,
-            continuous,
-            inner=None,
-            palette=pal,
-            ax=ax,
-            **seaborn_kwargs,
+            binary, continuous, inner=None, palette=pal, ax=ax, **seaborn_kwargs,
         )
 
     else:
@@ -268,29 +243,23 @@ def multi_dists(
     # sort categories by mean
     if order == "ascending":
 
-        merged_sorted = merged_sorted.sort_values(
-            continuous_name, ascending=True
-        )
+        merged_sorted = merged_sorted.sort_values(continuous_name, ascending=True)
 
         order = merged_sorted[continuous_name]
 
     elif order == "descending":
 
-        merged_sorted = merged_sorted.sort_values(
-            continuous_name, ascending=False
-        )
+        merged_sorted = merged_sorted.sort_values(continuous_name, ascending=False)
 
         order = merged_sorted[continuous_name]
 
     else:
 
-        merged_sorted["continuous_idx"] = merged_sorted[
-            categorical_name
-        ].apply(order.index)
-
-        merged_sorted = merged_sorted.sort_values(
-            "continuous_idx", ascending=True
+        merged_sorted["continuous_idx"] = merged_sorted[categorical_name].apply(
+            order.index
         )
+
+        merged_sorted = merged_sorted.sort_values("continuous_idx", ascending=True)
 
     # recompute category counts after applying cutoff
     counts = merged_sorted[categorical_name].apply(categorical_counts.get)
@@ -396,11 +365,7 @@ def roc_auc_curve(y, y_pred, ax=None):
 
     # summary box properties
     bbox_props = dict(
-        boxstyle="round,pad=0.5",
-        fc="lightgrey",
-        ec="lightgrey",
-        lw=0,
-        alpha=0.33,
+        boxstyle="round,pad=0.5", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33,
     )
 
     # add summary text
@@ -470,11 +435,7 @@ def pr_curve(y, y_pred, ax=None):
     ax.set_xlabel("Recall")
 
     bbox_props = dict(
-        boxstyle="round,pad=0.5",
-        fc="lightgrey",
-        ec="lightgrey",
-        lw=0,
-        alpha=0.33,
+        boxstyle="round,pad=0.5", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33,
     )
 
     ax.text(
@@ -537,17 +498,13 @@ def binary_metrics(y, y_pred):
 
     # boxplot
     ax = axes[0]
-    two_dists(
-        y, y_pred, ax=ax, method="mw_u", summary_type="box", annotate=False
-    )
+    two_dists(y, y_pred, ax=ax, method="mw_u", summary_type="box", annotate=False)
     ax.set_xlabel("Truth")
     ax.set_ylabel("Prediction")
 
     # violinplot
     ax = axes[1]
-    two_dists(
-        y, y_pred, ax=ax, method="mw_u", summary_type="violin", annotate=False
-    )
+    two_dists(y, y_pred, ax=ax, method="mw_u", summary_type="violin", annotate=False)
     ax.set_xlabel("Truth")
     ax.set_ylabel("Prediction")
 

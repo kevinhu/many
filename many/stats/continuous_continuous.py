@@ -357,11 +357,7 @@ def mat_corr_nan(a_mat, b_mat, melt: bool, method: str):
     corr_df["corr"] = corrs
     corr_df["n"] = num_samples - nan_sums
     corr_df["pval"] = corr_df.apply(pearson_significance, axis=1)
-    corr_df["qval"] = multipletests(
-        corr_df["pval"],
-        alpha=0.01,
-        method="fdr_bh",
-    )[1]
+    corr_df["qval"] = multipletests(corr_df["pval"], alpha=0.01, method="fdr_bh",)[1]
 
     # rename 'corr' column with name of method used
     corr_df = corr_df.rename({"corr": method}, axis=1)

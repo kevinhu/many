@@ -1,7 +1,7 @@
+import logging
+
 import numpy as np
 import pandas as pd
-
-import logging
 
 logger = logging.getLogger("log")
 
@@ -257,9 +257,7 @@ def calculate_moments_with_additional_mask(x, mask):
     expect_x = np.ma.dot(x.T, unmask) / non_mask_overlaps
     expect_x = expect_x.T
 
-    expect_x_squared = (
-        np.ma.dot(np.power(x, 2.0).T, unmask) / non_mask_overlaps
-    )
+    expect_x_squared = np.ma.dot(np.power(x, 2.0).T, unmask) / non_mask_overlaps
     expect_x_squared = expect_x_squared.T
 
     var_x = (
@@ -304,14 +302,10 @@ def nan_fast_corr(x, y=None, destination=None):
     r = nan_fast_cov(x_masked, y_masked, destination=destination)
 
     # calculate the standard deviation of the columns of each matrix, given the masking from the other
-    _, _, var_x = calculate_moments_with_additional_mask(
-        x_masked, y_masked.mask
-    )
+    _, _, var_x = calculate_moments_with_additional_mask(x_masked, y_masked.mask)
     std_x = np.sqrt(var_x)
 
-    _, _, var_y = calculate_moments_with_additional_mask(
-        y_masked, x_masked.mask
-    )
+    _, _, var_y = calculate_moments_with_additional_mask(y_masked, x_masked.mask)
     std_y = np.sqrt(var_y)
 
     r = r / (std_x.T * std_y)

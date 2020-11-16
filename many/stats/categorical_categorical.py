@@ -11,9 +11,7 @@ from .fisher import mlog10Test1t
 from .utils import precheck_align
 
 
-def melt_fisher(
-    oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int
-):
+def melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols: int, b_num_cols: int):
     """
     Flatten matrix-form outputs to column-form.
 
@@ -158,9 +156,7 @@ def mat_fisher_naive(a_mat, b_mat, melt: bool, pseudocount=0, pbar=False):
 
     if melt:
 
-        return melt_fisher(
-            oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols
-        )
+        return melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
 
     return oddsrs, pvals
 
@@ -255,9 +251,7 @@ def mat_fisher(a_mat, b_mat, melt: bool, pseudocount=0):
 
     if melt:
 
-        return melt_fisher(
-            oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols
-        )
+        return melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
 
     return oddsrs, pvals
 
@@ -335,8 +329,6 @@ def mat_fisher_nan(a_mat, b_mat, melt: bool, pseudocount=0):
 
     if melt:
 
-        return melt_fisher(
-            oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols
-        )
+        return melt_fisher(oddsrs, pvals, AB, Ab, aB, ab, a_num_cols, b_num_cols)
 
     return oddsrs, pvals

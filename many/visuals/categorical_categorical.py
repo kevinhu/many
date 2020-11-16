@@ -48,7 +48,9 @@ def binary_contingency(a, b, ax=None, heatmap_kwargs={}):
 
     # create 2x2 contingency table
     contingency = pd.DataFrame(
-        [[xx, xy], [yx, yy]], columns=["True", "False"], index=["True", "False"],
+        [[xx, xy], [yx, yy]],
+        columns=["True", "False"],
+        index=["True", "False"],
     )
 
     odds_ratio, p_val = fisher_exact([[xx, xy], [yx, yy]])

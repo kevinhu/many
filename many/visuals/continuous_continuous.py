@@ -176,7 +176,11 @@ def regression(
     n_text = "n = " + str(n)
 
     bbox_props = dict(
-        boxstyle="round,pad=0.5", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33,
+        boxstyle="round,pad=0.5",
+        fc="lightgrey",
+        ec="lightgrey",
+        lw=0,
+        alpha=0.33,
     )
 
     ax.text(
@@ -265,7 +269,11 @@ def dense_regression(
     n_text = "n = " + str(n)
 
     bbox_props = dict(
-        boxstyle="round,pad=0.5", fc="lightgrey", ec="lightgrey", lw=0, alpha=0.33,
+        boxstyle="round,pad=0.5",
+        fc="lightgrey",
+        ec="lightgrey",
+        lw=0,
+        alpha=0.33,
     )
 
     ax.text(
@@ -434,7 +442,9 @@ def dense_plot(
         if text_adjust:
 
             adjust_text(
-                texts, autoalign="", arrowprops=dict(arrowstyle="-", color="black"),
+                texts,
+                autoalign="",
+                arrowprops=dict(arrowstyle="-", color="black"),
             )
 
     return ax

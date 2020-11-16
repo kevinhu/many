@@ -26,7 +26,6 @@ adjusttext = "^0.7.3"
 seaborn = "^0.11.0"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "^2.6.0"
 pytest = "^5.2"
 black = "^19.10b0"
 isort = "^5.4.2"

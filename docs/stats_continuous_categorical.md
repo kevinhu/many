@@ -22,4 +22,5 @@ Exact same behavior as `mat_mwu`, with the exception that computation is acceler
 many.stats.mat_mwu_naive(a_mat, b_mat, melt: bool, effect: str, use_continuity=True, pbar=False)
 ```
 
-Same functionality as `mat_mwu`, but uses a double loop for direct computation of statistics. Unlike `mat_mwus, ` `effect` parameters of "mean", "median", and "rank_biserial" are all supported.
+Same functionality as `mat_mwu`, but uses a double loop for direct computation of statistics. Unlike `mat_mwu `, `effect` parameters of "mean", "median", and "rank_biserial" are all supported.
+

@@ -27,12 +27,8 @@ def melt_mwu(effects, pvals, pos_ns, neg_ns, effect):
         effect sizes matrix
     pvals: Pandas DataFrame
         p-values matrix
-    pos_ns neg_ns: Pandas DataFrames
+    pos_ns, neg_ns: Pandas DataFrames
         sample group counts
-    a_num_cols: int
-        number of columns in first observations matrix
-    b_num_cols: int
-        number of columns in second observations matrix
     effect: "mean", "median", or "rank_biserial"
         the effect statistic
 
@@ -63,8 +59,45 @@ def melt_mwu(effects, pvals, pos_ns, neg_ns, effect):
     return melted
 
 
+def melt_biserial(effects, pos_ns, neg_ns, effect):
+    """
+    Flatten matrix-form outputs to column-form.
+
+    Parameters
+    ----------
+    effects: Pandas DataFrame
+        effect sizes matrix
+    pos_ns, neg_ns: Pandas DataFrames
+        sample group counts
+    effect: "mean", "median", or "rank_biserial"
+        the effect statistic
+
+    Returns
+    -------
+    series form statistics
+    """
+
+    melted = pd.DataFrame()
+    melted[effect] = effects.unstack()
+
+    melted["pos_n"] = pos_ns.unstack()
+    melted["neg_n"] = neg_ns.unstack()
+
+    melted = melted.sort_values(by=effect, ascending=False)
+
+    melted.index.set_names(["b_col", "a_col"], inplace=True)
+    melted.index = melted.index.swaplevel(0, 1)
+
+    return melted
+
+
 def mat_mwu_naive(
-    a_mat, b_mat, melt: bool, effect: str, use_continuity=True, pbar=False,
+    a_mat,
+    b_mat,
+    melt: bool,
+    effect: str,
+    use_continuity=True,
+    pbar=False,
 ):
     """
     Compute rank-biserial correlations and Mann-Whitney statistics
@@ -321,14 +354,10 @@ def mat_mwu_gpu(a_mat, b_mat, melt: bool, effect: str, use_continuity=True):
     Compute rank-biserial correlations and Mann-Whitney statistics
     between every column-column pair of a_mat (continuous) and b_mat (binary).
 
-    In the case that a_mat or b_mat has a single column, the results are
-    re-formatted with the multiple hypothesis-adjusted q-value also returned.
-
     Parameters
     ----------
     a_mat: Pandas DataFrame
-        Continuous set of observations, with rows as samples and columns
-        as labels.
+        Continuous set of observations, with rows as samples and columns as labels.
     b_mat: Pandas DataFrame
         Binary set of observations, with rows as samples and columns as labels.
         Required to be castable to boolean datatype.
@@ -436,3 +465,83 @@ def mat_mwu_gpu(a_mat, b_mat, melt: bool, effect: str, use_continuity=True):
         return melt_mwu(effects, pvals, pos_ns, neg_ns, effect)
 
     return effects, pvals
+
+
+def biserial_continuous_nan(a_mat, b_mat, melt: bool, effect: str):
+
+    """
+    Compute biserial (point or rank) correlations for every column-column pair of
+    a_mat (continuous) and b_mat (binary). Allows for missing values in a_mat.
+
+    Parameters
+    ----------
+    a_mat: Pandas DataFrame
+        Continuous set of observations, with rows as samples and columns
+        as labels.
+    b_mat: Pandas DataFrame
+        Binary set of observations, with rows as samples and columns as labels.
+        Required to be castable to boolean datatype.
+    melt: boolean
+        Whether or not to melt the outputs into columns.
+    effect: "point_biserial" or "rank_biserial"
+        The effect statistic.
+
+    Returns
+    -------
+    biserial: biserial correlations
+    pos_num: number of positive group observations per variable pair
+    neg_num: number of negative group observations per variable pair
+    """
+
+    if effect not in ["point_biserial", "rank_biserial"]:
+
+        raise ValueError("effect must be 'point_biserial' or 'rank_biserial'")
+
+    a_names = a_mat.columns
+    b_names = b_mat.columns
+
+    if effect == "rank_biserial":
+        a_mat = a_mat.rank(method="average")
+
+    a_mat = a_mat.values
+    b_mat = b_mat.values
+
+    a_mat = np.ma.masked_invalid(a_mat)
+    a_mat_valid = (~a_mat.mask).astype(np.float32)
+
+    # overall standard deviations for A
+    a_stdev = np.std(a_mat, axis=0)
+
+    # sample numbers and grouped means
+    pos_ns = np.dot(a_mat_valid.T, b_mat)
+    neg_ns = np.dot(a_mat_valid.T, 1 - b_mat)
+    pos_means = np.ma.dot(a_mat.T, b_mat) / pos_ns
+    neg_means = np.ma.dot(a_mat.T, 1 - b_mat) / neg_ns
+
+    if effect == "point_biserial":
+
+        # number of total samples
+        num_total = np.sum(a_mat_valid, axis=0)
+        # fraction of positive groups
+        pos_frac = pos_num / num_total[:, None]
+
+        biserial = (
+            (pos_means - neg_means)
+            * np.sqrt(pos_frac * (1 - pos_frac))
+            / a_stdev[:, None]
+        )
+
+    elif effect == "rank_biserial":
+
+        biserial = 2 * (pos_means - neg_means) / (pos_ns + neg_ns)
+
+    # cast to DataFrames
+    biserial = pd.DataFrame(biserial, columns=b_names, index=a_names)
+    pos_ns = pd.DataFrame(pos_ns, columns=b_names, index=a_names)
+    neg_ns = pd.DataFrame(neg_ns, columns=b_names, index=a_names)
+
+    if melt:
+
+        return melt_biserial(biserial, pos_ns, neg_ns, effect)
+
+    return biserial, pos_ns, neg_ns

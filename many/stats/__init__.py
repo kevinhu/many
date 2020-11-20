@@ -5,10 +5,10 @@ from .categorical_categorical import (
     mat_fisher_nan,
 )
 from .continuous_categorical import (
+    biserial_continuous_nan,
     mat_mwu,
     mat_mwu_gpu,
     mat_mwu_naive,
-    biserial_continuous_nan,
 )
 from .continuous_continuous import (
     mat_corr,

@@ -24,3 +24,10 @@ many.stats.mat_mwu_naive(a_mat, b_mat, melt: bool, effect: str, use_continuity=T
 
 Same functionality as `mat_mwu`, but uses a double loop for direct computation of statistics. Unlike `mat_mwu `, `effect` parameters of "mean", "median", and "rank_biserial" are all supported.
 
+### many.stats.biserial_continuous_nan
+
+```python
+biserial_continuous_nan(a_mat, b_mat, melt: bool, effect: str)
+```
+
+Computes pairwise biserial (point or rank) statistics between columns of `a_mat` (continuous samples) and `b_mat` (binary samples). Allows for missing observations in `a_mat`.

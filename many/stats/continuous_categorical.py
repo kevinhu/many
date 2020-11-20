@@ -484,8 +484,8 @@ def biserial_continuous_nan(a_mat, b_mat, melt: bool, effect: str):
     Returns
     -------
     biserial: biserial correlations
-    pos_num: number of positive group observations per variable pair
-    neg_num: number of negative group observations per variable pair
+    pos_ns: number of positive group observations per variable pair
+    neg_ns: number of negative group observations per variable pair
     """
 
     if effect not in ["point_biserial", "rank_biserial"]:
@@ -518,7 +518,7 @@ def biserial_continuous_nan(a_mat, b_mat, melt: bool, effect: str):
         # number of total samples
         num_total = np.sum(a_mat_valid, axis=0)
         # fraction of positive groups
-        pos_frac = pos_num / num_total[:, None]
+        pos_frac = pos_ns / num_total[:, None]
 
         biserial = (
             (pos_means - neg_means)

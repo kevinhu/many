@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "many"
-version = "0.6.1"
+version = "0.6.2"
 description = "Statistical methods for computing many correlations"
 authors = ["Kevin Hu <kevinhuwest@gmail.com>"]
 

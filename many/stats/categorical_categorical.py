@@ -89,7 +89,7 @@ def mat_fisher_naive(a_mat, b_mat, melt: bool, pseudocount=0, pbar=False):
     fishers: -log10 p-values of Fisher exact test
     """
 
-    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, np.float64)
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.int64, np.int64)
 
     a_names = a_mat.columns
     b_names = b_mat.columns
@@ -231,11 +231,6 @@ def mat_fisher(a_mat, b_mat, melt: bool, pseudocount=0):
     aB = np.dot(A_neg.T, B_pos) + pseudocount
     ab = np.dot(A_neg.T, B_neg) + pseudocount
 
-    comb = np.stack([AB, Ab, aB, ab]).astype(np.float64)
-
-    pvals = np.apply_along_axis(fisher_arr, 0, comb)
-    pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
-
     numer = AB * ab
     denom = aB * Ab
 
@@ -245,6 +240,11 @@ def mat_fisher(a_mat, b_mat, melt: bool, pseudocount=0):
     oddsrs = numer / denom
     oddsrs[zero_denom] = -1
     oddsrs = pd.DataFrame(oddsrs, index=a_names, columns=b_names)
+
+    comb = np.stack([AB, Ab, aB, ab]).astype(np.float64)
+
+    pvals = np.apply_along_axis(fisher_arr, 0, comb)
+    pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
 
     pvals = pvals.fillna(0)
     oddsrs = oddsrs.fillna(1)

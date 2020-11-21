@@ -241,7 +241,7 @@ def mat_fisher(a_mat, b_mat, melt: bool, pseudocount=0):
     oddsrs[zero_denom] = -1
     oddsrs = pd.DataFrame(oddsrs, index=a_names, columns=b_names)
 
-    comb = np.stack([AB, Ab, aB, ab]).astype(np.float64)
+    comb = np.stack([AB, Ab, aB, ab]).astype(np.int64)
 
     pvals = np.apply_along_axis(fisher_arr, 0, comb)
     pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)
@@ -309,7 +309,7 @@ def mat_fisher_nan(a_mat, b_mat, melt: bool, pseudocount=0):
     aB = np.ma.dot(a_neg.T, b_pos) + pseudocount
     ab = np.ma.dot(a_neg.T, b_neg) + pseudocount
 
-    comb = np.stack([AB, Ab, aB, ab])
+    comb = np.stack([AB, Ab, aB, ab]).astype(np.int64)
 
     pvals = np.apply_along_axis(fisher_arr, 0, comb)
     pvals = pd.DataFrame(pvals, index=a_names, columns=b_names)

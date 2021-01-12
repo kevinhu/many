@@ -26,7 +26,7 @@ adjusttext = "^0.7.3"
 seaborn = "^0.11.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = "^6.2"
 black = "^19.10b0"
 isort = "^5.4.2"
 pylint = "^2.6.0"

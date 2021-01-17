@@ -92,7 +92,12 @@ def melt_biserial(effects, pos_ns, neg_ns, effect):
 
 
 def mat_mwu_naive(
-    a_mat, b_mat, melt: bool, effect: str, use_continuity=True, pbar=False,
+    a_mat,
+    b_mat,
+    melt: bool,
+    effect: str,
+    use_continuity=True,
+    pbar=False,
 ):
     """
     Compute rank-biserial correlations and Mann-Whitney statistics

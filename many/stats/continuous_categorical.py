@@ -181,27 +181,35 @@ def mat_mwu_naive(
 
                 else:
 
-                    U2, pval = mannwhitneyu(
-                        a_pos,
-                        a_neg,
-                        use_continuity=use_continuity,
-                        alternative="two-sided",
-                    )
+                    try:
 
-                    if effect == "rank_biserial":
-                        effects[a_col_idx][b_col_idx] = (
-                            2 * U2 / (len(a_pos) * len(a_neg)) - 1
+                        U2, pval = mannwhitneyu(
+                            a_pos,
+                            a_neg,
+                            use_continuity=use_continuity,
+                            alternative="two-sided",
                         )
-                    elif effect == "median":
-                        pos_med = a_pos.median()
-                        neg_med = a_neg.median()
-                        effects[a_col_idx][b_col_idx] = pos_med - neg_med
-                    elif effect == "mean":
-                        pos_mean = a_pos.mean()
-                        neg_mean = a_neg.mean()
-                        effects[a_col_idx][b_col_idx] = pos_mean - neg_mean
 
-                    pvals[a_col_idx][b_col_idx] = pval
+                        if effect == "rank_biserial":
+                            effects[a_col_idx][b_col_idx] = (
+                                2 * U2 / (len(a_pos) * len(a_neg)) - 1
+                            )
+                        elif effect == "median":
+                            pos_med = a_pos.median()
+                            neg_med = a_neg.median()
+                            effects[a_col_idx][b_col_idx] = pos_med - neg_med
+                        elif effect == "mean":
+                            pos_mean = a_pos.mean()
+                            neg_mean = a_neg.mean()
+                            effects[a_col_idx][b_col_idx] = pos_mean - neg_mean
+
+                        pvals[a_col_idx][b_col_idx] = pval
+
+                    # Catch "All numbers are identical" errors
+                    except ValueError:
+                        effects[a_col_idx][b_col_idx] = np.nan
+
+                        pvals[a_col_idx][b_col_idx] = 1
 
             if pbar:
                 progress.update(1)

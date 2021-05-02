@@ -503,6 +503,8 @@ def biserial_continuous_nan(a_mat, b_mat, melt: bool, effect: str):
     if effect == "rank_biserial":
         a_mat = a_mat.rank(method="average")
 
+    a_mat, b_mat = precheck_align(a_mat, b_mat, np.float64, np.bool)
+
     a_mat = a_mat.values
     b_mat = b_mat.values
 

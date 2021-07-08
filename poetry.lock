@@ -137,7 +137,7 @@ python-versions = "*"
 
 [[package]]
 name = "isort"
-version = "5.9.1"
+version = "5.9.2"
 description = "A Python utility / library to sort Python imports."
 category = "dev"
 optional = false
@@ -542,7 +542,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.1,<4.0"
-content-hash = "725e5cecd9886e766a137a59b2954c8710a4981efec8bae12ea648556cc41d77"
+content-hash = "8d59dc3fb8798d5663477ef50571f4c4a5d052346e44b129ad6f07fd08409713"
 
 [metadata.files]
 adjusttext = [
@@ -592,8 +592,8 @@ iniconfig = [
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
 isort = [
-    {file = "isort-5.9.1-py3-none-any.whl", hash = "sha256:8e2c107091cfec7286bc0f68a547d0ba4c094d460b732075b6fba674f1035c0c"},
-    {file = "isort-5.9.1.tar.gz", hash = "sha256:83510593e07e433b77bd5bff0f6f607dbafa06d1a89022616f02d8b699cfcd56"},
+    {file = "isort-5.9.2-py3-none-any.whl", hash = "sha256:eed17b53c3e7912425579853d078a0832820f023191561fcee9d7cae424e0813"},
+    {file = "isort-5.9.2.tar.gz", hash = "sha256:f65ce5bd4cbc6abdfbe29afc2f0245538ab358c14590912df638033f157d555e"},
 ]
 joblib = [
     {file = "joblib-0.16.0-py3-none-any.whl", hash = "sha256:d348c5d4ae31496b2aa060d6d9b787864dd204f9480baaa52d18850cb43e9f49"},

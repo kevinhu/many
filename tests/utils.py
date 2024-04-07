@@ -1,10 +1,11 @@
 import time
 from typing import List
 
-import many
 import numpy as np
 import pandas as pd
 from config import TOLERANCE
+
+import many
 
 
 class bcolors:
@@ -118,7 +119,6 @@ def compare(
     output_names: List[str],
     report_benchmark: bool,
 ):
-
     """
     General test handler for comparing two methods.
 
@@ -158,9 +158,7 @@ def compare(
     )
 
     # announce method parameters
-    print(
-        f" with {bcolors.BOLD}{bcolors.HEADER}{base_method.__name__}{bcolors.ENDC}"
-    )
+    print(f" with {bcolors.BOLD}{bcolors.HEADER}{base_method.__name__}{bcolors.ENDC}")
 
     args_string = ", ".join(
         f"{bcolors.BOLD}{key}{bcolors.ENDC} = {value}"
@@ -201,12 +199,8 @@ def compare(
 
     if report_benchmark:
         print(f"\tNaive speed: {bcolors.BOLD}{base_time:.2f}s{bcolors.ENDC}")
-        print(
-            f"\tVectorized speed: {bcolors.BOLD}{method_time:.2f}s{bcolors.ENDC}"
-        )
-        print(
-            f"\tSpeedup: {bcolors.BOLD}{base_time/method_time:.2f}x{bcolors.ENDC}"
-        )
+        print(f"\tVectorized speed: {bcolors.BOLD}{method_time:.2f}s{bcolors.ENDC}")
+        print(f"\tSpeedup: {bcolors.BOLD}{base_time/method_time:.2f}x{bcolors.ENDC}")
 
     benchmark_results = {"base_time": base_time, "method_time": method_time}
 
@@ -253,8 +247,6 @@ def compare(
 
         else:
 
-            print(
-                f"max deviation is {bcolors.FAIL}{max_deviation_str}{bcolors.ENDC}"
-            )
+            print(f"max deviation is {bcolors.FAIL}{max_deviation_str}{bcolors.ENDC}")
 
     return base_result, result, benchmark_results

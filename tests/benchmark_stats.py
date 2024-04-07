@@ -30,9 +30,7 @@ if submodules is None:
 
 for submodule in submodules:
 
-    params = importlib.import_module(
-        f"stats_benchmark_params.{submodule}"
-    ).params
+    params = importlib.import_module(f"stats_benchmark_params.{submodule}").params
 
     base_times = []
     method_times = []
@@ -51,21 +49,15 @@ for submodule in submodules:
         method_times.append(method_time)
         ratios.append(ratio)
 
-    benchmarks_df = pd.DataFrame(
-        params, columns=inspect.getfullargspec(compare)[0]
-    )
+    benchmarks_df = pd.DataFrame(params, columns=inspect.getfullargspec(compare)[0])
 
     benchmarks_df["base_method"] = benchmarks_df["base_method"].apply(
         lambda x: x.__name__
     )
-    benchmarks_df["method"] = benchmarks_df["method"].apply(
-        lambda x: x.__name__
-    )
+    benchmarks_df["method"] = benchmarks_df["method"].apply(lambda x: x.__name__)
 
     benchmarks_df["base_times"] = base_times
     benchmarks_df["method_times"] = method_times
     benchmarks_df["ratios"] = ratios
 
-    benchmarks_df.to_csv(
-        config.BENCHMARK_DATA_DIR / f"{submodule}.txt", sep="\t"
-    )
+    benchmarks_df.to_csv(config.BENCHMARK_DATA_DIR / f"{submodule}.txt", sep="\t")

@@ -476,7 +476,6 @@ def mat_mwu_gpu(a_mat, b_mat, melt: bool, effect: str, use_continuity=True):
 
 
 def biserial_continuous_nan(a_mat, b_mat, melt: bool, effect: str):
-
     """
     Compute biserial (point or rank) correlations for every column-column pair of
     a_mat (continuous) and b_mat (binary). Allows for missing values in a_mat.

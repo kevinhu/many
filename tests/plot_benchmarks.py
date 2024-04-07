@@ -36,9 +36,7 @@ for submodule in submodules:
 
     for method_id in method_ids:
 
-        method_benchmarks = benchmarks_df[
-            benchmarks_df["method_id"] == method_id
-        ]
+        method_benchmarks = benchmarks_df[benchmarks_df["method_id"] == method_id]
 
         ax = fig.add_subplot(SUBPLOT_ROWS, SUBPLOT_COLS, position)
 

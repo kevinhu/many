@@ -3,10 +3,7 @@ import sys
 import numpy as np
 import pandas as pd
 import scipy.special as special
-from scipy.stats import (
-    pearsonr,
-    spearmanr,
-)
+from scipy.stats import pearsonr, spearmanr
 from statsmodels.stats.multitest import multipletests
 from tqdm import tqdm_notebook as tqdm
 

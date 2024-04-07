@@ -4,10 +4,11 @@
 # import importlib
 
 import config
-import many
 import matplotlib.pyplot as plt
 import numpy as np
 import utils
+
+import many
 
 DPI = 256
 
@@ -32,7 +33,8 @@ print(many.visuals.as_si(5.493491349e30, decimals=8))
 print(many.visuals.colorize([0, 0, 0, 0, 1, 1, 1, 2, 2], cmap="Blues"))
 print(
     many.visuals.colorize(
-        ["a", "b", "c", "a", "a", "b", "c", "d", "b", "d", "a"], cmap="Blues",
+        ["a", "b", "c", "a", "a", "b", "c", "d", "b", "d", "a"],
+        cmap="Blues",
     )
 )
 
@@ -54,9 +56,7 @@ a[2] = a[1] + np.random.normal(size=100)
 a[3] = a[2] + np.random.normal(size=100)
 
 many.visuals.scatter_grid(a)
-plt.savefig(
-    config.PLOTS_DIR / "scatter_grid.png", bbox_inches="tight", dpi=DPI
-)
+plt.savefig(config.PLOTS_DIR / "scatter_grid.png", bbox_inches="tight", dpi=DPI)
 plt.clf()
 
 # ----------
@@ -70,9 +70,7 @@ x = np.random.normal(size=1000)
 y = x + np.random.normal(size=1000)
 
 many.visuals.regression(x, y, method="pearson")
-plt.savefig(
-    config.PLOTS_DIR / "regression_pearson.png", bbox_inches="tight", dpi=DPI
-)
+plt.savefig(config.PLOTS_DIR / "regression_pearson.png", bbox_inches="tight", dpi=DPI)
 plt.clf()
 
 # -----------
@@ -89,7 +87,9 @@ many.visuals.dense_plot(
     x, y, text_adjust=False, ax=ax, colormap="Blues", cmap_offset=0.1
 )
 plt.savefig(
-    config.PLOTS_DIR / "dense_plot_default.png", bbox_inches="tight", dpi=DPI,
+    config.PLOTS_DIR / "dense_plot_default.png",
+    bbox_inches="tight",
+    dpi=DPI,
 )
 plt.clf()
 
@@ -103,9 +103,7 @@ ax = plt.subplot(111)
 x = np.random.normal(size=1000)
 y = x + np.random.normal(size=1000)
 
-many.visuals.dense_regression(
-    x, y, method="pearson", colormap="Blues", cmap_offset=0.1
-)
+many.visuals.dense_regression(x, y, method="pearson", colormap="Blues", cmap_offset=0.1)
 plt.savefig(
     config.PLOTS_DIR / "dense_regression_pearson.png",
     bbox_inches="tight",
@@ -129,12 +127,8 @@ a, b = utils.generate_test(
 
 b[0] = b[0] + a[0]
 
-many.visuals.two_dists(
-    a[0], b[0], method="t_test", summary_type="box", stripplot=True
-)
-plt.savefig(
-    config.PLOTS_DIR / "two_dists_t_test_box.png", bbox_inches="tight", dpi=DPI
-)
+many.visuals.two_dists(a[0], b[0], method="t_test", summary_type="box", stripplot=True)
+plt.savefig(config.PLOTS_DIR / "two_dists_t_test_box.png", bbox_inches="tight", dpi=DPI)
 plt.clf()
 
 # -----------
@@ -158,9 +152,7 @@ a[0] = np.random.normal(size=500)
 b = (b * 25).astype(int)
 
 many.visuals.multi_dists(a[0], b[0], count_cutoff=0, summary_type="box", ax=ax)
-plt.savefig(
-    config.PLOTS_DIR / "multi_dists_box.png", bbox_inches="tight", dpi=DPI
-)
+plt.savefig(config.PLOTS_DIR / "multi_dists_box.png", bbox_inches="tight", dpi=DPI)
 plt.clf()
 
 # -------------
@@ -180,9 +172,7 @@ a, b = utils.generate_test(
 b[0] = b[0] + a[0] * np.random.random(size=100)
 
 many.visuals.roc_auc_curve(a[0], b[0])
-plt.savefig(
-    config.PLOTS_DIR / "roc_auc_curve.png", bbox_inches="tight", dpi=DPI
-)
+plt.savefig(config.PLOTS_DIR / "roc_auc_curve.png", bbox_inches="tight", dpi=DPI)
 plt.clf()
 
 # --------
@@ -222,9 +212,7 @@ a, b = utils.generate_test(
 b[0] = b[0] + a[0] * np.random.random(size=100)
 
 many.visuals.binary_metrics(a[0], b[0])
-plt.savefig(
-    config.PLOTS_DIR / "binary_metrics.png", bbox_inches="tight", dpi=DPI
-)
+plt.savefig(config.PLOTS_DIR / "binary_metrics.png", bbox_inches="tight", dpi=DPI)
 plt.clf()
 
 # ------------------

@@ -1,12 +1,9 @@
 import sys
-import warnings
 
 import numpy as np
 import pandas as pd
 import scipy.special as special
 from scipy.stats import (
-    PearsonRConstantInputWarning,
-    SpearmanRConstantInputWarning,
     pearsonr,
     spearmanr,
 )
@@ -104,12 +101,8 @@ def mat_corr_naive(a_mat, b_mat, melt: bool, method: str, pbar=False):
         sys.stderr.flush()
         progress = tqdm(total=a_num_cols * b_num_cols)
 
-    warnings.simplefilter("ignore", SpearmanRConstantInputWarning)
-    warnings.simplefilter("ignore", PearsonRConstantInputWarning)
-
     for a_col_idx, a_col_name in enumerate(a_names):
         for b_col_idx, b_col_name in enumerate(b_names):
-
             # select columns to correlate
             a_col = a_mat[a_col_name].dropna()
             b_col = b_mat[b_col_name].dropna()
@@ -119,14 +112,12 @@ def mat_corr_naive(a_mat, b_mat, melt: bool, method: str, pbar=False):
             num_samples = len(a_col)
 
             if num_samples > 2:
-
                 if method == "pearson":
                     corr, pval = pearsonr(a_col, b_col)
                 elif method == "spearman":
                     corr, pval = spearmanr(a_col, b_col)
 
             elif num_samples <= 2:
-
                 corr, pval = np.nan, np.nan
 
             # add in correlation
@@ -156,7 +147,6 @@ def mat_corr_naive(a_mat, b_mat, melt: bool, method: str, pbar=False):
     pvals = -np.log10(pvals)
 
     if melt:
-
         return melt_corr(corrs, pvals, sample_counts, method)
 
     return corrs, pvals
@@ -209,8 +199,8 @@ def mat_corr(a_mat, b_mat, melt: bool, method: str):
     residuals_b = b_mat - b_mat.mean(axis=0)
 
     # Sum squares across columns
-    sums_a = (residuals_a ** 2).sum(axis=0)
-    sums_b = (residuals_b ** 2).sum(axis=0)
+    sums_a = (residuals_a**2).sum(axis=0)
+    sums_b = (residuals_b**2).sum(axis=0)
 
     # Compute correlations
     residual_products = np.dot(residuals_a.T, residuals_b)
@@ -244,7 +234,6 @@ def mat_corr(a_mat, b_mat, melt: bool, method: str):
     pvals = -np.log10(pvals)
 
     if melt:
-
         return melt_corr(corrs, pvals, sample_counts, method)
 
     return corrs, pvals
@@ -304,7 +293,6 @@ def mat_corr_nan(a_mat, b_mat, melt: bool, method: str):
     # compute column ranks, as Spearman correlation is equivalent
     # to Pearson correlation between ranks
     if method == "spearman":
-
         b_nan = b_mat.isna()
         b_mat = b_mat.rank(na_option="top", method="average")
         b_mat[b_mat <= b_nan.sum()] = np.nan
@@ -339,8 +327,8 @@ def mat_corr_nan(a_mat, b_mat, melt: bool, method: str):
     residuals_a_nan = a_nan - np.ma.mean(a_nan, axis=0)
 
     # sum squares across columns
-    sums_b = np.ma.sum(residuals_b ** 2, axis=0)
-    sums_a_nan = np.ma.sum(residuals_a_nan ** 2, axis=0)
+    sums_b = np.ma.sum(residuals_b**2, axis=0)
+    sums_a_nan = np.ma.sum(residuals_a_nan**2, axis=0)
 
     # compute correlations
     residual_products = np.ma.sum(residuals_a_nan * residuals_b, axis=0)
@@ -382,7 +370,7 @@ def mat_corr_subtyped(
     stack: bool,
     mat_method,
     pbar=False,
-    **kwargs
+    **kwargs,
 ):
     """
     Compute correlations between a_mat and every column of b_mat, within
@@ -458,22 +446,18 @@ def mat_corr_subtyped(
 
     # compute correlation within each subtype
     for subtype in unique_subtypes:
-
         subtype_rows = list(subtypes[subtypes == subtype].index)
 
         a_subset = a_mat.loc[subtype_rows]
         b_subset = b_mat.loc[subtype_rows]
 
         if mat_method == "mat_corr_naive":
-
             res = mat_corr_naive(a_subset, b_subset, **kwargs, melt=True)
 
         elif mat_method == "mat_corr_nan":
-
             res = mat_corr_nan(a_subset, b_subset, **kwargs, melt=True)
 
         else:
-
             error = "mat_method must be 'mat_corr_naive' or 'mat_corr_nan'"
 
             raise ValueError(error)
